@@ -1,3 +1,3 @@
 Harriet 
 Mikael Fossbakk
-Jostein Ibsen
+Jostein Holen Ibsen
