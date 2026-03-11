@@ -66,7 +66,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team16Theme {
-                HomeScreen(modulViewModel = hiltViewModel<ModulViewModel>())
+                //HomeScreen(modulViewModel = hiltViewModel<ModulViewModel>())
+                KartScreen()
             }
         }
     }
