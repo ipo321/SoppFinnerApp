@@ -76,7 +76,6 @@ class MainActivity : ComponentActivity() {
 fun MapScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-
     // Her opprettes kartet med MapView og remember slik at state huskes
     val mapView = remember {
         MapView(context).apply {
@@ -98,9 +97,8 @@ fun MapScreen() {
                     // Hvis vi vil ha med kompass
                     val ui = map.uiSettings
                     ui.isCompassEnabled = true
-                    //ui.isCompassFadeWhenFacingNorth = true
                     ui.compassGravity = Gravity.TOP or Gravity.END
-
+                    // Legger til zoom, scrolling, rotering, tilting og dobbelttrykk
                     ui.isZoomGesturesEnabled = true
                     ui.isScrollGesturesEnabled = true
                     ui.isRotateGesturesEnabled = true
@@ -112,32 +110,29 @@ fun MapScreen() {
             }
         }
     }
-
+    // mapViewet får beskjed når livssyklusen endres
     DisposableEffect(lifecycleOwner, mapView) {
+        // observer lytter til livssyklusen og når hver av funksjonene under kalles på
+        // observatoren, så kalles de samme på mapView
         val observer = object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 mapView.onStart()
             }
-
             override fun onResume(owner: LifecycleOwner) {
                 mapView.onResume()
             }
-
             override fun onPause(owner: LifecycleOwner) {
                 mapView.onPause()
             }
-
             override fun onStop(owner: LifecycleOwner) {
                 mapView.onStop()
             }
-
             override fun onDestroy(owner: LifecycleOwner) {
                 mapView.onDestroy()
             }
         }
-
         lifecycleOwner.lifecycle.addObserver(observer)
-
+        // Når MapScreen fjernes, fjernes observatoren og mapViewet kaller ikke lenger på funksjonene over
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
