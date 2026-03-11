@@ -7,27 +7,34 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.kart.KartDataSource
-import no.uio.ifi.in2000.team16.model.Kart
+import no.uio.ifi.in2000.team16.data.modul.ModulDataSource
+import no.uio.ifi.in2000.team16.model.Modul
 import javax.inject.Inject
 
+/*
+    Implementerer HiltViewModel fordi dette er en ViewModel som gjør det enkelt med
+    Dependency Injection.
+
+    Per nå en default for et ViewModel.
+ */
+
 @HiltViewModel
-class KartViewModel @Inject constructor(
-    private val kartDataSource: KartDataSource
+class ModulViewModel @Inject constructor(
+    private val kartDataSource: ModulDataSource
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<UiState<KartUiState>>(UiState.Idle)
-    val uiState : StateFlow<UiState<KartUiState>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<UiState<ModulUiState>>(UiState.Idle)
+    val uiState : StateFlow<UiState<ModulUiState>> = _uiState.asStateFlow()
 
     init {
-        hentKart()
+        hentModul()
     }
 
-    fun hentKart() {
+    fun hentModul() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val kart = kartDataSource.hentKart()
-                _uiState.value = UiState.Success(KartUiState(kart))
+                val modul = kartDataSource.hentModul()
+                _uiState.value = UiState.Success(ModulUiState(modul))
             } catch (e: Exception) {
                 _uiState.value = UiState.Error
             }
@@ -35,7 +42,7 @@ class KartViewModel @Inject constructor(
     }
 }
 
-data class KartUiState(val kart: List<Kart>)
+data class ModulUiState(val modul: List<Modul>)
 
 sealed class UiState <out T> {
     object Idle : UiState<Nothing>()

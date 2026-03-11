@@ -8,7 +8,7 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.team16.ui.home.HomeScreen
-import no.uio.ifi.in2000.team16.ui.home.KartViewModel
+import no.uio.ifi.in2000.team16.ui.home.ModulViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team16Theme {
-                HomeScreen(kartViewModel = hiltViewModel<KartViewModel>())
+                HomeScreen(modulViewModel = hiltViewModel<ModulViewModel>())
             }
         }
     }

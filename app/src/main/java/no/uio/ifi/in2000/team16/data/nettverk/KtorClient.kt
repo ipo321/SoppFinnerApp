@@ -11,6 +11,10 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
+/*
+    Objekt som oppretter en HttpKlient, slik at vi bare har én av denne.
+ */
+
 @Module
 @InstallIn(SingletonComponent::class)
 object KtorClient {

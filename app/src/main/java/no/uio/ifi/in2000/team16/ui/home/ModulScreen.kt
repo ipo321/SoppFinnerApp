@@ -7,14 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team16.model.Kart
+import no.uio.ifi.in2000.team16.model.Modul
+
+/*
+    En liten default for hvordan en HomeScreen kan se ut.
+ */
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    kartViewModel: KartViewModel = hiltViewModel<KartViewModel>()
+    modulViewModel: ModulViewModel = hiltViewModel<ModulViewModel>()
 ) {
-    val uiState = kartViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = modulViewModel.uiState.collectAsStateWithLifecycle()
 
     Column {
         when (uiState.value) {
@@ -22,16 +26,16 @@ fun HomeScreen(
             is UiState.Idle -> Text("Venter")
             is UiState.Loading -> CircularProgressIndicator()
             is UiState.Success -> {
-                KartScreen(kart = (uiState.value as UiState.Success).data.kart)
+                ModulScreen(modul = (uiState.value as UiState.Success).data.modul)
             }
         }
     }
 }
 
 @Composable
-fun KartScreen(
-    kart: List<Kart>,
+fun ModulScreen(
+    modul: List<Modul>,
     modifier: Modifier = Modifier
 ) {
-    Text(kart[0].id ?: "Ukjent")
+    Text(modul[0].id ?: "Ukjent")
 }
