@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import org.osmdroid.config.Configuration
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -46,7 +48,12 @@ import androidx.compose.ui.platform.LocalContext
     Bruker MapLibre Native som oppdateres jevnlig på github: https://github.com/maplibre/maplibre-native
     Tutorial finnes her: https://maplibre.org/maplibre-native/android/examples/
 
-    Hvordan kartet skal oppføre seg konfigureres i res/layout/main.xml
+    Kartet er delvis konfigurert i res/layout/main.xml
+
+    Selve tilsene som viser byer og gater osv er kartet Base fra https://cloud.maptiler.com/maps/
+
+    I emulatoren kan kartet zoomes inn på ved å dobbelt-trykke på skjermen, eller zoome inn og ut
+    ved å holde inne Ctrl og dra i kartet.
  */
 
 @AndroidEntryPoint
@@ -70,16 +77,37 @@ fun MapScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    // Her opprettes kartet med MapView og remember slik at state huskes
     val mapView = remember {
         MapView(context).apply {
             onCreate(null)
 
             getMapAsync { map ->
-                map.setStyle("https://demotiles.maplibre.org/style.json") {
+                // Foreløpig bruk er kartet Base fra Maptiler, kan byttes ut
+                map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
+                    // Logging for å se hva som skjer når kartet brukes
+                    Log.d("MAP", "Style loaded: ${style.uri}")
+
                     map.cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(62.0, 10.0)) // Utsnittet hvor kartet åpnes
-                        .zoom(5.0) // Grad ac zoom ved åpning av kart
+                        .target(LatLng(59.91, 10.75)) // Utsnittet hvor kartet åpnes. Nå Oslo.
+                        .zoom(11.0) // Grad av zoom ved åpning av kart
                         .build()
+                    map.setMinZoomPreference(2.0) // Minimum zoom
+                    map.setMaxZoomPreference(25.0) // Maximum zoom
+
+                    // Hvis vi vil ha med kompass
+                    val ui = map.uiSettings
+                    ui.isCompassEnabled = true
+                    //ui.isCompassFadeWhenFacingNorth = true
+                    ui.compassGravity = Gravity.TOP or Gravity.END
+
+                    ui.isZoomGesturesEnabled = true
+                    ui.isScrollGesturesEnabled = true
+                    ui.isRotateGesturesEnabled = true
+                    ui.isTiltGesturesEnabled = true
+                    ui.isDoubleTapGesturesEnabled = true
+                    ui.isHorizontalScrollGesturesEnabled = true
+
                 }
             }
         }
