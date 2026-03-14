@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.modul.ModulDataSource
-import no.uio.ifi.in2000.team16.model.Modul
+import no.uio.ifi.in2000.team16.domain.model.Modul
 import javax.inject.Inject
 
 /*
