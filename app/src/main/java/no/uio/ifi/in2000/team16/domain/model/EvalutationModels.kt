@@ -22,17 +22,19 @@ data class EnvironmentContext(
 }
 
 data class WeatherData(
-    val temp: Double,
-    val rain: Double,
-    val humidity: Double,
-    val windSpeed: Double,
+    val temp: Double?,
+    val rain: Double?,
+    val humidity: Double?,
+    val windSpeed: Double?,
+    val dewPoint: Double?,
+    val fogFraction: Double?
     //Add fog, weather history and so on
 )
 
 data class WeatherHistory(
-    val tempHistory: Double,
-    val rainHistory: Double,
-    val humidityHistory: Double
+    val avgTempPast14Days: Double?,
+    val totalRainPast14Days: Double?,
+    val avgHumidityPast14Days: Double?
 )
 
 

@@ -7,7 +7,11 @@ data class SpeciesProfile(
     val killTemp: Double,
     val optimalTemp: Double,
     val tempToleranceC: Double,
+
     val optimalRainMm: Double,
+    val maCurrentRainMm: Double,
+    val optimalHumidity: Double,
+
     val preferredTerrain: List<Int>,
     val maxSlope: Double,
     val windPenaltyThreshold: Double
@@ -20,7 +24,11 @@ data class SpeciesProfile(
             killTemp = 0.0,
             optimalTemp = 15.0,
             tempToleranceC = 10.0,
+
             optimalRainMm = 0.0,
+            maCurrentRainMm = 0.0,
+            optimalHumidity = 80.0,
+
             preferredTerrain = listOf(1,2,3),
             maxSlope = 45.0,
             windPenaltyThreshold = 10.0
