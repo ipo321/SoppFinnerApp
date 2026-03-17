@@ -34,14 +34,13 @@ data class WeatherData(
 data class WeatherHistory(
     val avgTempPast14Days: Double?,
     val totalRainPast14Days: Double?,
-    val avgHumidityPast14Days: Double?
 )
 
 
 
 data class TerrainData(
-    val slope: Double,  //Slope in degrees (0- 90)
-    val direction: Double //Direction in degrees (0-360)
+    val slope: Double,  //Slope in degrees (0- 90) has to be calculated from the points
+    val direction: Double //Direction in degrees (0-360) has to be calculated from the points
 )
 
 data class ForestData(

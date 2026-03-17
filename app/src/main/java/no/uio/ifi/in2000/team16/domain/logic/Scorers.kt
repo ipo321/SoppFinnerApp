@@ -6,8 +6,6 @@ import kotlin.math.abs
 // score is set in the algorithm
 //USE .coerceIn(0.0, 1.0) to make sure that noe value is greater or larger
 
-//Implemented
-
 // Collection (Current weather / LocationForecast)
 
 object TemperatureScorer{
@@ -39,22 +37,61 @@ object HumidityScorer {
         return (humidity / optimalHumidity).coerceIn(0.0, 1.0)
     }
 }
-//object MicroClimateScorer
-//Fog and dew
+
+object MicroClimateScorer {
+    fun evaluate(dewPoint: Double?, temp: Double?, fogFraction: Double?): Double {
+        var score = 0.0
+        var conditions = 0
+
+        if (temp != null && dewPoint != null) { //temp and dewPoint to calculate microclimate
+            val diff = abs(temp - dewPoint)
+            score += (1.0 - (diff / 10.0)).coerceIn(0.0, 1.0)
+            conditions++
+        }
+        if (fogFraction != null) {  //add fog fraction, 50+ is positive
+            score += (fogFraction / 50.0).coerceIn(0.0, 1.0)
+            conditions++
+        }
+        if (conditions == 0) return 0.5   //If no conditions are given, return neutral score
+        return (score / conditions).coerceIn(0.0, 1.0)
+    }
+}
 
 
 // Growth ( Historical weather / Frost )
 
-//object TempHistoryScorer{}
-//object RainHistoryScorer{}
-//object HumidityHistoryScorer{}
+object PastRainScorer{
+    fun evaluate(totalRainPast14Days: Double?, optimalRainMm: Double = 5.0): Double{
+        if (totalRainPast14Days == null) return 0.0   //Clear weather if no weather is given
+        if (totalRainPast14Days >= optimalRainMm) return 1.0
+        return (totalRainPast14Days / optimalRainMm).coerceIn(0.0, 1.0)
+    }
+}
+
+object PastTempScorer{
+    fun evaluate(avgTempPast14Days: Double?, optimalTemp: Double, tolerance: Double = 10.0): Double{
+        if (avgTempPast14Days == null) return 0.0
+        val diff = abs(optimalTemp-avgTempPast14Days)
+        return (1.0 - (diff / tolerance)).coerceIn(0.0, 1.0)
+    }
+}
 
 // Terrain and forest
 
-//object HistoricalFindsScorer{}
-//object TreeSpeciesScorer{}
-//object DirectionScorer{}
-//object GeologyScorer (Ph and scoring of ground from NGU)
+object HistoricalFindsScorer{
+    fun evaluate(historicalFinds: Int, sufficientFinds: Int = 2): Double {
+        if (historicalFinds >= sufficientFinds) return 1.0
+        return (historicalFinds.toDouble() / sufficientFinds).coerceIn(0.0, 1.0)
+    }
+}
+
+object TreeSpeciesScorer{
+    fun evaluate(treeSpecies: Int?, preferredSpecies: List<Int>): Double {
+        if (treeSpecies == null) return 0.0
+        if (treeSpecies in preferredSpecies) return 1.0
+        return 0.0
+    }
+}
 
 object SlopeScorer{
     fun evaluate(slopeDegree: Double?, maxSlopeDegree: Double): Double {
@@ -65,5 +102,7 @@ object SlopeScorer{
 }
 
 
-
+//Can be implemented:
+//PH /ground scorer
+// Direction scorerer
 

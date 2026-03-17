@@ -9,7 +9,7 @@ data class SpeciesProfile(
     val tempToleranceC: Double,
 
     val optimalRainMm: Double,
-    val maCurrentRainMm: Double,
+    val maxCurrentRainMm: Double,
     val optimalHumidity: Double,
 
     val preferredTerrain: List<Int>,
@@ -26,7 +26,7 @@ data class SpeciesProfile(
             tempToleranceC = 10.0,
 
             optimalRainMm = 0.0,
-            maCurrentRainMm = 0.0,
+            maxCurrentRainMm = 0.0,
             optimalHumidity = 80.0,
 
             preferredTerrain = listOf(1,2,3),
