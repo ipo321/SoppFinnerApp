@@ -22,6 +22,7 @@ data class OccurrenceResult(
     val results: List<Occurrence> = emptyList()
 )
 
+//Data about the report in location (soppfunn)
 @Serializable
 data class Occurrence(
     val key: Long,
@@ -48,6 +49,7 @@ data class VernacularName(
 data class SpeciesSearchResult(
     val results: List<MushroomSearchResult>
 )
+
 
 @Serializable
 data class MushroomSearchResult(
