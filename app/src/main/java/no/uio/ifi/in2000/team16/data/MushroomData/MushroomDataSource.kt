@@ -1,18 +1,13 @@
 package no.uio.ifi.in2000.team16.data.MushroomData
 
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.request
-import no.uio.ifi.in2000.team16.model.Modul
+
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.math.cos
 
 //Gets data about mushrooms from GBIF API
 
@@ -61,7 +56,7 @@ class MushroomDataSource @Inject constructor(
         latMax: Double,
         lonMin: Double,
         lonMax: Double,
-        limit: String,
+        limit: Int,
     ): OccurrenceResult {
         val mushroomkey = "34" //filters what kind of mushrooms we get
         // 5 — Kingdom Fungi (everything, including mold, yeast etc.)
@@ -73,15 +68,15 @@ class MushroomDataSource @Inject constructor(
         ) {
             url {
                 if (mushRoomType == "all mushrooms")//if the taxonKey parameter is empty we search hardcoded scope
-                    parameters.append("kingdomKey", mushroomkey)
+                    parameters.append("phylumKey", mushroomkey)
                 else parameters.append("taxonKey", mushRoomType)
                 parameters.append("decimalLatitude", "$latMin,$latMax")
                 parameters.append("decimalLongitude", "$lonMin,$lonMax")
                 parameters.append("hasCoordinate", "true")
-                parameters.append("limit", limit)   //hvor mange resultater man vil ha.
+                parameters.append("limit", limit.toString())   //hvor mange resultater man vil ha.
             }
         }
-        println("GBIF request URL: ${response.request.url}")
+        //println("GBIF request URL: ${response.request.url}")
 
         if (response.status.value != 200) {
             throw Exception("Failed to fetch count: ${response.status}")
@@ -93,14 +88,3 @@ class MushroomDataSource @Inject constructor(
 
 }
 
-
-@Module
-@InstallIn(SingletonComponent::class)
-object MushroomApiModule {
-
-    @Provides
-    @Singleton
-    fun provideMushroomDataSource(httpClient: HttpClient): MushroomDataSource {
-        return MushroomDataSource(httpClient)
-    }
-}

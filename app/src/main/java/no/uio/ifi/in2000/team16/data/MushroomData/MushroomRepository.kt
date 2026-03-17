@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.data.MushroomData
 
-import jakarta.inject.Inject
+//import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
 
@@ -16,13 +17,13 @@ class MushroomRepository @Inject constructor(
         mushroomDataSource.getMushroomById(id).toMushroom()
 
 
-    //returnerer a OccurrenceResult objekt witch occurenses and a list of the occurenses.
+    //returns a OccurrenceResult objekt witch occurenses and a list of the occurenses.
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
         radiusKm: Double = 10.0,
         mushRoomType: String = "all mushrooms",
-        limit: String = "5" //hvor mange resultater man vil ha. defult er 5 resutlater.
+        limit: Int = 5 //hvor mange resultater man vil ha. defult er 5 resutlater.
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))//recalculation for the variation of latidiudes
@@ -44,7 +45,7 @@ class MushroomRepository @Inject constructor(
         radiusKm: Double = 10.0,
         mushRoomType: String = "all mushrooms",
     ): Int {
-        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  "0")
+        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  0)
         return result.count
     }
 
