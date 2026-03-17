@@ -8,6 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 import no.uio.ifi.in2000.team16.model.Modul
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,11 +18,11 @@ import kotlin.math.cos
 
 @Singleton
 class MushroomDataSource @Inject constructor(
-    private val httpClient : HttpClient
+    private val httpClient: HttpClient
 ) {
     private val baseUrl = "https://api.gbif.org"
 
-    suspend fun searchMushrooms(query: String): List<Species> {
+    suspend fun searchMushrooms(query: String): List<MushroomSearchResult> {
         val response: HttpResponse = httpClient.get(
             "$baseUrl/v1/species/search"
         ) {
@@ -40,7 +41,8 @@ class MushroomDataSource @Inject constructor(
         val searchResult: SpeciesSearchResult = response.body()
         return searchResult.results
     }
-    suspend fun getMushroomById(id: String): Species {
+
+    suspend fun getMushroomById(id: String): MushroomSearchResult {
         val response: HttpResponse = httpClient.get(
             "$baseUrl/v1/species/$id"
         )
@@ -49,17 +51,18 @@ class MushroomDataSource @Inject constructor(
             throw Exception("Failed to fetch mushroom with id=$id: ${response.status}")
         }
 
-        val species: Species = response.body()
-        return species
+        val mushroomSearchResult: MushroomSearchResult = response.body()
+        return mushroomSearchResult
     }
 
-    suspend fun getMushroomCountNearLocation(
-        taxonKey: String,
+    suspend fun getOccurrencesNearLocation(
+        mushRoomType: String,
         latMin: Double,
         latMax: Double,
         lonMin: Double,
         lonMax: Double,
-    ): Int {
+        limit: String,
+    ): OccurrenceResult {
         val mushroomkey = "34" //filters what kind of mushrooms we get
         // 5 — Kingdom Fungi (everything, including mold, yeast etc.)
         //34 — Phylum Basidiomycota (typical mushrooms like kantarell, sjampinjong, fluesopp etc.)
@@ -69,25 +72,26 @@ class MushroomDataSource @Inject constructor(
             "$baseUrl/v1/occurrence/search"
         ) {
             url {
-                if(taxonKey == "all mushrooms")//if the taxonKey parameter is empty we search hardcoded scope
+                if (mushRoomType == "all mushrooms")//if the taxonKey parameter is empty we search hardcoded scope
                     parameters.append("kingdomKey", mushroomkey)
-                else parameters.append("taxonKey", taxonKey)
+                else parameters.append("taxonKey", mushRoomType)
                 parameters.append("decimalLatitude", "$latMin,$latMax")
                 parameters.append("decimalLongitude", "$lonMin,$lonMax")
                 parameters.append("hasCoordinate", "true")
-                parameters.append("limit", "0")   // we don't need the actual results
+                parameters.append("limit", limit)   //hvor mange resultater man vil ha.
             }
         }
+        println("GBIF request URL: ${response.request.url}")
 
         if (response.status.value != 200) {
             throw Exception("Failed to fetch count: ${response.status}")
         }
 
-        val result: OccurrenceCountResult = response.body()
-        return result.count
+        val result: OccurrenceResult = response.body()
+        return result
     }
-}
 
+}
 
 
 @Module

@@ -12,12 +12,29 @@ data class MushroomInfo(
     val order: String?,
     val family: String?,
     val genus: String?,
+    val genusKey: Int? = null,
     val species: String?
 )
 
 @Serializable
-data class OccurrenceCountResult(
-    val count: Int = 0
+data class OccurrenceResult(
+    val count: Int = 0,
+    val results: List<Occurrence> = emptyList()
+)
+
+@Serializable
+data class Occurrence(
+    val key: Long,
+    val scientificName: String? = null,
+    val species: String? = null,
+    val speciesKey: Int? = null,
+    val genus: String? = null,
+    val genusKey: Int? = null,
+    val decimalLatitude: Double? = null,
+    val decimalLongitude: Double? = null,
+    val year: Int? = null,
+    val month: Int? = null,
+    val day: Int? = null
 )
 
 @Serializable
@@ -29,11 +46,11 @@ data class VernacularName(
 
 @Serializable
 data class SpeciesSearchResult(
-    val results: List<Species>
+    val results: List<MushroomSearchResult>
 )
 
 @Serializable
-data class Species(
+data class MushroomSearchResult(
     val key: Int,
     val scientificName: String,
     val vernacularNames: List<VernacularName> = emptyList(),
@@ -43,5 +60,6 @@ data class Species(
     val order: String? = null,
     val family: String? = null,
     val genus: String? = null,
+    val genusKey: Int? = null,
     val species: String? = null
 )

@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.data.MushroomData
 
 import jakarta.inject.Inject
+import kotlin.Int
 import kotlin.math.cos
 
 class MushroomRepository @Inject constructor(
@@ -10,16 +11,19 @@ class MushroomRepository @Inject constructor(
     suspend fun searchMushrooms(query: String): List<MushroomInfo> =
         mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
 
+    //finn en
+    suspend fun getMushroomDetails(id: String): MushroomInfo =
+        mushroomDataSource.getMushroomById(id).toMushroom()
 
-    suspend fun getMushroomDetails(id: String): MushroomInfo? =
-        mushroomDataSource.getMushroomById(id)?.toMushroom()
 
-    suspend fun getLocationCount(
+    //returnerer a OccurrenceResult objekt witch occurenses and a list of the occurenses.
+    suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
         radiusKm: Double = 10.0,
-        taxonKey: String = "all mushrooms",
-    ): Int {
+        mushRoomType: String = "all mushrooms",
+        limit: String = "5" //hvor mange resultater man vil ha. defult er 5 resutlater.
+    ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))//recalculation for the variation of latidiudes
 
@@ -30,12 +34,23 @@ class MushroomRepository @Inject constructor(
         val lonMax = lon + lonOffset
 
 
-        return mushroomDataSource.getMushroomCountNearLocation(taxonKey, latMin, latMax, lonMin, lonMax)
+        return mushroomDataSource.getOccurrencesNearLocation(mushRoomType, latMin, latMax, lonMin, lonMax, limit)
+    }
+
+    //returns an int with how many mushrooms are in the area
+    suspend fun getMushroomCountNearLocation(
+        lat: Double,
+        lon: Double,
+        radiusKm: Double = 10.0,
+        mushRoomType: String = "all mushrooms",
+    ): Int {
+        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  "0")
+        return result.count
     }
 
 
     // Convert Species to MushroomInfo
-    private fun Species.toMushroom(): MushroomInfo =
+    private fun MushroomSearchResult.toMushroom(): MushroomInfo =
         MushroomInfo(
             id = key.toString(),
             scientificName = scientificName,
@@ -49,6 +64,7 @@ class MushroomRepository @Inject constructor(
             order = order,
             family = family,
             genus = genus,
+            genusKey = genusKey,
             species = species
         )
 }
