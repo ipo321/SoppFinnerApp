@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.nettverk
+package no.uio.ifi.in2000.team16.data.network
 
 import dagger.Module
 import dagger.Provides
@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
 /*
-    Objekt som oppretter en HttpKlient, slik at vi bare har én av denne.
+    Object creates an Http client
  */
 
 @Module
@@ -20,7 +20,7 @@ import javax.inject.Singleton
 object KtorClient {
     @Provides
     @Singleton
-    fun tilbyHttpClient(): HttpClient = HttpClient(Android) {
+    fun provideHttpClient(): HttpClient = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true

@@ -1,11 +1,13 @@
-package no.uio.ifi.in2000.team16.data.MushroomData
+package no.uio.ifi.in2000.team16.data.artsdatabasen
 
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.request
+import no.uio.ifi.in2000.team16.domain.model.MushroomSearchResult
+import no.uio.ifi.in2000.team16.domain.model.OccurrenceResult
+import no.uio.ifi.in2000.team16.domain.model.SpeciesSearchResult
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -76,7 +78,7 @@ class MushroomDataSource @Inject constructor(
                 parameters.append("decimalLatitude", "$latMin,$latMax")
                 parameters.append("decimalLongitude", "$lonMin,$lonMax")
                 parameters.append("hasCoordinate", "true")
-                parameters.append("limit", limit.toString())   //hvor mange resultater man vil ha.
+                parameters.append("limit", limit.toString())   //Amount of results.
             }
         }
 

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.domain.logic
+package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
