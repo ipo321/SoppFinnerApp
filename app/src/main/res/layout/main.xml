@@ -12,4 +12,16 @@
         android:layout_height="match_parent"
         app:maplibre_uiScrollGestures="true"
         app:maplibre_uiZoomGestures="true" />
+
+    <!-- Skjult per nå -->
+    <WebView
+        android:id="@+id/wmsWebView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

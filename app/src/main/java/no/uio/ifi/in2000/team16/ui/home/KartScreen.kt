@@ -1,11 +1,19 @@
 package no.uio.ifi.in2000.team16.ui.home
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.util.Log
 import android.view.Gravity
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -15,7 +23,12 @@ import androidx.lifecycle.LifecycleOwner
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
+import org.maplibre.android.style.layers.FillLayer
+import org.maplibre.android.style.layers.PropertyFactory
+import org.maplibre.android.style.sources.GeoJsonSource
+import androidx.core.graphics.toColorInt
 
+//@SuppressLint("SetJavaScriptEnabled") // This turns of the warning on Java Script Enabled
 @Composable
 fun KartScreen() {
     val kontekst = LocalContext.current
@@ -50,6 +63,27 @@ fun KartScreen() {
                     ui.isDoubleTapGesturesEnabled = true
                     ui.isHorizontalScrollGesturesEnabled = true
 
+                    try {
+                        val geoJson = kontekst.assets.open("verdiklasser_ar5_oslo.geojson")
+                            .bufferedReader().use { it.readText() }
+
+                        // Makes the GeoJSon source
+                        val source = GeoJsonSource("verdiklasser_ar5_oslo-source", geoJson)
+                        stil.addSource(source)
+
+                        // Draws the polygons
+                        val layer = FillLayer(
+                            "verdiklasser_ar5_oslo-layer",
+                            "verdiklasser_ar5_oslo-source"
+                        ).withProperties(
+                            PropertyFactory.fillColor("#33AA33".toColorInt()), // Green fill
+                            PropertyFactory.fillOpacity(0.5f), // Makes the layer a little transparent
+                            PropertyFactory.fillOutlineColor(Color.BLACK) // Black outline
+                        )
+                        stil.addLayer(layer)
+                    } catch (e: Exception) {
+                        Log.e("MAP", "Error when loading GeoJSon")
+                    }
                 }
             }
         }
@@ -62,15 +96,19 @@ fun KartScreen() {
             override fun onStart(owner: LifecycleOwner) {
                 kartView.onStart()
             }
+
             override fun onResume(owner: LifecycleOwner) {
                 kartView.onResume()
             }
+
             override fun onPause(owner: LifecycleOwner) {
                 kartView.onPause()
             }
+
             override fun onStop(owner: LifecycleOwner) {
                 kartView.onStop()
             }
+
             override fun onDestroy(owner: LifecycleOwner) {
                 kartView.onDestroy()
             }
@@ -85,4 +123,32 @@ fun KartScreen() {
         modifier = Modifier.fillMaxSize(),
         factory = { kartView }
     )
+
+    /*
+    var showWms by remember { mutableStateOf(true) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { kartView }
+        )
+
+        if (showWms) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context ->
+                    WebView(context).apply {
+                        // Warning with enabling JavaScript, but safe as long as we do not give the
+                        // user the opportunity to write their own urls.
+                        settings.javaScriptEnabled = true
+                        settings.domStorageEnabled = true
+                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                        webViewClient = WebViewClient()
+                        loadUrl("file:///android_asset/map.html")
+                    }
+                }
+            )
+        }
+    }
+    */
 }
