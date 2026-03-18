@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
-import no.uio.ifi.in2000.team16.ui.home.KartScreen
+import no.uio.ifi.in2000.team16.ui.home.MapScreen
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.MapLibre
 
@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
             Team16Theme {
                 // Kall på HomeScreen for å teste API-modul
                 // HomeScreen(modulViewModel = hiltViewModel<ModulViewModel>())
-                KartScreen()
+                MapScreen()
             }
         }
     }
