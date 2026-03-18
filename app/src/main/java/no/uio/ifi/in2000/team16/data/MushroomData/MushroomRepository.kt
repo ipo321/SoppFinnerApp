@@ -12,18 +12,18 @@ class MushroomRepository @Inject constructor(
     suspend fun searchMushrooms(query: String): List<MushroomInfo> =
         mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
 
-    //finn en
+    //get one spesiffic by id.
     suspend fun getMushroomDetails(id: String): MushroomInfo =
         mushroomDataSource.getMushroomById(id).toMushroom()
 
 
-    //returns a OccurrenceResult objekt witch occurenses and a list of the occurenses.
+    //returns a OccurrenceResult object witch a list of the occurenses.
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
         radiusKm: Double = 10.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 5 //hvor mange resultater man vil ha. defult er 5 resutlater.
+        limit: Int = 5 //amount of results. default 5.
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))//recalculation for the variation of latidiudes

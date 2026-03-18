@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,6 +31,7 @@ class MushroomDataSource @Inject constructor(
         }
 
         if (response.status.value != 200) {
+            println("failed to response")
             throw Exception("Failed to fetch mushrooms: ${response.status}")
         }
 
@@ -43,6 +45,7 @@ class MushroomDataSource @Inject constructor(
         )
 
         if (response.status.value != 200) {
+            println("get mushroom by id fail")
             throw Exception("Failed to fetch mushroom with id=$id: ${response.status}")
         }
 
@@ -51,7 +54,7 @@ class MushroomDataSource @Inject constructor(
     }
 
     suspend fun getOccurrencesNearLocation(
-        mushRoomType: String,
+        mushRoomType: String, //maby find a better name.
         latMin: Double,
         latMax: Double,
         lonMin: Double,
@@ -76,9 +79,10 @@ class MushroomDataSource @Inject constructor(
                 parameters.append("limit", limit.toString())   //hvor mange resultater man vil ha.
             }
         }
-        //println("GBIF request URL: ${response.request.url}")
 
+        //println("GBIF request URL: ${response.request.url}")
         if (response.status.value != 200) {
+            println("failed to response occurance location")
             throw Exception("Failed to fetch count: ${response.status}")
         }
 

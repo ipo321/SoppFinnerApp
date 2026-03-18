@@ -12,7 +12,7 @@ data class MushroomInfo(
     val order: String?,
     val family: String?,
     val genus: String?,
-    val genusKey: Int? = null,
+    val genusKey: Int?,
     val species: String?
 )
 
@@ -47,13 +47,14 @@ data class VernacularName(
 
 @Serializable
 data class SpeciesSearchResult(
-    val results: List<MushroomSearchResult>
+    val results: List<MushroomSearchResult>,
+    //val count: Int = 0,
 )
 
 
 @Serializable
 data class MushroomSearchResult(
-    val key: Int,
+    val key: Long,
     val scientificName: String,
     val vernacularNames: List<VernacularName> = emptyList(),
     val kingdom: String? = null,
