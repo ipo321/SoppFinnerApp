@@ -1,34 +1,59 @@
 package no.uio.ifi.in2000.team16.ui.home
 
 import android.content.Context
-import android.graphics.Color
 import android.util.Log
 import android.view.Gravity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import no.uio.ifi.in2000.team16.data.Municipalities
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.sources.GeoJsonSource
-import androidx.core.graphics.toColorInt
-import no.uio.ifi.in2000.team16.data.layerList
-import org.maplibre.android.maps.MapLibreMap
-import org.maplibre.android.maps.Style
+import org.maplibre.geojson.Feature
+
+/*
+    MapLibre on GitHub: https://github.com/maplibre/maplibre-native
+    Tutorials: https://maplibre.org/maplibre-native/android/examples/
+
+    The map is partly configured in res/layout/main.xml
+
+    The tiles that shows cities, streets etc. is from the map Base from MapTiler: https://cloud.maptiler.com/maps/
+
+    In the emulator the map can be zoomed in on by double tapping on the screen,
+    or zoomed in or out by holding Ctrl and drag the map.
+ */
 
 @Composable
 fun MapScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    // Remembers which polygon is clicked and holds a string with its info
+    var chosenPolygon by remember { mutableStateOf("") }
     // The map is made with MapView and remember to save state
     val mapView = remember {
         MapView(context).apply {
@@ -39,8 +64,35 @@ fun MapScreen() {
                 map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
                     // Logging to see what happens when the map is used
                     Log.d("MAP", "Style loaded: ${style.uri}")
+
                     setMapLayout(map)
                     addPolygonsToMap(context, style)
+
+                    // Makes the map clickable
+                    map.addOnMapClickListener { coordinate ->
+                        Log.d("MAP", "Map clicked at: $coordinate")
+                        val point = map.projection.toScreenLocation(coordinate)
+                        // Holds the features of the point clicked and all layers added on that point
+                        // Since we do not know where the user clicks, all layers are added for now
+                        val features: List<Feature> = map.queryRenderedFeatures(
+                            point,
+                            Municipalities.oslo.layerId,
+                            Municipalities.baerum.layerId,
+                            Municipalities.asker.layerId
+                        )
+                        if (features.isNotEmpty()) {
+                            // Takes the first layer on the point clicked
+                            // This works now, but maybe not if we have overlapping layers
+                            val feature = features[0]
+                            // Gets the GeoJSon object
+                            val properties = feature.properties()
+                            // Gets the info on the category name that is stated in the QGIS-file
+                            val species = properties?.get("artype")?.asString ?: "Ukjent"
+                            val speciesDesc = properties?.get("artype_bes")?.asString ?: "Ukjent"
+                            chosenPolygon = "Artype: $species\nBeskrivelse: $speciesDesc"
+                        }
+                        true
+                    }
                 }
             }
         }
@@ -62,10 +114,24 @@ fun MapScreen() {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { mapView }
-    )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { mapView }
+        )
+        if (chosenPolygon != "") {
+            Text(
+                text = chosenPolygon,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.8f))
+                    .padding(8.dp)
+            )
+        }
+    }
 }
 
 fun setMapLayout(map: MapLibreMap) {
@@ -91,7 +157,7 @@ fun setMapLayout(map: MapLibreMap) {
 
 fun addPolygonsToMap(context: Context, style: Style) {
     // The layerList is defined in GeoJSonLayer.kt
-    layerList().forEach { geoLayer ->
+    Municipalities.municipalities.forEach { geoLayer ->
         try {
             val geoJson = context.assets.open(geoLayer.asset)
                 .bufferedReader().use { it.readText() }
@@ -105,7 +171,7 @@ fun addPolygonsToMap(context: Context, style: Style) {
                 FillLayer(geoLayer.layerId, geoLayer.sourceId).withProperties(
                     PropertyFactory.fillColor(geoLayer.color.toColorInt()),
                     PropertyFactory.fillOpacity(0.5f), // Makes the layer a little transparent
-                    PropertyFactory.fillOutlineColor(Color.BLACK) // Black outline
+                    PropertyFactory.fillOutlineColor(android.graphics.Color.BLACK) // Black outline
                 )
             style.addLayer(layer)
         } catch (e: Exception) {
@@ -113,6 +179,7 @@ fun addPolygonsToMap(context: Context, style: Style) {
         }
     }
 }
+
 /* WMS code no longer in use:
 
 var showWms by remember { mutableStateOf(true) }
