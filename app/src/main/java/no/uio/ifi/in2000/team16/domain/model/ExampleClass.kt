@@ -3,10 +3,10 @@ package no.uio.ifi.in2000.team16.domain.model
 import kotlinx.serialization.Serializable
 
 /*
-    Mock-klasse som per nå passer til alpakka-apiet sine stemmer.
+    Mock-class
  */
 @Serializable
-data class Modul (
+data class ExampleClass (
     val id: String?
 ) {
     companion object {

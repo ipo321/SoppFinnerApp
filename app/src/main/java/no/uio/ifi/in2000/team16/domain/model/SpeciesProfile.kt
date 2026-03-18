@@ -17,7 +17,7 @@ data class SpeciesProfile(
     val windPenaltyThreshold: Double
 ) {
     companion object{
-        val Mock = SpeciesProfile(
+        val mock = SpeciesProfile(
             name = "TestName",
             type = 1,
             activeMonths = listOf(7,8,9),

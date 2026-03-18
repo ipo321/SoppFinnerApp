@@ -1,6 +1,4 @@
-package no.uio.ifi.in2000.team16.domain.logic
-
-import no.uio.ifi.in2000.team16.domain.model.*
+package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 object SeasonKillSwitch {
     fun check(currentMonth: Int, activeMonths: List<Int>): String? {

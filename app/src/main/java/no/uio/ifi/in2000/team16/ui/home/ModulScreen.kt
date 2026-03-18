@@ -7,18 +7,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team16.domain.model.Modul
+import no.uio.ifi.in2000.team16.domain.model.ExampleClass
 
 /*
-    En liten default for hvordan en HomeScreen kan se ut.
+    Default homescreen
  */
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    modulViewModel: ModulViewModel = hiltViewModel<ModulViewModel>()
+    moduleViewModel: ModuleViewModel = hiltViewModel<ModuleViewModel>()
 ) {
-    val uiState = modulViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = moduleViewModel.uiState.collectAsStateWithLifecycle()
 
     Column {
         when (uiState.value) {
@@ -26,16 +26,16 @@ fun HomeScreen(
             is UiState.Idle -> Text("Venter")
             is UiState.Loading -> CircularProgressIndicator()
             is UiState.Success -> {
-                ModulScreen(modul = (uiState.value as UiState.Success).data.modul)
+                ModuleScreen(exampleClass = (uiState.value as UiState.Success).data.exampleClass)
             }
         }
     }
 }
 
 @Composable
-fun ModulScreen(
-    modul: List<Modul>,
+fun ModuleScreen(
+    exampleClass: List<ExampleClass>,
     modifier: Modifier = Modifier
 ) {
-    Text(modul[0].id ?: "Ukjent")
+    Text(exampleClass[0].id ?: "Ukjent")
 }

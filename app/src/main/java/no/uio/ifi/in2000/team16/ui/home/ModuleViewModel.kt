@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.modul.ModulDataSource
-import no.uio.ifi.in2000.team16.domain.model.Modul
+import no.uio.ifi.in2000.team16.data.example.ModuleDataSource
+import no.uio.ifi.in2000.team16.domain.model.ExampleClass
 import javax.inject.Inject
 
 /*
@@ -19,22 +19,22 @@ import javax.inject.Inject
  */
 
 @HiltViewModel
-class ModulViewModel @Inject constructor(
-    private val kartDataSource: ModulDataSource
+class ModuleViewModel @Inject constructor(
+    private val kartDataSource: ModuleDataSource
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<ModulUiState>>(UiState.Idle)
     val uiState : StateFlow<UiState<ModulUiState>> = _uiState.asStateFlow()
 
     init {
-        hentModul()
+        getModule()
     }
 
-    fun hentModul() {
+    fun getModule() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val modul = kartDataSource.hentModul()
-                _uiState.value = UiState.Success(ModulUiState(modul))
+                val module = kartDataSource.getModule()
+                _uiState.value = UiState.Success(ModulUiState(module))
             } catch (e: Exception) {
                 _uiState.value = UiState.Error
             }
@@ -42,7 +42,7 @@ class ModulViewModel @Inject constructor(
     }
 }
 
-data class ModulUiState(val modul: List<Modul>)
+data class ModulUiState(val exampleClass: List<ExampleClass>)
 
 sealed class UiState <out T> {
     object Idle : UiState<Nothing>()

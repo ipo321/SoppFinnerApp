@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.MushroomData
+package no.uio.ifi.in2000.team16.domain.model
 import kotlinx.serialization.Serializable
 
 
@@ -22,7 +22,7 @@ data class OccurrenceResult(
     val results: List<Occurrence> = emptyList()
 )
 
-//Data about the report in location (soppfunn)
+//Data about the report in location (findings)
 @Serializable
 data class Occurrence(
     val key: Long,

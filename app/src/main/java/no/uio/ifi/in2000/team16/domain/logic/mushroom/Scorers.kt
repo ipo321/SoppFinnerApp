@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.domain.logic
+package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 import kotlin.math.abs
 

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data
+package no.uio.ifi.in2000.team16.data.polygons
 
 data class GeoJSonLayer (
     val asset: String,
@@ -26,15 +26,6 @@ object Municipalities {
         layerId = "verdiklasser_ar5_asker-layer"
     )
     val municipalities = listOf(oslo, baerum, asker)
-}
-
-object Counties {
-    val akershus = GeoJSonLayer(
-        asset = "ar50_akershus.geojson",
-        sourceId = "ar50_akershus-source",
-        layerId = "ar50_akershus-layer"
-    )
-    val counties = listOf(akershus)
 }
 
 
