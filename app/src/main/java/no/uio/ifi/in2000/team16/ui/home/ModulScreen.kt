@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import no.uio.ifi.in2000.team16.model.Modul
+import no.uio.ifi.in2000.team16.domain.model.Modul
 
 /*
     En liten default for hvordan en HomeScreen kan se ut.
