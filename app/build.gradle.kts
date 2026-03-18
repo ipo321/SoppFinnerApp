@@ -80,6 +80,11 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
     implementation("com.google.dagger:hilt-android:2.59.2")
     ksp("com.google.dagger:hilt-compiler:2.59.2")
+
+//SplashScreen
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    //implementation(libs.androidx.core.splashscreen)
+
 }
 
 ksp {
