@@ -76,6 +76,7 @@ fun MapScreen() {
                         // Since we do not know where the user clicks, all layers are added for now
                         val features: List<Feature> = map.queryRenderedFeatures(
                             point,
+                            //Counties.akershus.layerId
                             Municipalities.oslo.layerId,
                             Municipalities.baerum.layerId,
                             Municipalities.asker.layerId
@@ -87,8 +88,8 @@ fun MapScreen() {
                             // Gets the GeoJSon object
                             val properties = feature.properties()
                             // Gets the info on the category name that is stated in the QGIS-file
-                            val species = properties?.get("artype")?.asString ?: "Ukjent"
-                            val speciesDesc = properties?.get("artype_bes")?.asString ?: "Ukjent"
+                            val species = properties?.get(/*"skogbonitet"*/"artype")?.asString ?: "Ukjent"
+                            val speciesDesc = properties?.get(/*"treslag"*/"artype_bes")?.asString ?: "Ukjent"
                             chosenPolygon = "Artype: $species\nBeskrivelse: $speciesDesc"
                         }
                         true
@@ -158,6 +159,7 @@ fun setMapLayout(map: MapLibreMap) {
 fun addPolygonsToMap(context: Context, style: Style) {
     // The layerList is defined in GeoJSonLayer.kt
     Municipalities.municipalities.forEach { geoLayer ->
+    //Counties.counties.forEach { geoLayer ->
         try {
             val geoJson = context.assets.open(geoLayer.asset)
                 .bufferedReader().use { it.readText() }
