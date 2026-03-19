@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
@@ -57,9 +58,36 @@ fun MapScreen() {
     val lifecycleOwner = LocalLifecycleOwner.current
     val viewModel: MapViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-    // Remembers which polygon is clicked and holds a string with its info
-    //var chosenPolygon by remember { mutableStateOf("") }
     // The map is made with MapView and remember to save state
+    val mapView = getMapView(viewModel, context)
+    // mapView is alerted when lifecycle changes
+    LifeCycleObserver(lifecycleOwner, mapView)
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { mapView }
+        )
+        when (uiState) {
+            is UiState.Success -> {
+                val forestInfo = (uiState as UiState.Success<MapUiState>).data.areaResource
+                InfoPopUp("Arealdekar: ${forestInfo.acres}\n" +
+                        "Arealtype: ${forestInfo.areaType}\n" +
+                        "Treslag: ${forestInfo.woodSpecies}\n" +
+                        "Grunnforhold: ${forestInfo.groundConditions}\n" +
+                        "Skogbonitet: ${forestInfo.forestQuality}"
+                )
+            }
+            is UiState.Loading -> InfoPopUp("Laster inn")
+            is UiState.Error -> InfoPopUp("Feilet innlasting")
+            is UiState.Idle -> {}
+        }
+    }
+}
+
+@Composable
+fun getMapView(viewModel: MapViewModel, context: Context): MapView {
     val mapView = remember {
         MapView(context).apply {
             onCreate(null)
@@ -71,7 +99,7 @@ fun MapScreen() {
                     Log.d("MAP", "Style loaded: ${style.uri}")
 
                     setMapLayout(map)
-                    addPolygonsToMap(context, style)
+                    //addPolygonsToMap(context, style)  // No polygons for now
 
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
@@ -84,44 +112,24 @@ fun MapScreen() {
                         val west  = bounds.southWest.longitude
                         val north = bounds.northEast.latitude
                         val east  = bounds.northEast.longitude
-                        val width  = this@apply.width // This from apply function above to get the MapView Object
-                        val height = this@apply.height
+                        val width  = this@apply.width // this@apply to get the MapView object from
+                        val height = this@apply.height // the apply function above
 
                         viewModel.getForestInfo(
                             pxX, pxY, south, west, north, east, width, height
                         )
 
                         true // lambda returns true to inform that the click is managed
-
-                        /*
-                        val point = map.projection.toScreenLocation(coordinate)
-                        // Holds the features of the point clicked and all layers added on that point
-                        // Since we do not know where the user clicks, all layers are added for now
-                        val features: List<Feature> = map.queryRenderedFeatures(
-                            point,
-                            Municipalities.oslo.layerId,
-                            Municipalities.baerum.layerId,
-                            Municipalities.asker.layerId
-                        )
-                        if (features.isNotEmpty()) {
-                            // Takes the first layer on the point clicked
-                            // This works now, but maybe not if we have overlapping layers
-                            val feature = features[0]
-                            // Gets the GeoJSon object
-                            val properties = feature.properties()
-                            // Gets the info on the category name that is stated in the QGIS-file
-                            val species = properties?.get("artype")?.asString ?: "Ukjent"
-                            val speciesDesc = properties?.get("artype_bes")?.asString ?: "Ukjent"
-                            chosenPolygon = "Artype: $species\nBeskrivelse: $speciesDesc"
-                        }
-                        true
-                         */
                     }
                 }
             }
         }
     }
-    // mapView is alerted when lifecycle changes
+    return mapView
+}
+
+@Composable
+fun LifeCycleObserver(lifecycleOwner: LifecycleOwner, mapView: MapView) {
     DisposableEffect(lifecycleOwner, mapView) {
         // observer listens to the lifecycle and when each of the functions below
         // are called by the observer, the same ones are called by mapView
@@ -136,26 +144,6 @@ fun MapScreen() {
         // When mapScreen is removed, so is the observer and mapView no longer calls the above functions
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { mapView }
-        )
-        when (uiState) {
-            is UiState.Success -> {
-                val forestInfo = (uiState as UiState.Success<MapUiState>).data.areaResource
-                InfoPopUp("Arealtype: ${forestInfo.areaType}\n" +
-                        "Treslag: ${forestInfo.woodSpecies}\n" +
-                        "Skogbonitet: ${forestInfo.forestQuality}"
-                )
-            }
-            is UiState.Loading -> InfoPopUp("Laster inn")
-            is UiState.Error -> InfoPopUp("Feilet innlasting")
-            is UiState.Idle -> {}
         }
     }
 }
@@ -198,6 +186,8 @@ fun setMapLayout(map: MapLibreMap) {
     ui.isHorizontalScrollGesturesEnabled = true
 }
 
+
+// This function is currently not in use, but might come in handy if we want polygons later on
 fun addPolygonsToMap(context: Context, style: Style) {
     // The layerList is defined in GeoJSonLayer.kt
     Municipalities.municipalities.forEach { geoLayer ->
@@ -222,32 +212,3 @@ fun addPolygonsToMap(context: Context, style: Style) {
         }
     }
 }
-
-/* WMS code no longer in use:
-
-var showWms by remember { mutableStateOf(true) }
-
-Box(modifier = Modifier.fillMaxSize()) {
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { kartView }
-    )
-
-    if (showWms) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                WebView(context).apply {
-                    // Warning with enabling JavaScript, but safe as long as we do not give the
-                    // user the opportunity to write their own urls.
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    setBackgroundColor(android.graphics.Color.TRANSPARENT)
-                    webViewClient = WebViewClient()
-                    loadUrl("file:///android_asset/map.html")
-                }
-            }
-        )
-    }
-}
-*/
