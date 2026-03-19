@@ -7,6 +7,10 @@ import io.ktor.client.request.header
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/*
+    API for getting weather data from MET and their locationforecast
+*/
+
 @Singleton
 class LocationForecastDataSource @Inject constructor(
     private val httpClient: HttpClient

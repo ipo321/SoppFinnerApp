@@ -2,6 +2,9 @@ package no.uio.ifi.in2000.team16.data.MET
 
 import kotlinx.serialization.Serializable
 
+/*
+    Dataclasses for handling the information coming from the MET API. Might be move the file to a different location
+*/
 
 @Serializable
 data class MetResponse(
