@@ -16,9 +16,10 @@ class LocationForecastRepository @Inject constructor(
         val next8Hours = response.properties.timeseries.take(8)
         if (next8Hours.isEmpty()) return null
 
+        /*
         val totalRain = next8Hours.sumOf {
             it.data.next_1_hours?.details?.precipitation_amount ?: 0.0
-        }
+        }*/
         val maxWind = next8Hours.mapNotNull {
             it.data.instant.details.wind_speed
         }.maxOrNull()
@@ -35,7 +36,7 @@ class LocationForecastRepository @Inject constructor(
 
         return WeatherData(
             temp = avgTemp,
-            rain = totalRain,
+            rain = null,
             humidity = avgHumidity,
             windSpeed = maxWind,
             dewPoint = avgDewPoint,
