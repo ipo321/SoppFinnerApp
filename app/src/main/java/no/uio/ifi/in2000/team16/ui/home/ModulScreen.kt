@@ -14,11 +14,12 @@ import no.uio.ifi.in2000.team16.domain.model.ExampleClass
  */
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    moduleViewModel: ModuleViewModel = hiltViewModel<ModuleViewModel>()
+fun ModuleScreen(
+    onNavigateBack: () -> Unit,
+    viewModel: ModuleViewModel,
+    modifier: Modifier = Modifier
 ) {
-    val uiState = moduleViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Column {
         when (uiState.value) {
@@ -26,14 +27,14 @@ fun HomeScreen(
             is UiState.Idle -> Text("Venter")
             is UiState.Loading -> CircularProgressIndicator()
             is UiState.Success -> {
-                ModuleScreen(exampleClass = (uiState.value as UiState.Success).data.exampleClass)
+                Display(exampleClass = (uiState.value as UiState.Success).data.exampleClass)
             }
         }
     }
 }
 
 @Composable
-fun ModuleScreen(
+fun Display(
     exampleClass: List<ExampleClass>,
     modifier: Modifier = Modifier
 ) {

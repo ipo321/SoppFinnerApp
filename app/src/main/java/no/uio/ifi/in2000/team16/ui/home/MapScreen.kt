@@ -53,10 +53,14 @@ import org.maplibre.geojson.Feature
  */
 
 @Composable
-fun MapScreen() {
+fun MapScreen(
+    onButtonClicked: () -> Unit,
+    viewModel: MapViewModel,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val viewModel: MapViewModel = hiltViewModel()
+    //val viewModel: MapViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     // The map is made with MapView and remember to save state
     val mapView = getMapView(viewModel, context)
