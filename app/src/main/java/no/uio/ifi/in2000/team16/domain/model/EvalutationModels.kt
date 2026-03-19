@@ -27,7 +27,10 @@ data class WeatherData(
     val humidity: Double?,
     val windSpeed: Double?,
     val dewPoint: Double?,
-    val fogFraction: Double?
+    val fogFraction: Double?,
+
+    val symbolCode: String?,
+    val probOfRain: Double?
     //Add fog, weather history and so on
 )
 
