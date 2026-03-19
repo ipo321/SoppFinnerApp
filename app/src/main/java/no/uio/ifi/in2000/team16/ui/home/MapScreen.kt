@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.home
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
@@ -10,14 +9,13 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,7 +24,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
@@ -38,7 +35,6 @@ import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.sources.GeoJsonSource
-import org.maplibre.geojson.Feature
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -70,9 +66,17 @@ fun MapScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
+        Button(
+            onClick = onButtonClicked,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(8.dp)
+        ) {
+            Text("Knapp")
+        }
         when (uiState) {
             is UiState.Success -> {
                 val forestInfo = (uiState as UiState.Success<MapUiState>).data.areaResource

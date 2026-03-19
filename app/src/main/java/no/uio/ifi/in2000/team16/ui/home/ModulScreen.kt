@@ -1,11 +1,17 @@
 package no.uio.ifi.in2000.team16.ui.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import no.uio.ifi.in2000.team16.domain.model.ExampleClass
 
@@ -27,7 +33,10 @@ fun ModuleScreen(
             is UiState.Idle -> Text("Venter")
             is UiState.Loading -> CircularProgressIndicator()
             is UiState.Success -> {
-                Display(exampleClass = (uiState.value as UiState.Success).data.exampleClass)
+                Display(
+                    onNavigateBack = onNavigateBack,
+                    exampleClass = (uiState.value as UiState.Success).data.exampleClass
+                )
             }
         }
     }
@@ -35,8 +44,21 @@ fun ModuleScreen(
 
 @Composable
 fun Display(
+    onNavigateBack: () -> Unit,
     exampleClass: List<ExampleClass>,
     modifier: Modifier = Modifier
 ) {
-    Text(exampleClass[0].id ?: "Ukjent")
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(exampleClass[0].id ?: "Ukjent")
+        Spacer(modifier = Modifier.padding(8.dp))
+        Button(
+            onClick = onNavigateBack
+        ) {
+            Text("Kart")
+        }
+    }
 }
