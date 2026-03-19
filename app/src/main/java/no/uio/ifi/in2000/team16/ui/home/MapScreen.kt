@@ -5,12 +5,14 @@ import android.util.Log
 import android.view.Gravity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +25,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
@@ -52,8 +55,10 @@ import org.maplibre.geojson.Feature
 fun MapScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val viewModel: MapViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
     // Remembers which polygon is clicked and holds a string with its info
-    var chosenPolygon by remember { mutableStateOf("") }
+    //var chosenPolygon by remember { mutableStateOf("") }
     // The map is made with MapView and remember to save state
     val mapView = remember {
         MapView(context).apply {
@@ -72,11 +77,28 @@ fun MapScreen() {
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
                         val point = map.projection.toScreenLocation(coordinate)
+                        val pxX = point.x.toInt() // Pixel position
+                        val pxY = point.y.toInt()
+                        val bounds = map.projection.visibleRegion.latLngBounds
+                        val south = bounds.southWest.latitude
+                        val west  = bounds.southWest.longitude
+                        val north = bounds.northEast.latitude
+                        val east  = bounds.northEast.longitude
+                        val width  = this@apply.width // This from apply function above to get the MapView Object
+                        val height = this@apply.height
+
+                        viewModel.getForestInfo(
+                            pxX, pxY, south, west, north, east, width, height
+                        )
+
+                        true // lambda returns true to inform that the click is managed
+
+                        /*
+                        val point = map.projection.toScreenLocation(coordinate)
                         // Holds the features of the point clicked and all layers added on that point
                         // Since we do not know where the user clicks, all layers are added for now
                         val features: List<Feature> = map.queryRenderedFeatures(
                             point,
-                            //Counties.akershus.layerId
                             Municipalities.oslo.layerId,
                             Municipalities.baerum.layerId,
                             Municipalities.asker.layerId
@@ -88,11 +110,12 @@ fun MapScreen() {
                             // Gets the GeoJSon object
                             val properties = feature.properties()
                             // Gets the info on the category name that is stated in the QGIS-file
-                            val species = properties?.get(/*"skogbonitet"*/"artype")?.asString ?: "Ukjent"
-                            val speciesDesc = properties?.get(/*"treslag"*/"artype_bes")?.asString ?: "Ukjent"
+                            val species = properties?.get("artype")?.asString ?: "Ukjent"
+                            val speciesDesc = properties?.get("artype_bes")?.asString ?: "Ukjent"
                             chosenPolygon = "Artype: $species\nBeskrivelse: $speciesDesc"
                         }
                         true
+                         */
                     }
                 }
             }
@@ -100,8 +123,8 @@ fun MapScreen() {
     }
     // mapView is alerted when lifecycle changes
     DisposableEffect(lifecycleOwner, mapView) {
-        // observator listens to the lifecycle and when each of the functions below
-        // are called by the observer, the same ones are called on mapView
+        // observer listens to the lifecycle and when each of the functions below
+        // are called by the observer, the same ones are called by mapView
         val observer = object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) { mapView.onStart() }
             override fun onResume(owner: LifecycleOwner) { mapView.onResume() }
@@ -110,7 +133,7 @@ fun MapScreen() {
             override fun onDestroy(owner: LifecycleOwner) { mapView.onDestroy() }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        // When mapScreen is removed, so is the observator and mapView no longer calls the above functions
+        // When mapScreen is removed, so is the observer and mapView no longer calls the above functions
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
@@ -122,17 +145,36 @@ fun MapScreen() {
             modifier = Modifier.fillMaxSize(),
             factory = { mapView }
         )
-        if (chosenPolygon != "") {
-            Text(
-                text = chosenPolygon,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .background(Color.White.copy(alpha = 0.8f))
-                    .padding(8.dp)
-            )
+        when (uiState) {
+            is UiState.Success -> {
+                val forestInfo = (uiState as UiState.Success<MapUiState>).data.areaResource
+                InfoPopUp("Arealtype: ${forestInfo.areaType}\n" +
+                        "Treslag: ${forestInfo.woodSpecies}\n" +
+                        "Skogbonitet: ${forestInfo.forestQuality}"
+                )
+            }
+            is UiState.Loading -> InfoPopUp("Laster inn")
+            is UiState.Error -> InfoPopUp("Feilet innlasting")
+            is UiState.Idle -> {}
         }
     }
+}
+
+// For now, the forest info is visible on screen
+// In the future, this info will be sent to the score algorithm instead
+@Composable
+fun BoxScope.InfoPopUp(
+    msg: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = msg,
+        modifier = modifier
+            .align(Alignment.BottomStart)
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.8f))
+            .padding(8.dp)
+    )
 }
 
 fun setMapLayout(map: MapLibreMap) {
@@ -159,7 +201,6 @@ fun setMapLayout(map: MapLibreMap) {
 fun addPolygonsToMap(context: Context, style: Style) {
     // The layerList is defined in GeoJSonLayer.kt
     Municipalities.municipalities.forEach { geoLayer ->
-    //Counties.counties.forEach { geoLayer ->
         try {
             val geoJson = context.assets.open(geoLayer.asset)
                 .bufferedReader().use { it.readText() }
