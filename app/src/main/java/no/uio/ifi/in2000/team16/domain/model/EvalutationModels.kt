@@ -1,5 +1,10 @@
 package no.uio.ifi.in2000.team16.domain.model
 
+
+/*
+Dataclasses for handling the information that will be put into the evaluation module. Important to look at for all API and repositories as this is what your repository should return.
+*/
+
 data class EnvironmentContext(
     val currentWeather: WeatherData?,
     val weatherHistory: WeatherHistory?,

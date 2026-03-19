@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.MET
+package no.uio.ifi.in2000.team16.data.met
 
 import no.uio.ifi.in2000.team16.domain.model.WeatherData
 import javax.inject.Inject
