@@ -122,15 +122,21 @@ fun MapScreen() {
             modifier = Modifier.fillMaxSize(),
             factory = { mapView }
         )
+
+        //Loads scorecard in on polygon click
         if (chosenPolygon != "") {
-            Text(
-                text = chosenPolygon,
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .background(Color.White.copy(alpha = 0.8f))
-                    .padding(8.dp)
-            )
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
+            ){
+                ScoreCard(
+                    title = chosenPolygon,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }

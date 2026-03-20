@@ -20,11 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 
-@Preview
 @Composable
-fun ScoreCard(modifier: Modifier = Modifier){
+fun ScoreCard(modifier: Modifier = Modifier,
+              title: String){
 
     Card(
         modifier = modifier,
@@ -48,7 +49,7 @@ fun ScoreCard(modifier: Modifier = Modifier){
                     .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ){
-                    Text("SCORE")
+                    Text("100")
                 }
             }
 
@@ -67,7 +68,7 @@ fun ScoreCard(modifier: Modifier = Modifier){
                         contentAlignment = Alignment.Center
 
                     ){
-                        Text("Example1")
+                        Text(title)
                     }
 
                     Spacer(Modifier.height(4.dp))
