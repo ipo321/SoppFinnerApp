@@ -55,39 +55,6 @@ class MushroomRepository @Inject constructor(
     }
 
 
-    suspend fun getChanterelleNearLocation(
-        lat: Double,
-        lon: Double,
-        radiusKm: Double = 10.0
-    ): Int = getMushroomCountNearLocation(
-        lat = lat,
-        lon = lon,
-        radiusKm = radiusKm,
-        mushRoomType = "5249504"
-    )
-
-    suspend fun getFunnelChanterelleNearLocation(
-        lat: Double,
-        lon: Double,
-        radiusKm: Double = 10.0
-    ): Int = getMushroomCountNearLocation(
-        lat = lat,
-        lon = lon,
-        radiusKm = radiusKm,
-        mushRoomType = "2554536"
-    )
-
-    suspend fun getPorciniNearLocation(
-        lat: Double,
-        lon: Double,
-        radiusKm: Double = 10.0
-    ): Int = getMushroomCountNearLocation(
-        lat = lat,
-        lon = lon,
-        radiusKm = radiusKm,
-        mushRoomType = "5954958"
-    )
-
     //returns a OccurrenceResult object witch a list of the occurenses inside a radius.
     suspend fun getMushroomsNearLocation(
         lat: Double,
