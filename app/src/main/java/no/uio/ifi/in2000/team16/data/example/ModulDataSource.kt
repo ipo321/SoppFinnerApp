@@ -32,12 +32,3 @@ class ModuleDataSource @Inject constructor(
     }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ModuleApi {
-    @Provides
-    @Singleton
-    fun provideModuleDataSource(httpClient: HttpClient): ModuleDataSource {
-        return ModuleDataSource(httpClient)
-    }
-}

@@ -5,7 +5,9 @@ import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 
 
-//MOCK algorithm that gives just a random score to test UI functions
+/*
+First version of the algorithm, it has the most important kill switches and the scorers for the current weather
+*/
 
 class MushroomScorerV1 : MushroomScorer {
     override fun calculateScore(                    //Overrides the Interface

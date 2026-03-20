@@ -4,8 +4,10 @@ import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 
+/*
+MOCK algorithm that gives just a random score to test UI functions
+*/
 
-//MOCK algorithm that gives just a random score to test UI functions
 
 class ScoreAlgorithmMock : MushroomScorer {
     override fun calculateScore(                    //Overrides the Interface

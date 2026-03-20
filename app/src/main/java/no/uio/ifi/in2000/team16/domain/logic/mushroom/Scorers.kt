@@ -2,9 +2,11 @@ package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 import kotlin.math.abs
 
-//Scorers are used to build up the algorithm. They can be combined in different ways to create different types. They will all return a value between 0.0 and 1.0 wheras the weighting and
-// score is set in the algorithm
-//USE .coerceIn(0.0, 1.0) to make sure that noe value is greater or larger
+/*
+Scorers are used to build up the algorithm. They can be combined in different ways to create different types. They will all return a value between 0.0 and 1.0 wheres the weighting and
+score is set in the algorithm. If you wanna design new ones: USE .coerceIn(0.0, 1.0) to make sure that no value is greater or larger than 1.0 or smaller than 0.0
+*/
+
 
 // Collection (Current weather / LocationForecast)
 
@@ -104,5 +106,5 @@ object SlopeScorer{
 
 //Can be implemented:
 //PH /ground scorer
-// Direction scorerer
+//Direction scorer
 
