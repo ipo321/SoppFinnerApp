@@ -7,7 +7,19 @@ import no.uio.ifi.in2000.team16.domain.model.OccurrenceResult
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
+/*
+repository that can search for mushrooms and get information about them
+and the amount of mushrooms spottings in a certain area.
+use getSpeciesNearLocation with latidude, longitude and the enumc class MushroomSpicies.
 
+
+*/
+
+enum class MushroomSpecies(val taxonKey: String) {
+    CHANTERELLE("5249504"),
+    FUNNEL_CHANTERELLE("2554536"),
+    PORCINI("5954958")
+}
 class MushroomRepository @Inject constructor(
     private val mushroomDataSource: MushroomDataSource
 ) {
@@ -19,8 +31,31 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomDetails(id: String): MushroomInfo =
         mushroomDataSource.getMushroomById(id).toMushroom()
 
+    suspend fun getSpeciesCountNearLocation(
+        lat: Double,
+        lon: Double,
+        species: MushroomSpecies,
+        radiusKm: Double = 10.0,
+    ): Int = getMushroomCountNearLocation(
+        lat = lat,
+        lon = lon,
+        radiusKm = radiusKm,
+        mushRoomType = species.taxonKey
+    )
 
-    //returns a OccurrenceResult object witch a list of the occurenses.
+    //returns an int with how many mushrooms are in the area
+    suspend fun getMushroomCountNearLocation(
+        lat: Double,
+        lon: Double,
+        radiusKm: Double = 10.0,
+        mushRoomType: String = "all mushrooms",
+    ): Int {
+        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  0)
+        return result.count
+    }
+
+
+    //returns a OccurrenceResult object witch a list of the occurenses inside a radius.
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
@@ -40,18 +75,6 @@ class MushroomRepository @Inject constructor(
 
         return mushroomDataSource.getOccurrencesNearLocation(mushRoomType, latMin, latMax, lonMin, lonMax, limit)
     }
-
-    //returns an int with how many mushrooms are in the area
-    suspend fun getMushroomCountNearLocation(
-        lat: Double,
-        lon: Double,
-        radiusKm: Double = 10.0,
-        mushRoomType: String = "all mushrooms",
-    ): Int {
-        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  0)
-        return result.count
-    }
-
 
     // Convert Species to MushroomInfo
     private fun MushroomSearchResult.toMushroom(): MushroomInfo =
