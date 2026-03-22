@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.nibio
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -18,30 +19,32 @@ class SatSkogDataSource @Inject constructor(
     suspend fun fetchForest(lat: Double, lon: Double): SatSkogResponse? {
 
         //Making a square box around the location
-        val latMin = lat - 0.001
-        val lonMin = lon - 0.001
-        val latMax = lat + 0.001
-        val lonMax = lon + 0.001
+        val offset = 0.0001
+        val latMin = lat - offset
+        val lonMin = lon - offset
+        val latMax = lat + offset
+        val lonMax = lon + offset
 
-        //Making the url
-        val url = "https://wms.nibio.no/cgi-bin/sat_skog" +
+        val url = "https://wms.nibio.no/cgi-bin/satskog" +
                 "?SERVICE=WMS" +
                 "&VERSION=1.3.0" +
                 "&REQUEST=GetFeatureInfo" +
                 "&BBOX=$latMin,$lonMin,$latMax,$lonMax" +
                 "&CRS=EPSG:4326" +
-                "&WIDTH=100&HEIGHT=100" +
-                "&LAYERS=sat_skog" +
-                "&QUERY_LAYERS=sat_skog" +
-                "&I=50&J=50" +
-                "&INFO_FORMAT=text/plain"
+                "&WIDTH=10&HEIGHT=10" +
+                "&LAYERS=Alder" +
+                "&QUERY_LAYERS=Alder" +
+                "&I=5&J=5" +
+                "&INFO_FORMAT=application/vnd.ogc.gml"
 
         return try {
             val responseText = httpClient.get(url) {
                 header("User-Agent", "IN2000 Team 16 jostein.ibsen@gmail.com")
             }.bodyAsText()
+            println(url)
+            Log.d("NIBIO_DEBUG", "NIBIO: \n$responseText")
+            parseResponse(responseText)
 
-            parsePlainTextResponse(responseText)
 
         } catch (e: Exception) {
             println("Network error SatSkog: ${e.message}")
@@ -49,25 +52,30 @@ class SatSkogDataSource @Inject constructor(
         }
     }
 
-    private fun parsePlainTextResponse(text: String): SatSkogResponse {
-        val dataMap = text.lines()
-            .filter { it.contains("=") }
-            .associate { line ->
-                val parts = line.split("=")
-                parts[0].trim().lowercase() to parts[1].trim()
-            }
+    private fun parseResponse(gmlText: String): SatSkogResponse {
+
+        if (!gmlText.contains("<alder>")){
+            Log.d("NIBIO_DEBUG", "NIBIO: No data on this point")
+            return SatSkogResponse()
+        }
+
+        fun extractValue(tagName: String): String? {
+            val regex = "<$tagName>(.*?)</$tagName>".toRegex(RegexOption.DOT_MATCHES_ALL)
+            val match = regex.find(gmlText)
+            return match?.groupValues?.get(1)?.trim()
+        }
 
 
         return SatSkogResponse(
-            treeSpecies = dataMap["treslag"],
-            sprucePct = dataMap["gran_pct"]?.toIntOrNull(),
-            pinePct = dataMap["furu_pct"]?.toIntOrNull(),
-            broadleafPct = dataMap["lauv_pct"]?.toIntOrNull(),
-            fertilityCategory = dataMap["bon1_n"],
-            siteIndex = dataMap["bonitet"]?.toIntOrNull(),
-            standAge = dataMap["alder"]?.toIntOrNull(),
-            minElevation = dataMap["min_dem"]?.toIntOrNull(),
-            maxElevation = dataMap["max_dem"]?.toIntOrNull()
+            treeSpecies = extractValue("treslag"),
+            sprucePct = extractValue("gran_pct")?.toIntOrNull(),
+            pinePct = extractValue("furu_pct")?.toIntOrNull(),
+            broadleafPct = extractValue("lauv_pct")?.toIntOrNull(),
+            fertilityCategory = extractValue("bon1_n"),
+            siteIndex = extractValue("bonitet")?.toIntOrNull(),
+            standAge = extractValue("alder")?.toIntOrNull(),
+            minElevation = extractValue("min_dem")?.toIntOrNull(),
+            maxElevation = extractValue("max_dem")?.toIntOrNull()
         )
 
     }
