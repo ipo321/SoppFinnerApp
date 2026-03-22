@@ -52,9 +52,24 @@ data class TerrainData(
 )
 
 data class ForestData(
-    val arType: Int,    //AR5 code
-    val treeSpecies: Int //type of forest
+    // Trees
+    val dominantTreeSpecies: String?,
+    val sprucePercentage: Int?,       // 0 - 100
+    val pinePercentage: Int?,         // 0 - 100
+    val broadleafPercentage: Int?,    // 0 - 100
+
+    // Soil & Growth
+    val fertilityCategory: String?,
+    val siteIndex: Int?,              // e.g., 8, 11, 14, 17, 20
+
+    // Age
+    val standAge: Int?,               // Age of the trees in years
+
+    // Terrain (Elevation)
+    val minElevation: Int?,           // Meters above sea level
+    val maxElevation: Int?
 )
+
 
 
 // Structure of the result from the algorithm
