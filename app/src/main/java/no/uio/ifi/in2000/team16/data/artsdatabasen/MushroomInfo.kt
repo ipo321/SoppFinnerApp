@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.domain.model
+package no.uio.ifi.in2000.team16.data.artsdatabasen
 import kotlinx.serialization.Serializable
 
 

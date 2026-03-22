@@ -1,9 +1,6 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
 //import jakarta.inject.Inject
-import no.uio.ifi.in2000.team16.domain.model.MushroomInfo
-import no.uio.ifi.in2000.team16.domain.model.MushroomSearchResult
-import no.uio.ifi.in2000.team16.domain.model.OccurrenceResult
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
