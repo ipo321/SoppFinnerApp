@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met
+package no.uio.ifi.in2000.team16.data.met.locationForecast
 
 import kotlinx.serialization.Serializable
 

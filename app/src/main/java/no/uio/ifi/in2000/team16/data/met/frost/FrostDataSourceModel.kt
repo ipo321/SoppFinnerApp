@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met
+package no.uio.ifi.in2000.team16.data.met.frost
 
 import kotlinx.serialization.Serializable
 
@@ -73,4 +73,14 @@ data class Observation(
 data class Body(
     val data: String? = null,
     val value: String? = null
+)
+
+//Class used by the datasource to find closest station
+data class LocalStation(
+    val id: String,
+    val name: String,
+    val lat: Double,
+    val lon: Double,
+    val hasTemp: Boolean,
+    val hasRain: Boolean
 )

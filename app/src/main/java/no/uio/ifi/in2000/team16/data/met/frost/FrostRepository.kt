@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met
+package no.uio.ifi.in2000.team16.data.met.frost
 
 import no.uio.ifi.in2000.team16.domain.model.WeatherHistory
 import java.text.SimpleDateFormat
@@ -13,7 +13,8 @@ import kotlin.math.*
 */
 
 class FrostRepository @Inject constructor(
-    private val dataSource: FrostDataSource
+    private val dataSource: FrostDataSource,
+    private val stationLocator: StationLocator
 ) {
     // In-memory cache, should be made into a room database in the future for better persistence
 
@@ -50,24 +51,47 @@ class FrostRepository @Inject constructor(
         val timeRange = "${sdf.format(currentTime-fourteenDaysAgo)}T00:00:00Z/${sdf.format(currentTime)}T00:00:00Z"
 
         // Fetching data from API
-        val response = dataSource.fetchWeather(lat, lon, timeRange) ?: return null
-        val rseries = response.data?.tseries ?: return null
+        var rseries: List<TimeSeries>? = null
+
+        //FIND BEST STATION
+        val stationIdsList = stationLocator.findNearestStation(lat, lon, 50000.0)
+
+        //QUICK PATH
+        if (stationIdsList.isNotEmpty()) {
+            val idsString = stationIdsList.joinToString(",") // F.eks "18500,18950"
+            val fastResponse = dataSource.fetchWeather(idsString, timeRange)
+            rseries = fastResponse?.data?.tseries
+        }
+
+        val hasValidData = rseries?.any { it.observations?.isNotEmpty() == true } == true
+
+        // FALLBACK
+        if (!hasValidData) {
+            println("Frost: Fallback for $lat, $lon")
+            val slowResponse = dataSource.fetchWeatherFallback(lat, lon, timeRange)
+            rseries = slowResponse?.data?.tseries ?: return null
+        }
+
+        if (rseries == null) return null
 
         val allTempObs = mutableListOf<Double>()
         val allRainObs = mutableListOf<Double>()
 
+        var foundTemp = false
+        var foundRain = false
+
         rseries.forEach { series ->
             val elementId = series.header?.extra?.element?.id?.lowercase() ?: ""
+            val values = series.observations?.mapNotNull {
+                (it.body?.value ?: it.body?.data)?.toDoubleOrNull()
+            } ?: emptyList()
 
-            // VIKTIG: Vi henter fra 'value' slik JSON-en din viser
-            val values = series.observations.mapNotNull {
-                it.body?.value?.toDoubleOrNull()
-            }
-
-            if (elementId.contains("air_temperature")) {
+            if (elementId.contains("air_temperature") && !foundTemp && values.isNotEmpty()) {
                 allTempObs.addAll(values)
-            } else if (elementId.contains("precipitation_amount")) {
+                foundTemp = true
+            } else if (elementId.contains("precipitation_amount") && !foundRain && values.isNotEmpty()) {
                 allRainObs.addAll(values)
+                foundRain = true
             }
         }
         // calculation

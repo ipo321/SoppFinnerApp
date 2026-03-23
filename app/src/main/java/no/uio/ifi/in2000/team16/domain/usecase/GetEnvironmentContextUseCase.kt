@@ -3,9 +3,9 @@ package no.uio.ifi.in2000.team16.domain.usecase
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.async
 import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
-import no.uio.ifi.in2000.team16.data.met.LocationForecastRepository
+import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepository
 import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
-import no.uio.ifi.in2000.team16.data.met.FrostRepository
+import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
 import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepository
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import javax.inject.Inject
