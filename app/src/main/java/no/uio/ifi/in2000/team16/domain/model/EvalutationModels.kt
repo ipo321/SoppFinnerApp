@@ -42,6 +42,8 @@ data class WeatherData(
 data class WeatherHistory(
     val avgTempPast14Days: Double?,
     val totalRainPast14Days: Double?,
+    val minTempPast14Days: Double?,
+    val maxTempPast14Days: Double?
 )
 
 

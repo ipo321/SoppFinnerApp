@@ -74,7 +74,7 @@ class LocationForecastRepository @Inject constructor(
         val rainProb = generalForecast?.details?.probability_of_precipitation
 
 
-        return WeatherData(
+        val weatherData = WeatherData(
             temp = avgTemp,
             rain = totalRain,
             humidity = avgHumidity,
@@ -85,6 +85,12 @@ class LocationForecastRepository @Inject constructor(
             probOfRain = rainProb
         )
 
+        cache[cacheKey] = CacheEntry(
+            data = weatherData,
+            timestamp = currentTime
+        )
+
+        return weatherData
     }
 }
 

@@ -43,5 +43,4 @@ class ModuleViewModel @Inject constructor(
     }
 }
 
-// State holder nå på den komplette datapakken for algoritmen
 data class ModulUiState(val environmentContext: EnvironmentContext)
