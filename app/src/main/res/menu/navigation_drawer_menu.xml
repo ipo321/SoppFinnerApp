@@ -16,7 +16,7 @@
             android:title = "@string/min_side"/>
         <item
             android:id = "@+id/nav_informasjon"
-            android:icon = "@drawable/marioSopp"
+            android:icon = "@drawable/mushroom"
             android:title = "@string/min_side"/>
 
         <item

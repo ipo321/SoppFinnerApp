@@ -1,28 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name = "Base.Theme.Team16" parent = "android:Theme.Material.Light.NoActionBar">
+    <style name="Base.Theme.Team16" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/green</item>
         <item name="android:navigationBarColor">@color/white</item>
         <item name="android:textColorPrimary">@color/black</item>
     </style>
 
-
-
-    <style name = "Theme.MySplashScreen" parent = "Theme.SplashScreen">
-        <item name = "windowSplashScreenBackground">@color/white</item>
-        <item name =  "windowSplashScreenAnimatedIcon">@drawable/brunSopp</item>
-        <item name = "windowSplashScreenAnimationDuration">1000</item>
-        <item name = "postSplashScreenTheme">@style/Theme.Team16</item>
-
-</style>
     <style name="Theme.Team16" parent="Base.Theme.Team16" />
-    <style name = "ThemeOverlay.AppCompat.navTheme">
-        <item name= "colorPrimary">@color/white</item>
+
+    <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/mushroom</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.Team16</item>
     </style>
 
-    <style name="SlideActivityAnimation" parent ="@android:style/Animation.Activity">
-        <item name = "android:activityOpenEnterAnimation">@anim/slide_in_right</item>
-        <item name = "android:activityOpenExitAnimation">@anim/slide_out_left</item>
+    <style name="ThemeOverlay.AppCompat.navTheme">
+        <item name="colorPrimary">@color/white</item>
     </style>
+
+    <style name="SlideActivityAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+    </style>
+
 </resources>
