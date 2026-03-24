@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Profile">
@@ -30,7 +31,6 @@
         app:itemIconTint="@drawable/item_selector"
         app:itemTextColor="@drawable/item_selector"
         app:itemRippleColor="@android:color/transparent"
-        app:labelVisibilityMode="labeled"
-        app:selectedItemId="@id/bottom_home" />
+        app:labelVisibilityMode="labeled" />
 
 </RelativeLayout>

@@ -53,7 +53,7 @@ fun Display(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(exampleClass[0].id ?: "Ukjent")
+        Text(exampleClass.firstOrNull()?.id ?: "Ukjent")
         Spacer(modifier = Modifier.padding(8.dp))
         Button(
             onClick = onNavigateBack
@@ -62,3 +62,4 @@ fun Display(
         }
     }
 }
+

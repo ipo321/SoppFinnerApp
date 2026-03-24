@@ -30,8 +30,7 @@
         app:itemIconTint="@drawable/item_selector"
         app:itemTextColor="@drawable/item_selector"
         app:itemRippleColor="@android:color/transparent"
-        app:labelVisibilityMode="labeled"
-        app:selectedItemId="@id/bottom_home" />
+        app:labelVisibilityMode="labeled" />
 
     <WebView
         android:id="@+id/wmsWebView"

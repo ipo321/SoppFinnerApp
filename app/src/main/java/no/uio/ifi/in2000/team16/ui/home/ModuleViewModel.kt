@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.example.ModuleDataSource
 import no.uio.ifi.in2000.team16.domain.model.ExampleClass
 import javax.inject.Inject
-
 /*
     Implementerer HiltViewModel fordi dette er en ViewModel som gjør det enkelt med
     Dependency Injection.
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ModuleViewModel @Inject constructor(
-    private val kartDataSource: ModuleDataSource
+    private val kartDataSource: ModuleDataSource //<- Denne finnes ikke og skaper en bug
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<ModulUiState>>(UiState.Idle)
     val uiState : StateFlow<UiState<ModulUiState>> = _uiState.asStateFlow()
