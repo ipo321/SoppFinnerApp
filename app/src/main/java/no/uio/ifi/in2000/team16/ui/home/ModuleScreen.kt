@@ -9,12 +9,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.ExampleClass
 
 /*
@@ -37,8 +36,7 @@ fun ModuleScreen(
             is UiState.Success -> {
                 Display(
                     onNavigateBack = onNavigateBack,
-                    exampleClass = (uiState.value as UiState.Success).data.exampleClass
-                )
+                    environmentContext = (uiState.value as UiState.Success).data.environmentContext)
             }
         }
     }
@@ -47,7 +45,7 @@ fun ModuleScreen(
 @Composable
 fun Display(
     onNavigateBack: () -> Unit,
-    exampleClass: List<ExampleClass>,
+    environmentContext: EnvironmentContext,
     modifier: Modifier = Modifier
 ) {
 
@@ -55,7 +53,7 @@ fun Display(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(exampleClass.firstOrNull()?.id ?: "Ukjent")
+        Text(environmentContext.toString())
         Spacer(modifier = Modifier.padding(8.dp))
         Button(
             onClick = onNavigateBack
@@ -64,4 +62,3 @@ fun Display(
         }
     }
 }
-

@@ -1,10 +1,5 @@
 package no.uio.ifi.in2000.team16.data.example
 
-
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -19,7 +14,7 @@ import javax.inject.Singleton
 */
 
 @Singleton
-class ModuleDataSource @Inject constructor(
+class ModulDataSource @Inject constructor(
     private val httpClient : HttpClient
 ) {
     private val baseUrl = "https://in2000-proxy.ifi.uio.no"
