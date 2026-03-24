@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.example
 
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,4 +32,3 @@ class ModuleDataSource @Inject constructor(
         return response.body()
     }
 }
-
