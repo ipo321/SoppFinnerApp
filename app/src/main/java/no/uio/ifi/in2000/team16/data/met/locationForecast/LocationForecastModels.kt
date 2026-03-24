@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met
+package no.uio.ifi.in2000.team16.data.met.locationForecast
 
 import kotlinx.serialization.Serializable
 
@@ -25,7 +25,8 @@ data class MetTimeSeries(
 @Serializable
 data class MetData(
     val instant: MetInstant,
-    val next_1_hours: MetNext1Hours? = null
+    val next_1_hours: MetNext1Hours? = null,
+    val next_12_hours: MetNext12Hours? = null
 )
 
 
@@ -61,7 +62,7 @@ data class MetDetails(
 
 @Serializable
 data class MetNext1Hours(
-    val details: MetDetails
+    val details: MetPrecipDetails
 )
 
 @Serializable
