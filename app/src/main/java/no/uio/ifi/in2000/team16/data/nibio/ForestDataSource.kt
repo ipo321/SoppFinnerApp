@@ -1,15 +1,15 @@
 package no.uio.ifi.in2000.team16.data.nibio
 
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
 import javax.inject.Inject
 import javax.inject.Singleton
-
-/*
-    API for getting weather data from NIBIO and AR5 data
-*/
 
 @Singleton
 class ForestDataSource @Inject constructor(
@@ -23,5 +23,15 @@ class ForestDataSource @Inject constructor(
             throw Exception("Could not get forest info")
         }
         return response.body()
+    }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object ForestApi {
+    @Provides
+    @Singleton
+    fun provideForestDataSource(httpClient: HttpClient): ForestDataSource {
+        return ForestDataSource(httpClient)
     }
 }

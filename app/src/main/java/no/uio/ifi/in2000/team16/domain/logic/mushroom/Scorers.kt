@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
-import no.uio.ifi.in2000.team16.domain.model.ForestData
 import kotlin.math.abs
 
 /*
@@ -101,32 +100,6 @@ object SlopeScorer{
         if (slopeDegree == null) return 0.0
         if (slopeDegree >= maxSlopeDegree) return 0.0
         return (1.0 - (slopeDegree / maxSlopeDegree)).coerceIn(0.0, 1.0)
-    }
-}
-
-object TreePercentageScorer {
-    fun evaluate(data: ForestData?, preferred: List<String>): Double {
-        if (data == null) return 0.5
-
-        if (data.sprucePercentage != null || data.pinePercentage != null || data.broadleafPercentage != null) {
-            var pct = 0
-            if (preferred.any { it.contains("Gran", true) }) pct += data.sprucePercentage ?: 0
-            if (preferred.any { it.contains("Furu", true) }) pct += data.pinePercentage ?: 0
-            if (preferred.any { it.contains("Lauv", true) }) pct += data.broadleafPercentage ?: 0
-            return (pct / 100.0).coerceIn(0.0, 1.0)
-        }
-
-        val dominant = data.dominantTreeSpecies ?: return 0.5
-        return if (preferred.any { dominant.contains(it, true) }) 1.0 else 0.0
-    }
-}
-
-object ForestAgeScorer {
-    fun evaluate(standAge: Int?, minAge: Int): Double {
-        if (standAge == null) return 0.5
-        if (standAge >= minAge) return 1.0
-
-        return (standAge.toDouble() / minAge).coerceIn(0.0, 1.0)
     }
 }
 
