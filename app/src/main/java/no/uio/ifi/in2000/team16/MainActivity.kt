@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.team16.ui.home.Navigation
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.MapLibre
 
@@ -23,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team16Theme {
-                MushroomInfoScreen()
+                Navigation()
             }
         }
     }
