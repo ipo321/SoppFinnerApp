@@ -14,6 +14,8 @@ import kotlinx.serialization.Serializable
 object MapScreenRoute
 
 // This will be changed when we have other screens
+
+// This will be changed when we have other screens
 @Serializable
 object ModuleScreenRoute
 
@@ -33,7 +35,7 @@ fun Navigation(
         composable<MapScreenRoute> {
             MapScreen(
                 onButtonClicked = {
-                    navController.navigate(route = ModuleScreenRoute)
+                    navController.navigate(ModuleScreenRoute)
                 },
                 viewModel = mapViewModel
             )
@@ -48,7 +50,6 @@ fun Navigation(
         }
     }
 }
-
 
 
 

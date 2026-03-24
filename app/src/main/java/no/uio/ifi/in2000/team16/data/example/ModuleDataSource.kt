@@ -21,7 +21,7 @@ import javax.inject.Singleton
 class ModuleDataSource @Inject constructor(
     private val httpClient : HttpClient
 ) {
-    private val baseUrl = "https://in2000-proxy.ifi.uio.no/"
+    private val baseUrl = "https://in2000-proxy.ifi.uio.no"
 
     suspend fun getModule(): List<ExampleClass> {
         val response: HttpResponse = httpClient.get("${baseUrl}/alpacaapi/v2/district1")
