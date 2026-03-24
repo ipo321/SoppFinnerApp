@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV1
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 
@@ -54,9 +56,14 @@ fun ModuleScreen(
 
 @Composable
 fun DisplayEnvironmentContext(context: EnvironmentContext) {
-    val scorer: MushroomScorer = remember { MushroomScorerV1() }
+    val scorer: MushroomScorer = remember { MushroomScorerV2() }
+    val speciesRepo = remember { SpeciesRepository() }
+    val skarlagenProfile = remember {
+        speciesRepo.getSpeciesByName("Skarlagen vårbeger") ?: SpeciesProfile.mock
+    }
 
-    val evaluation = scorer.calculateScore(context, SpeciesProfile.mock)
+    //val evaluation = scorer.calculateScore(context, SpeciesProfile.mock)
+    val evaluation = scorer.calculateScore(context, skarlagenProfile)
 
     Column(horizontalAlignment = Alignment.Start) {
 

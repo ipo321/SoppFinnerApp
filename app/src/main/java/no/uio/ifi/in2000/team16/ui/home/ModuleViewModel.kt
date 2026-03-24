@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ModuleViewModel @Inject constructor(
-    private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase // Injisere UseCasen!
+    private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<ModulUiState>>(UiState.Idle)
     val uiState : StateFlow<UiState<ModulUiState>> = _uiState.asStateFlow()
@@ -25,11 +25,9 @@ class ModuleViewModel @Inject constructor(
             try {
                 Log.d("API_TEST", "Henter alt av vær og skog parallelt...")
 
-                // Koordinater for Nordmarka
                 val lat = 60.008
                 val lon = 10.686
 
-                // Kaller UseCasen din! Vi sender foreløpig null på art for å teste den generelle flyten
                 val contextResult = getEnvironmentContextUseCase(lat, lon, null)
 
                 Log.d("API_TEST", "SUKSESS! Hentet EnvironmentContext: $contextResult")
