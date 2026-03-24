@@ -3,8 +3,11 @@ package no.uio.ifi.in2000.team16.ui.mushroomInfo
 import no.uio.ifi.in2000.team16.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -30,7 +33,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+/* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
+this screen only uses resorses that are in the app and no api calls are made.
+see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
 
+ */
 @Composable
 fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
     val selected = viewModel.selectedMushroom
@@ -42,6 +49,10 @@ fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(text = "Aldri spis sopp du er usikker på." +
+                " se soppkontroll.no for mere informasjon",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold)
 
         Box {
         Button(onClick = { expanded = true }) {
@@ -82,5 +93,38 @@ fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
 
         Text(text = selected.commonName, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Text(text = selected.latinName, fontSize = 14.sp, fontStyle = FontStyle.Italic)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            selected.properties.forEach { property ->
+                MushroomPropertyBadge(property)
+            }
+        }
+    }
+}
+
+@Composable
+fun MushroomPropertyBadge(property: MushroomIcon) {
+    val borderColor = if (property.isRed) Color(0xFFD94F4F) else Color(0xFF7A9B6E)
+    val bgColor     = if (property.isRed) Color(0xFFFDE8E8) else Color(0xFFE8F0E2)
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(bgColor)
+                .border(1.5.dp, borderColor, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = property.iconRes),
+                contentDescription = property.label,
+                modifier = Modifier.size(28.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = property.label, fontSize = 12.sp)
     }
 }
