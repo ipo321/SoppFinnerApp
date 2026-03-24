@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met
+package no.uio.ifi.in2000.team16.data.met.locationForecast
 
 import no.uio.ifi.in2000.team16.domain.model.WeatherData
 import javax.inject.Inject
@@ -74,7 +74,7 @@ class LocationForecastRepository @Inject constructor(
         val rainProb = generalForecast?.details?.probability_of_precipitation
 
 
-        return WeatherData(
+        val weatherData = WeatherData(
             temp = avgTemp,
             rain = totalRain,
             humidity = avgHumidity,
@@ -85,6 +85,12 @@ class LocationForecastRepository @Inject constructor(
             probOfRain = rainProb
         )
 
+        cache[cacheKey] = CacheEntry(
+            data = weatherData,
+            timestamp = currentTime
+        )
+
+        return weatherData
     }
 }
 
