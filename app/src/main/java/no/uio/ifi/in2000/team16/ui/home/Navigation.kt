@@ -8,40 +8,38 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import kotlinx.serialization.Serializable
 
-@Serializable
-object MapScreenRoute
 
-// This will be changed when we have other screens
-@Serializable
-object ModuleScreenRoute
+//
+const val MAP_SCREEN = "map"
+const val MODULE_SCREEN = "module"
+
 
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    val mapViewModel: MapViewModel = hiltViewModel<MapViewModel>()
-    val moduleViewModel: ModuleViewModel = hiltViewModel<ModuleViewModel>()
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val moduleViewModel: ModuleViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
-        startDestination = MapScreenRoute,
+        startDestination = MAP_SCREEN,
         modifier = modifier.fillMaxSize()
     ) {
-        composable<MapScreenRoute> {
+        composable(MAP_SCREEN) {
             MapScreen(
                 onButtonClicked = {
-                    navController.navigate(route = ModuleScreenRoute)
+                    navController.navigate(MODULE_SCREEN)
                 },
                 viewModel = mapViewModel
             )
         }
-        composable<ModuleScreenRoute> {
+        composable(MODULE_SCREEN){
             ModuleScreen(
                 onNavigateBack = {
-                    navController.navigate(route = MapScreenRoute)
+                    navController.navigate(MAP_SCREEN)
                 },
                 viewModel = moduleViewModel
             )
