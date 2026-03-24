@@ -33,6 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
+
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
 see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
@@ -105,9 +107,9 @@ fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
 }
 
 @Composable
-fun MushroomPropertyBadge(property: MushroomIcon) {
-    val borderColor = if (property.isRed) Color(0xFFD94F4F) else Color(0xFF7A9B6E)
-    val bgColor     = if (property.isRed) Color(0xFFFDE8E8) else Color(0xFFE8F0E2)
+fun MushroomPropertyBadge(property: MushroomProperty) {
+    val borderColor = if (property.isNegative) Color(0xFFD94F4F) else Color(0xFF7A9B6E)
+    val bgColor     = if (property.isNegative) Color(0xFFFDE8E8) else Color(0xFFE8F0E2)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -115,7 +117,7 @@ fun MushroomPropertyBadge(property: MushroomIcon) {
                 .size(56.dp)
                 .clip(CircleShape)
                 .background(bgColor)
-                .border(1.5.dp, borderColor, CircleShape),
+                .border(2.5.dp, borderColor, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Image(
