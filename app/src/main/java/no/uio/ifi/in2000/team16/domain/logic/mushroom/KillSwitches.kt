@@ -26,7 +26,7 @@ object SlopeKillSwitch{
         return null
     }
 }
-/*
+
 object UrbanKillSwitch{
     fun check(arType: Int?): String? {
         if (arType == null) return null
@@ -41,4 +41,3 @@ object UrbanKillSwitch{
         }
     }
 }
-*/

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.met.locationForecast
+package no.uio.ifi.in2000.team16.data.met
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
