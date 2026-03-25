@@ -1,15 +1,16 @@
 package no.uio.ifi.in2000.team16.domain.model
 
 import no.uio.ifi.in2000.team16.R
+//this file holds the data classes and the acual value that the MushroominfoScreen uses
+//add MushroomDisplay to allMushrooms for additional Mushroom screens
 
-
-data class MushroomProperty(   // was MushroomIcon
+data class MushroomProperty(  
     val label: String,
     val iconRes: Int,
     val isNegative: Boolean = false  // was isRed
 )
 
-data class MushroomDisplay(    // was Mushroom (to avoid confusion with MushroomInfo)
+data class MushroomDisplay(    
     val commonName: String,
     val latinName: String,
     val imageRes: Int,
