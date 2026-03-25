@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.home
 
+//Version-3.0
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,10 +24,17 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
+
+
+//Initialize it with the arguments from the logic/MushroomScorer data.
 
 @Composable
 fun ScoreCard(modifier: Modifier = Modifier,
-              title: String){
+              title: String,
+              score: Int,
+              description: String ){
 
     Card(
         modifier = modifier,
@@ -49,7 +58,16 @@ fun ScoreCard(modifier: Modifier = Modifier,
                     .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ){
-                    Text("100")
+                    //Displays the score evaluation.
+                    Text(score.toString())
+                }
+
+                Box(
+                    modifier = Modifier,
+                    contentAlignment = Alignment.Center
+
+                ){
+                    Text(description)
                 }
             }
 
@@ -77,7 +95,7 @@ fun ScoreCard(modifier: Modifier = Modifier,
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
                     ){
-                        Text("Example3")
+                        Text("'Example3'")
                     }
                 }
 

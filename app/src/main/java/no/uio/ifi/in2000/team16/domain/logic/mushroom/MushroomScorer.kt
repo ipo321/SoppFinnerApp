@@ -5,8 +5,8 @@ import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 
 /*
-Interface to be implemented by the algorithm, meant to help make the UI-get the data the same way even when new
-version of the algorithm is made
+Interface to be implemented by the algorithm, meant to help make the UI-get the data the same way
+even when new version of the algorithm is made
 */
 
 
