@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class ModuleViewModel @Inject constructor(
                 val lat = 60.008
                 val lon = 10.686
 
-                val contextResult = getEnvironmentContextUseCase(lat, lon, null)
+                val contextResult = getEnvironmentContextUseCase(lat, lon, MushroomSpecies.FUNNEL_CHANTERELLE)
 
                 Log.d("API_TEST", "SUKSESS! Hentet EnvironmentContext: $contextResult")
                 _uiState.value = UiState.Success(ModulUiState(contextResult))
