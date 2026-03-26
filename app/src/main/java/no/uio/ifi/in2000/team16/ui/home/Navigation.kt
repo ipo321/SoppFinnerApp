@@ -60,52 +60,26 @@ fun Navigation(
             composable(Screen.MinSide.rout) {
                 MinSide()
             }
- //THE PATH TO THE SCORECARD
-            composable(Screen.Score.rout) {
-                Score()
-            }
-    NavHost(
-        navController = navController,
-        startDestination = MAP_SCREEN,
-        modifier = modifier.fillMaxSize()
-    ) {
-        composable(MAP_SCREEN) {
-            MapScreen(
-                onButtonClicked = {
-                    navController.navigate(MODULE_SCREEN)
-                },
-                viewModel = mapViewModel
-            )
-        }
-        composable(MODULE_SCREEN){
-            ModuleScreen(
-                onNavigateBack = {
-                    navController.navigate(MAP_SCREEN)
-                },
-                viewModel = moduleViewModel
-            )
-        }
 
-        composable(MUSHROOM_INFO_SCREEN){
-            MushroomInfoScreen(
-                onNavigateHome = {
-                    navController.navigate(MAP_SCREEN){
-                        popUpTo(MAP_SCREEN){
-                            inclusive = false
+
+            composable(MUSHROOM_INFO_SCREEN) {
+                MushroomInfoScreen(
+                    onNavigateHome = {
+                        navController.navigate(MAP_SCREEN) {
+                            popUpTo(MAP_SCREEN) {
+                                inclusive = false
+                            }
                         }
                     }
-                }
-            )
-        }
-    }
-}
-
-            composable(Screen.Soppsiden.rout) {
-                MushroomInfoScreen()
+                )
             }
         }
     }
 }
+
+
+
+
 
 
 

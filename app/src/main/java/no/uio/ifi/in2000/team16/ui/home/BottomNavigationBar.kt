@@ -40,7 +40,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Soppesiden",
             icon = Icons.Default.Favorite,
-            route = Screen.Soppsiden.rout
+            route = MUSHROOM_INFO_SCREEN
         ),
         BottombarNavItem(
             title = "Min side",
