@@ -7,14 +7,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.data.nibio.ForestRepository
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 import no.uio.ifi.in2000.team16.domain.model.AreaResource
+import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
+import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
+import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import org.maplibre.android.maps.MapLibreMap
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val forestRepository: ForestRepository
+    private val forestRepository: ForestRepository,
+    private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<MapUiState>>(UiState.Idle)
     val uiState : StateFlow<UiState<MapUiState>> = _uiState.asStateFlow()
@@ -37,12 +44,35 @@ class MapViewModel @Inject constructor(
                 val forestInfo = forestRepository.getForestInfo(
                     pxX, pxY, south, west, north, east, width, height
                 )
-                _uiState.value = UiState.Success(MapUiState(forestInfo))
+
+                //Cheap?? version to make up lon and lat just to have some nmbrs, unsure how to get them
+                val lat = (south + north) / 2
+                val lon = (west + east) / 2
+
+                val context = getEnvironmentContextUseCase(
+                    lat,
+                    lon,
+                    MushroomSpecies.FUNNEL_CHANTERELLE
+                )
+
+                val scorer = MushroomScorerV2()
+                val profile = SpeciesProfile.mock
+
+                val evalutation = scorer.calculateScore(context, profile)
+
+                _uiState.value = UiState.Success(
+                    MapUiState(forestInfo, evalutation)
+                )
+
             } catch (e: Exception) {
                 _uiState.value = UiState.Error
             }
         }
     }
+
+
 }
 
-data class MapUiState(val areaResource: AreaResource)
+data class MapUiState(
+    val areaResource: AreaResource,
+    val evaluation: EvaluationResult)
