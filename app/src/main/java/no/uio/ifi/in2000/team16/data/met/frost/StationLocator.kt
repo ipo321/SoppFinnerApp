@@ -9,6 +9,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import kotlin.math.*
 
+
 /*
     Calling Frost with nearest casued the respone time to go from <1 to 8-10 seconds which was not optimal for the app. Without having to find the station the
     call went fast so we downloaded all the stations into a csv. Here we read it and returns the one that is closes based on a probably much simpler calculations

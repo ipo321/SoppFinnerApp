@@ -8,11 +8,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 
 
 //
 const val MAP_SCREEN = "map"
 const val MODULE_SCREEN = "module"
+
+const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
+
 
 
 @Composable
@@ -42,6 +46,18 @@ fun Navigation(
                     navController.navigate(MAP_SCREEN)
                 },
                 viewModel = moduleViewModel
+            )
+        }
+
+        composable(MUSHROOM_INFO_SCREEN){
+            MushroomInfoScreen(
+                onNavigateHome = {
+                    navController.navigate(MAP_SCREEN){
+                        popUpTo(MAP_SCREEN){
+                            inclusive = false
+                        }
+                    }
+                }
             )
         }
     }

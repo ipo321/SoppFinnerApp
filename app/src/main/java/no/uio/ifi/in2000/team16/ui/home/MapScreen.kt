@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -72,10 +73,18 @@ fun MapScreen(
         Button(
             onClick = onButtonClicked,
             modifier = Modifier
-                .align(Alignment.Center)
+                .align(Alignment.BottomCenter)
                 .padding(8.dp)
         ) {
             Text("Knapp")
+
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .wrapContentSize()
+        ) {
+            Dropdown()
         }
         when (uiState) {
             is UiState.Success -> {
@@ -91,6 +100,7 @@ fun MapScreen(
             is UiState.Error -> InfoPopUp("Feilet innlasting")
             is UiState.Idle -> {}
         }
+
     }
 }
 
