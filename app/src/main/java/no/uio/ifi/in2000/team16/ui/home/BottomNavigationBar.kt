@@ -32,15 +32,16 @@ fun BottomNavigationBar(
     navController: NavController
 ) {
     val navigationItems = listOf(
-        BottombarNavItem(
-            title = "Kart",
-            icon = Icons.Default.Place,
-            route = MAP_SCREEN
-        ),
+
         BottombarNavItem(
             title = "Soppesiden",
             icon = Icons.Default.Favorite,
             route = MUSHROOM_INFO_SCREEN
+        ),
+        BottombarNavItem(
+            title = "Kart",
+            icon = Icons.Default.Place,
+            route = MAP_SCREEN
         ),
         BottombarNavItem(
             title = "Min side",
