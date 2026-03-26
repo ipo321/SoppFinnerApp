@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,6 +29,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.createGraph
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
@@ -57,6 +63,7 @@ fun MapScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
     //val viewModel: MapViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
@@ -64,6 +71,7 @@ fun MapScreen(
     val mapView = getMapView(viewModel, context)
     // mapView is alerted when lifecycle changes
     LifeCycleObserver(lifecycleOwner, mapView)
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -80,6 +88,7 @@ fun MapScreen(
             Text("Knapp")
 
         }
+
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -87,6 +96,7 @@ fun MapScreen(
         ) {
             Dropdown()
         }
+
         when (uiState) {
             is UiState.Success -> {
                 val data = (uiState as UiState.Success<MapUiState>).data
