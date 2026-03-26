@@ -41,7 +41,9 @@ fun ScoreCard(modifier: Modifier = Modifier,
 
     ){
         Column(
-            modifier = Modifier,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //The ScoreCirlce itself:
@@ -53,25 +55,23 @@ fun ScoreCard(modifier: Modifier = Modifier,
 
             ) {
                 Box(
-                    modifier = Modifier,
-                    //.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ){
                     //Displays the score evaluation.
                     Text(score.toString())
                 }
-                Spacer(Modifier.height(4.dp))
-
-
-                //Display the summary of the area
-                Text("AAAAAAA")
-
-                Spacer(Modifier.height(4.dp))
 
             }
 
 
             Spacer(Modifier.height(8.dp))
+
+            Text(description)
+
+            Spacer(Modifier.height(8.dp))
+
 
             //Rows intended for extra info like humidity exct..:
 
@@ -86,7 +86,7 @@ fun ScoreCard(modifier: Modifier = Modifier,
                         contentAlignment = Alignment.Center
 
                     ){
-                        Text(description)
+                        Text("Helning")
                     }
 
                     Spacer(Modifier.height(4.dp))
@@ -96,7 +96,7 @@ fun ScoreCard(modifier: Modifier = Modifier,
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
                     ){
-                        Text("'Example3'")
+                        Text("Fukt")
                     }
                 }
 
@@ -112,7 +112,7 @@ fun ScoreCard(modifier: Modifier = Modifier,
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
                     ){
-                        Text("Example2")
+                        Text("Temperature")
                     }
 
                     Spacer(Modifier.height(4.dp))
@@ -121,7 +121,7 @@ fun ScoreCard(modifier: Modifier = Modifier,
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
                     ){
-                        Text("Example4")
+                        Text("Smthn else")
                     }
                 }
 
