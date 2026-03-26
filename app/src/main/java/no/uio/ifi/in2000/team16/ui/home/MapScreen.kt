@@ -59,7 +59,6 @@ import org.maplibre.android.style.sources.GeoJsonSource
 fun MapScreen(
     onButtonClicked: () -> Unit,
     viewModel: MapViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -71,32 +70,6 @@ fun MapScreen(
     val mapView = getMapView(viewModel, context)
     // mapView is alerted when lifecycle changes
     LifeCycleObserver(lifecycleOwner, mapView)
-
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
-        bottomBar = { BottomNavigationBar(navController) }
-    ) { innerPadding ->
-        val graph =
-            navController.createGraph(startDestination = Screen.MinSide.rout) {
-                composable(route = Screen.MinSide.rout) {
-                    MinSide()
-                }
-                composable(route = Screen.Score.rout) {
-                    Score()
-                }
-                composable(route = Screen.Soppsiden.rout) {
-                    Soppsiden()
-                }
-
-            }
-        NavHost(
-            navController = navController,
-            graph = graph,
-            modifier = Modifier.padding(innerPadding)
-        )
-
-    }
 
     Box(
         modifier = Modifier.fillMaxSize()

@@ -18,19 +18,10 @@ sealed class Screen(val rout: String) {
     object MinSide: Screen("Min_side")
     object Score: Screen("Score")
     object Soppsiden: Screen("Soppsiden")
+    object Kart : Screen("Kart")
+
 }
-@Composable
-fun Soppsiden(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        Text(
-            text = "Soppsiden",
-            style = MaterialTheme.typography.headlineLarge
-        )
-    }
-}
+
 
 @Composable
 fun MinSide(){
@@ -44,6 +35,11 @@ fun MinSide(){
         )
     }
 }
+
+/*
+TEMP PLACEHOLDER FOR THE SCORE SCREEN
+REMOVE WHEN SCORECARD IS FINISHED
+ */
 @Composable
 fun Score(){
     Box (modifier = Modifier

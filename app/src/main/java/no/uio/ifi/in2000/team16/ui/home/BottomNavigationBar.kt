@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -31,6 +32,11 @@ fun BottomNavigationBar(
     navController: NavController
 ) {
     val navigationItems = listOf(
+        BottombarNavItem(
+            title = "Kart",
+            icon = Icons.Default.Place,
+            route = MAP_SCREEN
+        ),
         BottombarNavItem(
             title = "Soppesiden",
             icon = Icons.Default.Favorite,
@@ -60,8 +66,13 @@ fun BottomNavigationBar(
                 selected = selectedNavigationIndex == index,
                 onClick = {
                     selectedNavigationIndex = index
-                    navController.navigate(item.route)
-                },
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true }
+                          },
                 icon = {
                     Icon(
                         imageVector = item.icon,

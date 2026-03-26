@@ -36,7 +36,7 @@ fun Dropdown() {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.padding(start =16.dp, top = 48.dp)
+        modifier = Modifier.padding(start =40.dp, top = 40.dp)
             .size(50.dp).
         background(Color.White,
                 shape = RoundedCornerShape(20.dp))
