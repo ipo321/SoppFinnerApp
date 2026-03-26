@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 
 
 @Composable
@@ -35,10 +36,13 @@ fun Dropdown() {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.size(100.dp).background(Color(0xFF9DC183),
+        modifier = Modifier.padding(start =16.dp, top = 48.dp)
+            .size(50.dp).
+        background(Color.White,
                 shape = RoundedCornerShape(20.dp))
-                .padding(16.dp),
-                contentAlignment = Alignment.Center
+                .padding(10.dp),
+                contentAlignment = Alignment.Center,
+
 
     ) {
         IconButton(
@@ -50,7 +54,7 @@ fun Dropdown() {
         }
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
         ) {
             // First section
             DropdownMenuItem(
