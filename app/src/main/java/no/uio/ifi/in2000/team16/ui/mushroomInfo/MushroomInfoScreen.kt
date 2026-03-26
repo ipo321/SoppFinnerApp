@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -41,7 +42,9 @@ see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
 
  */
 @Composable
-fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
+fun MushroomInfoScreen(
+    onNavigateHome: () -> Unit,
+    viewModel: MushroomInfoViewModel = viewModel()) {
     val selected = viewModel.selectedMushroom
     var expanded by remember { mutableStateOf(false) }
     Column(
@@ -102,6 +105,15 @@ fun MushroomInfoScreen(viewModel: MushroomInfoViewModel = viewModel()) {
             selected.properties.forEach { property ->
                 MushroomPropertyBadge(property)
             }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = onNavigateHome,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text("Tilbake til kart")
         }
     }
 }
