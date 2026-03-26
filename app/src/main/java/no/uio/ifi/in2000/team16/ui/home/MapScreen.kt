@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -79,16 +80,16 @@ fun MapScreen(
         }
         when (uiState) {
             is UiState.Success -> {
-                val forestInfo = (uiState as UiState.Success<MapUiState>).data.areaResource
-                InfoPopUp("Arealdekar: ${forestInfo.acres}\n" +
-                        "Arealtype: ${forestInfo.areaType}\n" +
-                        "Treslag: ${forestInfo.woodSpecies}\n" +
-                        "Grunnforhold: ${forestInfo.groundConditions}\n" +
-                        "Skogbonitet: ${forestInfo.forestQuality}"
+                val data = (uiState as UiState.Success<MapUiState>).data
+                val forestInfo = data.areaResource
+                val evaluation = data.evaluation
+                InfoPopUp(
+                    msg = evaluation.description,
+                    score = evaluation.score
                 )
             }
-            is UiState.Loading -> InfoPopUp("Laster inn")
-            is UiState.Error -> InfoPopUp("Feilet innlasting")
+            is UiState.Loading -> InfoPopUp("Laster inn", score = 0)
+            is UiState.Error -> InfoPopUp("Feilet innlasting", score = 0)
             is UiState.Idle -> {}
         }
     }
@@ -160,16 +161,28 @@ fun LifeCycleObserver(lifecycleOwner: LifecycleOwner, mapView: MapView) {
 // In the future, this info will be sent to the score algorithm instead
 @Composable
 fun BoxScope.InfoPopUp(
-    msg: String,
+    msg : String,
+    score : Int,
     modifier: Modifier = Modifier
 ) {
-    Text(
+
+
+    /*Text(
         text = msg,
         modifier = modifier
             .align(Alignment.BottomStart)
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.8f))
             .padding(8.dp)
+    )*/
+
+    ScoreCard(
+        score = score,
+        description = msg,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth()
+            .padding(16.dp)
     )
 }
 

@@ -32,9 +32,8 @@ import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 
 @Composable
 fun ScoreCard(modifier: Modifier = Modifier,
-              title: String,
-              score: Int,
-              description: String ){
+              description: String,
+              score: Int ){
 
     Card(
         modifier = modifier,
@@ -47,28 +46,28 @@ fun ScoreCard(modifier: Modifier = Modifier,
         ) {
             //The ScoreCirlce itself:
             Card(
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier.size(70.dp),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(Color.Red),
                 elevation = CardDefaults.cardElevation(defaultElevation = 20.dp)
 
             ) {
                 Box(
-                    modifier = Modifier
-                    .fillMaxSize(),
+                    modifier = Modifier,
+                    //.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ){
                     //Displays the score evaluation.
                     Text(score.toString())
                 }
+                Spacer(Modifier.height(4.dp))
 
-                Box(
-                    modifier = Modifier,
-                    contentAlignment = Alignment.Center
 
-                ){
-                    Text(description)
-                }
+                //Display the summary of the area
+                Text("AAAAAAA")
+
+                Spacer(Modifier.height(4.dp))
+
             }
 
 
@@ -81,16 +80,18 @@ fun ScoreCard(modifier: Modifier = Modifier,
                     modifier = Modifier,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    //Uppermost left
                     Box(
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
 
                     ){
-                        Text(title)
+                        Text(description)
                     }
 
                     Spacer(Modifier.height(4.dp))
 
+                    //Bottom Left
                     Box(
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
@@ -105,6 +106,8 @@ fun ScoreCard(modifier: Modifier = Modifier,
                     modifier = Modifier,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    //Upper right
                     Box(
                         modifier = Modifier,
                         contentAlignment = Alignment.Center
