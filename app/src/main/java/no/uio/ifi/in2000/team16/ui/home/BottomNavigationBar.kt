@@ -32,17 +32,18 @@ fun BottomNavigationBar(
     navController: NavController
 ) {
     val navigationItems = listOf(
-
-        BottombarNavItem(
-            title = "Soppesiden",
-            icon = Icons.Default.Favorite,
-            route = MUSHROOM_INFO_SCREEN
-        ),
         BottombarNavItem(
             title = "Kart",
             icon = Icons.Default.Place,
             route = MAP_SCREEN
         ),
+        
+        BottombarNavItem(
+            title = "Soppesiden",
+            icon = Icons.Default.Favorite,
+            route = MUSHROOM_INFO_SCREEN
+        ),
+
         BottombarNavItem(
             title = "Min side",
             icon = Icons.Default.Home,
@@ -86,8 +87,8 @@ fun BottomNavigationBar(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.surface,
-                    indicatorColor = MaterialTheme.colorScheme.primary
+                    selectedIconColor = Color(0xFFFDE8E8),
+                    indicatorColor = Color(0xFFD4E6CC)
                 )
             )
         }
