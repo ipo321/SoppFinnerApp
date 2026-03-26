@@ -46,11 +46,6 @@ fun BottomNavigationBar(
             title = "Min side",
             icon = Icons.Default.Home,
             route = Screen.MinSide.rout
-        ),
-        BottombarNavItem(
-            title = "Score",
-            icon = Icons.Default.Person,
-            route = Screen.Score.rout
         )
     )
 
