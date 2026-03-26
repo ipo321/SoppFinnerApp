@@ -1,6 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.home
 
-//Version-3.0
+//Version-3.5
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
