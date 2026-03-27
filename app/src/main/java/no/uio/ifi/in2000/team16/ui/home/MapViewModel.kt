@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.data.nibio.ForestRepository
+import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 import no.uio.ifi.in2000.team16.domain.model.AreaResource
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
@@ -21,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val forestRepository: ForestRepository,
+    private val SpeciesRepository: SpeciesRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<UiState<MapUiState>>(UiState.Idle)
@@ -44,6 +46,8 @@ class MapViewModel @Inject constructor(
                 val forestInfo = forestRepository.getForestInfo(
                     pxX, pxY, south, west, north, east, width, height
                 )
+                val profile = SpeciesRepository.getSpeciesByName("Skarlagen vårbeger") ?: throw IllegalArgumentException("Species 'Skarlagen vårbeger' not found")
+
 
                 //Cheap?? version to make up lon and lat just to have some nmbrs, unsure how to get them
                 val lat = (south + north) / 2
@@ -56,7 +60,6 @@ class MapViewModel @Inject constructor(
                 )
 
                 val scorer = MushroomScorerV2()
-                val profile = SpeciesProfile.mock
 
                 val evalutation = scorer.calculateScore(context, profile)
 
