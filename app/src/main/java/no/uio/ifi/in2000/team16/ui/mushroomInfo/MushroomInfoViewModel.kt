@@ -18,3 +18,5 @@ class MushroomInfoViewModel : ViewModel(){
         selectedMushroom = mushroom
     }
 }
+
+
