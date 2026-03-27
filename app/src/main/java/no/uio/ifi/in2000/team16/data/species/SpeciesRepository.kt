@@ -4,8 +4,19 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
 
+//Repository That returns objects of MushroomInfo
+
 @Singleton
 class SpeciesRepository @Inject constructor(){
+
+    fun getSpeciesByName(name: String): SpeciesProfile{
+        val allSpecies = getAllSpecies()
+        return allSpecies.firstOrNull { it.name == name }
+            ?: allSpecies.first()
+    }
+    fun getAllSpecies(): List<SpeciesProfile> {
+        return allSpecies
+    }
     private val allSpecies = listOf(
         SpeciesProfile(
             name = "Kantarell",
@@ -66,11 +77,5 @@ class SpeciesRepository @Inject constructor(){
         )
     )
 
-    fun getSpeciesByName(name: String): SpeciesProfile?{
-        return allSpecies.find {it.name.equals(name,ignoreCase = true)}
-    }
-
-    fun getAllSpecies(): List<SpeciesProfile> {
-        return allSpecies
-    }
 }
+
