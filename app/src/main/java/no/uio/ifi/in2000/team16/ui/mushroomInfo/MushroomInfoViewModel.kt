@@ -5,15 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.domain.model.MushroomDisplay
-import no.uio.ifi.in2000.team16.domain.model.allMushrooms
+import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
 
 class MushroomInfoViewModel : ViewModel(){
-   val mushrooms = allMushrooms
+
+    val source: SpeciesDataSource = SpeciesDataSource()
+   val mushrooms = source.getAllMushroomInfos()
     var selectedMushroom by mutableStateOf(mushrooms[0])
         private set
 
-    fun selectMushroom(mushroom: MushroomDisplay) {
+    fun selectMushroom(mushroom: SpeciesDataSource.MushroomInfo) {
         selectedMushroom = mushroom
     }
 }

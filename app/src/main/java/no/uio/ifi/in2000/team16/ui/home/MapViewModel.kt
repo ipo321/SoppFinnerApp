@@ -17,6 +17,7 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import org.maplibre.android.maps.MapLibreMap
 import javax.inject.Inject
+import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
