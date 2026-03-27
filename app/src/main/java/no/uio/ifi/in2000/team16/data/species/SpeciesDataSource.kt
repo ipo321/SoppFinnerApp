@@ -1,18 +1,24 @@
 package no.uio.ifi.in2000.team16.data.species
 
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SpeciesRepository @Inject constructor(){
+class SpeciesDataSource @Inject constructor(){
+
+    //keeps track of how many mushrooms we have profiled easily,
+    //gets updated to actual value when getAllSpecies is called.
+    var amount: Int = 0
+
     private val allSpecies = listOf(
         SpeciesProfile(
             name = "Kantarell",
             type = 1,
             activeMonths = listOf(6, 7, 8, 9, 10),
             killTemp = -2.0,
-            optimalTemp = 15.0,
+            optimalTemp = 18.0,
             tempToleranceC = 8.0,
 
             optimalRainMm = 20.0,
@@ -45,6 +51,7 @@ class SpeciesRepository @Inject constructor(){
             maxSlope = 25.0,
             windPenaltyThreshold = 6.0
         ),
+
         SpeciesProfile(
             name = "Skarlagen vårbeger",
             type = 3,
@@ -66,11 +73,58 @@ class SpeciesRepository @Inject constructor(){
         )
     )
 
-    fun getSpeciesByName(name: String): SpeciesProfile?{
-        return allSpecies.find {it.name.equals(name,ignoreCase = true)}
-    }
+//this file holds the data classes and the acual value that the MushroominfoScreen uses
+//add MushroomDisplay to allMushrooms for additional Mushroom screens
+
+    data class MushroomProperty(
+        val label: String,
+        val iconRes: Int,
+        val isNegative: Boolean = false  // was isRed
+    )
+
+    data class MushroomInfo(
+        val commonName: String,
+        val latinName: String,
+        val imageRes: Int,
+        val properties: List<MushroomProperty>,
+        val speciesProfile: SpeciesProfile?
+    )
+
+    val allMushrooms = listOf(
+        MushroomInfo(
+            commonName = "Kantarell",
+            latinName = "Cantharellus cibarius",
+            imageRes = R.drawable.chanterelle,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            speciesProfile = allSpecies.find{it.name == "Kantarell"}
+
+        ),
+        MushroomInfo(
+            commonName = "Steinsopp",
+            latinName = "Boletus edulis",
+            imageRes = R.drawable.rockfungus,
+            properties = listOf(
+                MushroomProperty("Giftig", R.drawable.skull, isNegative = true),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            speciesProfile = allSpecies.find{it.name == "Steinsopp"}
+        ),
+
+    )
+
+
 
     fun getAllSpecies(): List<SpeciesProfile> {
+        //keeps track of how many mushrooms we have profiled easily
+        amount = allSpecies.count()
         return allSpecies
+    }
+
+    fun getAllMushroomInfos(): List<MushroomInfo> {
+
+        return allMushrooms
     }
 }
