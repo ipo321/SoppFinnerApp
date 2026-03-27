@@ -1,9 +1,10 @@
 package no.uio.ifi.in2000.team16.data.species
 
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
-import 
+
 
 @Singleton
 class SpeciesDataSource @Inject constructor(){
