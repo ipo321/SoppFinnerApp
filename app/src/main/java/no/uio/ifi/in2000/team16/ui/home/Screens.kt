@@ -36,19 +36,3 @@ fun MinSide(){
     }
 }
 
-/*
-TEMP PLACEHOLDER FOR THE SCORE SCREEN
-REMOVE WHEN SCORECARD IS FINISHED
- */
-@Composable
-fun Score(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        Text(
-            text = "Score",
-            style = MaterialTheme.typography.headlineLarge
-        )
-    }
-}
