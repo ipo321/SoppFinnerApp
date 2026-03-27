@@ -13,7 +13,10 @@ class MushroomInfoViewModel : ViewModel(){
     var selectedMushroom by mutableStateOf(mushrooms[0])
         private set
 
+
     fun selectMushroom(mushroom: MushroomDisplay) {
         selectedMushroom = mushroom
     }
 }
+
+
