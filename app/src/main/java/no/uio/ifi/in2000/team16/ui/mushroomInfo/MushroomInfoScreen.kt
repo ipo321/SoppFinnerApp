@@ -1,6 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
-import no.uio.ifi.in2000.team16.R
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
+import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -118,7 +119,7 @@ fun MushroomInfoScreen(
     }
 }
 @Composable
-fun MushroomPropertyBadge(property: SpeciesDataSource.MushroomProperty) {
+fun MushroomPropertyBadge(property: MushroomProperty) {
     val borderColor = if (property.isNegative) Color(0xFFD94F4F) else Color(0xFF7A9B6E)
     val bgColor     = if (property.isNegative) Color(0xFFFDE8E8) else Color(0xFFE8F0E2)
 

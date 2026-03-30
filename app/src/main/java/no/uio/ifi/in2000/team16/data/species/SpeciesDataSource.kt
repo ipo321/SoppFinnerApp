@@ -1,8 +1,6 @@
 package no.uio.ifi.in2000.team16.data.species
 
 import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomInfo
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
@@ -22,7 +20,7 @@ class SpeciesDataSource @Inject constructor(){
         SpeciesProfile(
             name = "Kantarell",
             type = 1,
-            speciesType = "5249504",
+            taxKey = "5249504",
             activeMonths = listOf(6, 7, 8, 9, 10),
             killTemp = -2.0,
             optimalTemp = 18.0,
@@ -42,7 +40,7 @@ class SpeciesDataSource @Inject constructor(){
         SpeciesProfile(
             name = "Steinsopp",
             type = 1,
-            speciesType = "5954958",
+            taxKey = "5954958",
             activeMonths = listOf(8, 9, 10), //Later in season
             killTemp = 0.0,
             optimalTemp = 13.0,
@@ -63,7 +61,7 @@ class SpeciesDataSource @Inject constructor(){
         SpeciesProfile(
             name = "Skarlagen vårbeger",
             type = 1,
-            speciesType = "55480",
+            taxKey = "55480",
             activeMonths = listOf(3, 4, 5),
             killTemp = -8.0,
             optimalTemp = 5.0,
@@ -120,7 +118,7 @@ class SpeciesDataSource @Inject constructor(){
         return allMushrooms
     }
 
-    fun getAmount(): Int {
+    fun getAmountofMushrooms(): Int {
         return amount
     }
 }
