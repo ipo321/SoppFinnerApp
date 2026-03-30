@@ -23,9 +23,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
-import no.uio.ifi.in2000.team16.ui.common.UiState
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -54,10 +52,10 @@ fun MapScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
-    //val viewModel: MapViewModel = hiltViewModel()
+
     val uiState by viewModel.uiState.collectAsState()
+
     // The map is made with MapView and remember to save state
     val mapView = getMapView(viewModel, context)
     // mapView is alerted when lifecycle changes
@@ -79,19 +77,18 @@ fun MapScreen(
             Dropdown(onNavigateToDev = onNavigateToDev)
         }
 
-        when (uiState) {
-            is UiState.Success -> {
-                val data = (uiState as UiState.Success<MapUiState>).data
-                val forestInfo = data.areaResource
-                val evaluation = data.evaluation
-                InfoPopUp(
-                    msg = evaluation.description,
-                    score = evaluation.score
-                )
+        when (uiState.screenStatus) {
+            is ScreenStatus.Success -> {
+                uiState.evaluation?.let { eval ->
+                    InfoPopUp(
+                        msg = eval.description,
+                        score = eval.score
+                    )
+                }
             }
-            is UiState.Loading -> InfoPopUp("Laster inn", score = 0)
-            is UiState.Error -> InfoPopUp("Feilet innlasting", score = 0)
-            is UiState.Idle -> {}
+            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0)
+            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0)
+            is ScreenStatus.Idle -> {}
         }
 
     }
@@ -115,22 +112,12 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
-                        val point = map.projection.toScreenLocation(coordinate)
-                        val pxX = point.x.toInt() // Pixel position
-                        val pxY = point.y.toInt()
-                        val bounds = map.projection.visibleRegion.latLngBounds
-                        val south = bounds.southWest.latitude
-                        val west  = bounds.southWest.longitude
-                        val north = bounds.northEast.latitude
-                        val east  = bounds.northEast.longitude
-                        val width  = this@apply.width // this@apply to get the MapView object from
-                        val height = this@apply.height // the apply function above
 
-                        viewModel.getForestInfo(
-                            pxX, pxY, south, west, north, east, width, height
+                        viewModel.onMapClicked(
+                            lat = coordinate.latitude,
+                            lon = coordinate.longitude
                         )
-
-                        true // lambda returns true to inform that the click is managed
+                        true
                     }
                 }
             }
@@ -167,17 +154,6 @@ fun BoxScope.InfoPopUp(
     score : Int,
     modifier: Modifier = Modifier
 ) {
-
-
-    /*Text(
-        text = msg,
-        modifier = modifier
-            .align(Alignment.BottomStart)
-            .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.8f))
-            .padding(8.dp)
-    )*/
-
     ScoreCard(
         score = score,
         description = msg,
