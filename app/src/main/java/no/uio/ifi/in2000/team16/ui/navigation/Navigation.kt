@@ -58,6 +58,7 @@ fun Navigation(
                 val devViewModel: DevViewModel = hiltViewModel()
 
                 DevScreen(
+                    mapViewModel = mapViewModel,
                     onNavigateBack = {
                         navController.popBackStack()
                     }

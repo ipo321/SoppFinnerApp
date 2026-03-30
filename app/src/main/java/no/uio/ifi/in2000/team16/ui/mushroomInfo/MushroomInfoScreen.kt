@@ -33,9 +33,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
+import androidx.hilt.navigation.compose.hiltViewModel
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -45,8 +44,11 @@ see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
 @Composable
 fun MushroomInfoScreen(
     onNavigateHome: () -> Unit,
-    viewModel: MushroomInfoViewModel = viewModel()) {
-    val selected = viewModel.selectedMushroom
+    viewModel: MushroomInfoViewModel = hiltViewModel()) {
+
+
+
+    val selected = viewModel.selectedMushroom ?: return  //Return if no mushroom is selected
     var expanded by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
