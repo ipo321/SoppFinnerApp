@@ -28,7 +28,6 @@ fun Navigation(
     navController: NavHostController = rememberNavController()
 ) {
     val mapViewModel: MapViewModel = hiltViewModel()
-    val moduleViewModel: ModuleViewModel = hiltViewModel()
 
     Scaffold(
         bottomBar = {
@@ -47,14 +46,6 @@ fun Navigation(
                         navController.navigate(MODULE_SCREEN)
                     },
                     viewModel = mapViewModel,
-                )
-            }
-            composable(MODULE_SCREEN) {
-                ModuleScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    viewModel = moduleViewModel
                 )
             }
             composable(Screen.MinSide.rout) {

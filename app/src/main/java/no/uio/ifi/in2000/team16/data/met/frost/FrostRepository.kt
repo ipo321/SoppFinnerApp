@@ -72,7 +72,6 @@ class FrostRepository @Inject constructor(
             rseries = slowResponse?.data?.tseries ?: return null
         }
 
-        if (rseries == null) return null
 
         val allTempObs = mutableListOf<Double>()
         val allRainObs = mutableListOf<Double>()
