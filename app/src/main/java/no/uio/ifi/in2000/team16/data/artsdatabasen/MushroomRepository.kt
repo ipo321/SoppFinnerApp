@@ -12,11 +12,7 @@ use getSpeciesNearLocation with latidude, longitude and the enumc class Mushroom
 
 */
 
-enum class MushroomSpecies(val taxonKey: String) {
-    CHANTERELLE("5249504"),
-    FUNNEL_CHANTERELLE("2554536"),
-    PORCINI("5954958")
-}
+
 class MushroomRepository @Inject constructor(
     private val mushroomDataSource: MushroomDataSource
 ) {
@@ -24,21 +20,20 @@ class MushroomRepository @Inject constructor(
     suspend fun searchMushrooms(query: String): List<MushroomInfo> =
         mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
 
-    //get one spesiffic by id.
+
     suspend fun getMushroomDetails(id: String): MushroomInfo =
         mushroomDataSource.getMushroomById(id).toMushroom()
 
     suspend fun getSpeciesCountNearLocation(
         lat: Double,
         lon: Double,
-        species: MushroomSpecies,
-        radiusKm: Double = 10.0,
-    ): Int = getMushroomCountNearLocation(
-        lat = lat,
-        lon = lon,
-        radiusKm = radiusKm,
-        mushRoomType = species.taxonKey
-    )
+        taxonKey: String,
+        radiusKm: Double = 1.0,
+    ): Int {
+        val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
+        return result.count
+    }
+
 
     //returns an int with how many mushrooms are in the area
     suspend fun getMushroomCountNearLocation(
@@ -56,19 +51,17 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 10.0,
+        radiusKm: Double = 1.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 5 //amount of results. default 5.
+        limit: Int = 100
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
-        val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))//recalculation for the variation of latidiudes
+        val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
 
-        //making a square box around the location
         val latMin = lat - latOffset
         val latMax = lat + latOffset
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
-
 
         return mushroomDataSource.getOccurrencesNearLocation(mushRoomType, latMin, latMax, lonMin, lonMax, limit)
     }
