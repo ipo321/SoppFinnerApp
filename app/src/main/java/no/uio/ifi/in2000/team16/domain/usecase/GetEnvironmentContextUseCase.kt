@@ -25,6 +25,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
     //Add other repositories here
 ) {
     suspend operator fun invoke(lat: Double, lon: Double, species: MushroomSpecies? = null): EnvironmentContext {
+
         return coroutineScope {
             val weather = async { locationForecastRepository.weatherNext8Hours(lat, lon) }
             val forest = async { forestRepository.getForestData(lat, lon) }

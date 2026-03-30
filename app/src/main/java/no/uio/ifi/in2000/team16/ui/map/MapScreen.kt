@@ -1,18 +1,14 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.map
 
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -20,8 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -29,11 +23,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.createGraph
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
@@ -58,15 +47,15 @@ import org.maplibre.android.style.sources.GeoJsonSource
 
 @Composable
 fun MapScreen(
-    onButtonClicked: () -> Unit,
+    onNavigateToDev: () -> Unit,
     viewModel: MapViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
-    //val viewModel: MapViewModel = hiltViewModel()
+
     val uiState by viewModel.uiState.collectAsState()
+
     // The map is made with MapView and remember to save state
     val mapView = getMapView(viewModel, context)
     // mapView is alerted when lifecycle changes
@@ -79,37 +68,27 @@ fun MapScreen(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
-        Button(
-            onClick = onButtonClicked,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(8.dp)
-        ) {
-            Text("Knapp")
-
-        }
 
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .wrapContentSize()
         ) {
-            Dropdown()
+            Dropdown(onNavigateToDev = onNavigateToDev)
         }
 
-        when (uiState) {
-            is UiState.Success -> {
-                val data = (uiState as UiState.Success<MapUiState>).data
-                val forestInfo = data.areaResource
-                val evaluation = data.evaluation
-                InfoPopUp(
-                    msg = evaluation.description,
-                    score = evaluation.score
-                )
+        when (uiState.screenStatus) {
+            is ScreenStatus.Success -> {
+                uiState.evaluation?.let { eval ->
+                    InfoPopUp(
+                        msg = eval.description,
+                        score = eval.score
+                    )
+                }
             }
-            is UiState.Loading -> InfoPopUp("Laster inn", score = 0)
-            is UiState.Error -> InfoPopUp("Feilet innlasting", score = 0)
-            is UiState.Idle -> {}
+            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0)
+            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0)
+            is ScreenStatus.Idle -> {}
         }
 
     }
@@ -133,22 +112,12 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
-                        val point = map.projection.toScreenLocation(coordinate)
-                        val pxX = point.x.toInt() // Pixel position
-                        val pxY = point.y.toInt()
-                        val bounds = map.projection.visibleRegion.latLngBounds
-                        val south = bounds.southWest.latitude
-                        val west  = bounds.southWest.longitude
-                        val north = bounds.northEast.latitude
-                        val east  = bounds.northEast.longitude
-                        val width  = this@apply.width // this@apply to get the MapView object from
-                        val height = this@apply.height // the apply function above
 
-                        viewModel.getForestInfo(
-                            pxX, pxY, south, west, north, east, width, height
+                        viewModel.onMapClicked(
+                            lat = coordinate.latitude,
+                            lon = coordinate.longitude
                         )
-
-                        true // lambda returns true to inform that the click is managed
+                        true
                     }
                 }
             }
@@ -185,17 +154,6 @@ fun BoxScope.InfoPopUp(
     score : Int,
     modifier: Modifier = Modifier
 ) {
-
-
-    /*Text(
-        text = msg,
-        modifier = modifier
-            .align(Alignment.BottomStart)
-            .fillMaxWidth()
-            .background(Color.White.copy(alpha = 0.8f))
-            .padding(8.dp)
-    )*/
-
     ScoreCard(
         score = score,
         description = msg,

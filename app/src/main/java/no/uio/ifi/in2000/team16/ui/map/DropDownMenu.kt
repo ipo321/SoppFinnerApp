@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.map
 
 
 import androidx.compose.foundation.background
@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Create
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
@@ -28,11 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
-
 
 @Composable
-fun Dropdown() {
+fun Dropdown(onNavigateToDev: () -> Unit = {}) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -63,9 +60,12 @@ fun Dropdown() {
                 onClick = { /* Do something... */ }
             )
             DropdownMenuItem(
-                text = { Text("Settings") },
+                text = { Text("Dev") },
                 leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                onClick = { /* Do something... */ }
+                onClick = {
+                    expanded = false
+                    onNavigateToDev()
+                }
             )
 
             HorizontalDivider()
@@ -82,7 +82,7 @@ fun Dropdown() {
 @Preview(showBackground = true)
 @Composable
 fun DropdownPreview() {
-    Dropdown()
+    Dropdown(onNavigateToDev = {})
 }
 
 

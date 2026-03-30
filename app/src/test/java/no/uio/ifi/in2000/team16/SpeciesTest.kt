@@ -2,7 +2,7 @@ package no.uio.ifi.in2000.team16
 
 import junit.framework.TestCase.assertEquals
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
-import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
+import no.uio.ifi.in2000.team16.data.species.SpeciesProfile
 import org.junit.Test
 
 /*

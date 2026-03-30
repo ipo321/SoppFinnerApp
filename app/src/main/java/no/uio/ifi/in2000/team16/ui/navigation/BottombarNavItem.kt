@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.navigation
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

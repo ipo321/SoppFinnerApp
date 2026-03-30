@@ -11,4 +11,8 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class Team16App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        org.maplibre.android.MapLibre.getInstance(this)
+    }
 }

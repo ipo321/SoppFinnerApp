@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.map
 
 //Version-3.5
 
@@ -21,11 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
-import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 
 
 //Initialize it with the arguments from the logic/MushroomScorer data.

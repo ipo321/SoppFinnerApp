@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.data.species
 
-import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +15,16 @@ class SpeciesRepository @Inject constructor(){
     }
     fun getAllSpecies(): List<SpeciesProfile> {
         return speciesDataSource.getAllSpecies()
+    }
+
+    fun getMushroomInfoByName(name: String): SpeciesDataSource.MushroomInfo? {
+        val allMushrooms = speciesDataSource.allMushrooms
+        return allMushrooms.firstOrNull { it.commonName.equals(name, ignoreCase = true) }
+            ?: allMushrooms.firstOrNull()
+    }
+
+    fun getAllMushrooms(): List<SpeciesDataSource.MushroomInfo> {
+        return speciesDataSource.allMushrooms
     }
 
 }
