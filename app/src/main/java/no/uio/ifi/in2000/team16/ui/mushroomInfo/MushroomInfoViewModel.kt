@@ -16,7 +16,7 @@ class MushroomInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
     val mushrooms = repository.getAllMushrooms()
-    var selectedMushroom by mutableStateOf(mushrooms[0])
+    var selectedMushroom by mutableStateOf<Mushroom?>(if (mushrooms.isNotEmpty()) mushrooms[0] else null)
         private set
 
     fun selectMushroom(mushroom: Mushroom) {
