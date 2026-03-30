@@ -9,6 +9,7 @@ data class EnvironmentContext(
     val currentWeather: WeatherData?,
     val weatherHistory: WeatherHistory?,
     val terrainData: TerrainData?,
+    val ar5: String?,
     val forestData: ForestData?,
     val historicalFinds: Int = 0,
     val currentMonth: Int
@@ -18,6 +19,7 @@ data class EnvironmentContext(
             currentWeather = null,
             weatherHistory = null,
             terrainData = null,
+            ar5 = null,
             forestData = null,
             historicalFinds = 0,
             currentMonth = 8 //August
