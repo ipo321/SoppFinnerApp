@@ -11,12 +11,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
+import no.uio.ifi.in2000.team16.ui.dev.DevScreen
+import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 
 
 //
 const val MAP_SCREEN = "map"
-const val MODULE_SCREEN = "module"
+const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
@@ -43,7 +44,7 @@ fun Navigation(
             composable(MAP_SCREEN) {
                 MapScreen(
                     onButtonClicked = {
-                        navController.navigate(MODULE_SCREEN)
+                        navController.navigate(DEV_SCREEN)
                     },
                     viewModel = mapViewModel,
                 )
@@ -51,7 +52,15 @@ fun Navigation(
             composable(Screen.MinSide.rout) {
                 MinSide()
             }
+            composable(DEV_SCREEN) {
+                val devViewModel: DevViewModel = hiltViewModel()
 
+                DevScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
 
             composable(MUSHROOM_INFO_SCREEN) {
                 MushroomInfoScreen(
