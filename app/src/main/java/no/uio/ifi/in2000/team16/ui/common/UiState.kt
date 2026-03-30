@@ -1,8 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
-
-/*
-    General class for UiState, because a sealed class UiState can only be declared once
-*/
+package no.uio.ifi.in2000.team16.ui.common
 
 sealed class UiState <out T> {
     object Idle : UiState<Nothing>()

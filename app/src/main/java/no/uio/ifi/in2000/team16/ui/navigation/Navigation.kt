@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +13,8 @@ import androidx.compose.material3.Scaffold
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
+import no.uio.ifi.in2000.team16.ui.map.MapScreen
+import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 
 
 //

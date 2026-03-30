@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.home
+package no.uio.ifi.in2000.team16.ui.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,13 +11,11 @@ import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.data.nibio.ForestRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 import no.uio.ifi.in2000.team16.domain.model.AreaResource
-import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
-import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
-import org.maplibre.android.maps.MapLibreMap
 import javax.inject.Inject
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
+import no.uio.ifi.in2000.team16.ui.common.UiState
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
