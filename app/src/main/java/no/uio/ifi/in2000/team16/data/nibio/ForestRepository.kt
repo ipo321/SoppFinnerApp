@@ -1,9 +1,5 @@
 package no.uio.ifi.in2000.team16.data.nibio
 
-import android.util.Log
-import no.uio.ifi.in2000.team16.domain.model.AreaResource
-import org.jsoup.Jsoup
-import org.jsoup.select.Elements
 import javax.inject.Inject
 import javax.inject.Singleton
 

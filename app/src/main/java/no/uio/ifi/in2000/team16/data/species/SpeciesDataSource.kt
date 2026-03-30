@@ -1,6 +1,11 @@
 package no.uio.ifi.in2000.team16.data.species
 
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomInfo
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
+import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
+import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,10 +17,12 @@ class SpeciesDataSource @Inject constructor(){
     //gets updated to actual value when getAllSpecies is called.
     var amount: Int = 0
 
-    private val allSpecies = listOf(
+
+    private val allSpeciesProfiles = listOf(
         SpeciesProfile(
             name = "Kantarell",
             type = 1,
+            speciesType = "5249504",
             activeMonths = listOf(6, 7, 8, 9, 10),
             killTemp = -2.0,
             optimalTemp = 18.0,
@@ -34,7 +41,8 @@ class SpeciesDataSource @Inject constructor(){
         ),
         SpeciesProfile(
             name = "Steinsopp",
-            type = 2,
+            type = 1,
+            speciesType = "5954958",
             activeMonths = listOf(8, 9, 10), //Later in season
             killTemp = 0.0,
             optimalTemp = 13.0,
@@ -54,7 +62,8 @@ class SpeciesDataSource @Inject constructor(){
 
         SpeciesProfile(
             name = "Skarlagen vårbeger",
-            type = 3,
+            type = 1,
+            speciesType = "55480",
             activeMonths = listOf(3, 4, 5),
             killTemp = -8.0,
             optimalTemp = 5.0,
@@ -73,25 +82,8 @@ class SpeciesDataSource @Inject constructor(){
         )
     )
 
-//this file holds the data classes and the acual value that the MushroominfoScreen uses
-//add MushroomDisplay to allMushrooms for additional Mushroom screens
-
-    data class MushroomProperty(
-        val label: String,
-        val iconRes: Int,
-        val isNegative: Boolean = false  // was isRed
-    )
-
-    data class MushroomInfo(
-        val commonName: String,
-        val latinName: String,
-        val imageRes: Int,
-        val properties: List<MushroomProperty>,
-        val speciesProfile: SpeciesProfile?
-    )
-
-    val allMushrooms = listOf(
-        MushroomInfo(
+    private val allMushrooms = listOf(
+        Mushroom(
             commonName = "Kantarell",
             latinName = "Cantharellus cibarius",
             imageRes = R.drawable.chanterelle,
@@ -99,32 +91,36 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            speciesProfile = allSpecies.find{it.name == "Kantarell"}
-
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
         ),
-        MushroomInfo(
+        Mushroom(
             commonName = "Steinsopp",
             latinName = "Boletus edulis",
             imageRes = R.drawable.rockfungus,
             properties = listOf(
-                MushroomProperty("Giftig", R.drawable.skull, isNegative = true),
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            speciesProfile = allSpecies.find{it.name == "Steinsopp"}
+            profile = allSpeciesProfiles.find { it.name == "Steinsopp" }!!
         ),
-
+        Mushroom(
+            commonName = "Skarlagen vårbeger",
+            latinName = "Sarcoscypha austriaca",
+            imageRes = R.drawable.rockfungus,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Skarlagen vårbeger" }!!
+        )
     )
 
-
-
-    fun getAllSpecies(): List<SpeciesProfile> {
-        //keeps track of how many mushrooms we have profiled easily
-        amount = allSpecies.count()
-        return allSpecies
+    fun getAllMushrooms(): List<Mushroom> {
+        amount = allMushrooms.size
+        return allMushrooms
     }
 
-    fun getAllMushroomInfos(): List<MushroomInfo> {
-
-        return allMushrooms
+    fun getAmount(): Int {
+        return amount
     }
 }

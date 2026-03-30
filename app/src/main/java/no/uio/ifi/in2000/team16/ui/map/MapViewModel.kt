@@ -8,14 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomSpecies
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import javax.inject.Inject
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import no.uio.ifi.in2000.team16.data.species.SpeciesProfile
+import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -28,24 +27,23 @@ class MapViewModel @Inject constructor(
 
     init{
         viewModelScope.launch {
-            val defaultSpecies = speciesRepository.getSpeciesByName("Skarlagen vårbeger")
-            _uiState.update { it.copy(selectedSpecies = defaultSpecies) }
+            val defaultMushroom = speciesRepository.getMushroomByName("Skarlagen vårbeger")
+            _uiState.update { it.copy(selectedMushroom = defaultMushroom) }
             try {
-                getEnvironmentContextUseCase(59.91, 10.75) //Warmup to get scorer quicker
+                getEnvironmentContextUseCase(59.91, 10.75, defaultMushroom.profile) //Warmup to get scorer quicker
             } catch (e: Exception){
             }
         }
     }
     fun onMapClicked(lat: Double, lon: Double) {
+        val currentMushroom = _uiState.value.selectedMushroom ?: return
+
         viewModelScope.launch {
             _uiState.update { it.copy(screenStatus = ScreenStatus.Loading) }
             try {
-                val profile =
-                    _uiState.value.selectedSpecies ?: throw Exception("Mangler sopp-profil")
-                val context = getEnvironmentContextUseCase(lat, lon, MushroomSpecies.FUNNEL_CHANTERELLE)  // Have to add species selection here as well, but needs to update usecase and
+                val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)  // Have to add species selection here as well, but needs to update usecase and
                 val scorer = scorerProvider.activeScorer
-
-                val evaluation = scorer.calculateScore(context, profile)
+                val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
                 _uiState.update {
                     it.copy(
@@ -66,12 +64,10 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(isHeatmapEnabled = !it.isHeatmapEnabled) }
     }
 
-    fun selectFavoriteMushroom() {
-        viewModelScope.launch {
-            val fav = speciesRepository.getSpeciesByName("Kantarell") ?: return@launch
-            _uiState.update { it.copy(selectedSpecies = fav) }
-        }
+    fun onMushroomSelected(mushroom: Mushroom) {
+        _uiState.update { it.copy(selectedMushroom = mushroom) }
     }
+
     fun updateSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
     }
@@ -85,13 +81,12 @@ class MapViewModel @Inject constructor(
 
     data class MapScreenState(
         val screenStatus: ScreenStatus = ScreenStatus.Idle,
-        val selectedSpecies: SpeciesProfile? = null,
+        val selectedMushroom: Mushroom? = null,
         val currentContext: EnvironmentContext? = null,
         val evaluation: EvaluationResult? = null,
 
         val isHeatmapEnabled: Boolean = false,
-        val searchQuery: String = "",
-        val isTilerForest: Boolean = false
+        val searchQuery: String = ""
     )
 
     sealed class ScreenStatus{
