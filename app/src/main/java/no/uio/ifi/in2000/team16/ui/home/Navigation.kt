@@ -43,7 +43,7 @@ fun Navigation(
         ) {
             composable(MAP_SCREEN) {
                 MapScreen(
-                    onButtonClicked = {
+                    onNavigateToDev = {
                         navController.navigate(DEV_SCREEN)
                     },
                     viewModel = mapViewModel,

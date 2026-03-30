@@ -58,7 +58,7 @@ import org.maplibre.android.style.sources.GeoJsonSource
 
 @Composable
 fun MapScreen(
-    onButtonClicked: () -> Unit,
+    onNavigateToDev: () -> Unit,
     viewModel: MapViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -79,22 +79,13 @@ fun MapScreen(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
-        Button(
-            onClick = onButtonClicked,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(8.dp)
-        ) {
-            Text("Knapp")
-
-        }
 
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .wrapContentSize()
         ) {
-            Dropdown()
+            Dropdown(onNavigateToDev = onNavigateToDev)
         }
 
         when (uiState) {
