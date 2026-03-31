@@ -9,8 +9,18 @@ class ScorerProvider @Inject constructor() {
     var activeScorer: MushroomScorer = MushroomScorerV2()
         private set
 
+    var activeHeatScorer: MushroomScorer = MushroomScorerV2()
+        private set
+
     fun setAlgorithm(type: AlgorithmType) {
         activeScorer = when (type) {
+            AlgorithmType.V1 -> MushroomScorerV1()
+            AlgorithmType.V2 -> MushroomScorerV2()
+            AlgorithmType.MOCK -> ScoreAlgorithmMock()
+        }
+    }
+    fun setHeatAlgorithm(type: AlgorithmType) {
+        activeHeatScorer = when (type) {
             AlgorithmType.V1 -> MushroomScorerV1()
             AlgorithmType.V2 -> MushroomScorerV2()
             AlgorithmType.MOCK -> ScoreAlgorithmMock()

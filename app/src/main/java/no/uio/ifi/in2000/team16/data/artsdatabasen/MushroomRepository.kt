@@ -84,4 +84,23 @@ class MushroomRepository @Inject constructor(
             genusKey = genusKey,
             species = species
         )
+
+    suspend fun getMushroomInBoundingBox(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        mushRoomType: String,
+        limit: Int = 500
+    ): OccurrenceResult {
+        return mushroomDataSource.getOccurrencesNearLocation(
+            mushRoomType = mushRoomType,
+            latMin = south,
+            latMax = north,
+            lonMin = west,
+            lonMax = east,
+            limit = limit
+        )
+    }
+
 }
