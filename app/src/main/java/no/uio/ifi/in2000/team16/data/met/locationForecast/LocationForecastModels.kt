@@ -3,7 +3,7 @@ package no.uio.ifi.in2000.team16.data.met.locationForecast
 import kotlinx.serialization.Serializable
 
 /*
-    Dataclasses for handling the information coming from the MET API. Might be move the file to a different location
+    Dataclasses for handling the information coming from the MET API.
 */
 
 @Serializable
@@ -57,17 +57,12 @@ data class MetDetails(
     val relative_humidity: Double? = null,
     val wind_speed: Double? = null,
     val dew_point_temperature: Double? = null,
-    val fog_area_fraction: Double? = null,
+    val fog_area_fraction: Double? = null
 )
 
 @Serializable
 data class MetNext1Hours(
     val details: MetPrecipDetails
-)
-
-@Serializable
-data class MetNext1HoursDetails(
-    val details: MetPrecipDetails? = null
 )
 
 @Serializable

@@ -1,15 +1,14 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
 //import jakarta.inject.Inject
+import android.util.Log
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
 /*
 repository that can search for mushrooms and get information about them
-and the amount of mushrooms spottings in a certain area.
-use getSpeciesNearLocation with latidude, longitude and the enumc class MushroomSpicies.
-
-
+and the amount of mushrooms spotting in a certain area.
+use getSpeciesNearLocation with latitude, longitude and species profile.
 */
 
 
@@ -17,13 +16,21 @@ class MushroomRepository @Inject constructor(
     private val mushroomDataSource: MushroomDataSource
 ) {
 
-    suspend fun searchMushrooms(query: String): List<MushroomInfo> =
-        mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
+    suspend fun searchMushrooms(query: String): List<MushroomInfo> {
+        Log.d("T16_Mushroom_Repository", "Searching for mushrooms with query: $query")
+        return mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
+    }
 
 
-    suspend fun getMushroomDetails(id: String): MushroomInfo =
-        mushroomDataSource.getMushroomById(id).toMushroom()
-
+    suspend fun getMushroomDetails(id: String): MushroomInfo? {
+        Log.d("T16_Mushroom_Repository", "Fetching details for mushroom ID: $id")
+        val result = mushroomDataSource.getMushroomById(id)
+        if (result == null){
+            Log.w("T16_Mushroom_Repository","Could not find mushroom details for ID: $id")
+            return null
+        }
+        return result.toMushroom()
+    }
     suspend fun getSpeciesCountNearLocation(
         lat: Double,
         lon: Double,

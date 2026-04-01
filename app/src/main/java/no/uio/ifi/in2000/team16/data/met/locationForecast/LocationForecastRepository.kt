@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.met.locationForecast
 
+import android.util.Log
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -45,19 +46,31 @@ class LocationForecastRepository @Inject constructor(
         if (existingDeferred != null) {
             val cached = existingDeferred.await()
             if (cached != null && (System.currentTimeMillis() - cached.timestamp) < cacheMaxAgeMs) {
+                Log.d("T16_Weather_Repo", "Returning cached data for $cacheKey")
                 return@coroutineScope cached.data
             } else {
+                Log.d("T16_Weather_Repo", "Cache expired for $cacheKey")
                 cache.remove(cacheKey)
             }
         }
+
+        Log.d("T16_Weather_Repo", "No cache found, fetching new data for $cacheKey")
+
 
         //Fetching data from API
         val deferredResult = cache.getOrPut(cacheKey) {
             async {
                 val response = dataSource.fetchWeather(roundedLat, roundedLon)
-                val timeseries = response?.properties?.timeseries ?: return@async null
+
+                val timeseries = response?.properties?.timeseries ?: run{
+                    Log.w("T16_Weather_Repo", "No timeseries found in response for $cacheKey")
+                    return@async null
+                }
                 val next8Hours = timeseries.take(8)
-                if (next8Hours.isEmpty()) return@async null
+                if (next8Hours.isEmpty()) {
+                    Log.w("T16_Weather_Repo", "No timeseries response for $cacheKey")
+                    return@async null
+                }
 
                 val totalRain = next8Hours.sumOf {
                     it.data.next_1_hours?.details?.precipitation_amount ?: 0.0
@@ -91,7 +104,7 @@ class LocationForecastRepository @Inject constructor(
                     probOfRain = rainProb
                 )
 
-
+                Log.i("T16_Weather_Repo", "Successfully fetched weather data for $cacheKey")
 
                 CacheEntry(
                     data = weatherData,

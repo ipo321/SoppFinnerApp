@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.nibio
 
+import android.util.Log
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -11,19 +12,24 @@ import java.util.concurrent.ConcurrentHashMap
 
 
 /*
-   Repository for the SAT-SKOG Api than handles the data output and puts it into a ForestData module from the evaluation module
+   Repository for the SAT-SKOG Api than handles the data output and puts it into
+   a ForestData module from the evaluation module. Utilizes concurrent caching to
+   prevent redundant network calls for nearby locations
 */
 
 @Singleton
 class SatSkogRepository @Inject constructor(
     private val dataSource: SatSkogDataSource
 ){
-
+    // Caches to avoid hammering the API. Heatmap uses lower precision to group requests.
     private val heatmapCache = ConcurrentHashMap<String, Deferred<ForestData?>>()
     private val preciseCache = ConcurrentHashMap<String, Deferred<ForestData?>>()
 
     private suspend fun fetchAndMapForestData(lat: Double, lon: Double): ForestData? {
-        val response = dataSource.fetchForest(lat, lon) ?: return null
+        val response = dataSource.fetchForest(lat, lon) ?: run {
+            Log.w("T16_NIBIO_Repo", "No forest data found for $lat, $lon")
+            return null
+        }
 
         return ForestData(
             dominantTreeSpecies = response.treeSpecies,
@@ -38,8 +44,14 @@ class SatSkogRepository @Inject constructor(
         )
     }
     suspend fun getForestData(lat: Double, lon: Double): ForestData? = coroutineScope {
+        // Formats to 5 decimal places (approx. 11 meter precision)
+        val cacheKey = String.format(Locale.US, "%.4f_%.4f", lat, lon)
 
-        val cacheKey = String.format(Locale.US, "%.5f_%.5f", lat, lon)
+        if (preciseCache.containsKey(cacheKey)) {
+            Log.d("T16_NIBIO_Repo", "Returning cached data for $cacheKey")
+        } else {
+            Log.d("T16_NIBIO_Repo", "No cache found, fetching new data for $cacheKey")
+        }
 
         val deferredResult = preciseCache.getOrPut(cacheKey) {
             async {
@@ -49,9 +61,16 @@ class SatSkogRepository @Inject constructor(
         deferredResult.await()
     }
 
-    //Method for lower resolution (heatmap)
+    //Method for lower resolution (heatmap) to prevent unnecessary network calls
     suspend fun getForestDataForHeatmap(lat: Double, lon: Double): ForestData? = coroutineScope {
+        // Formats to 3 decimal places (approx. 111 meter precision)
         val cacheKey = String.format(Locale.US, "%.3f_%.3f", lat, lon)
+
+        if (heatmapCache.containsKey(cacheKey)) {
+            Log.d("T16_NIBIO_Repo", "Returning cached heatmap data for $cacheKey")
+        } else {
+            Log.d("T16_NIBIO_Repo", "No cache found, fetching new heatmap data for $cacheKey")
+        }
 
         val deferredResult = heatmapCache.getOrPut(cacheKey) {
             async {

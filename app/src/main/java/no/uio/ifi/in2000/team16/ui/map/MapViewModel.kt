@@ -1,8 +1,10 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,17 +15,23 @@ import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import javax.inject.Inject
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
+import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
+    private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
     private val scorerProvider: ScorerProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MapScreenState())
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
+
+    private var heatmapJob: Job? = null // cancel old calculations
 
     init{
         viewModelScope.launch {
@@ -60,9 +68,31 @@ class MapViewModel @Inject constructor(
             }
         }
     }
+    fun fetchHeatmapData(bounds: BoundingBox) {
+        if (!_uiState.value.isHeatmapEnabled) return
+        val profile = _uiState.value.selectedMushroom?.profile ?: return
+
+        heatmapJob?.cancel()
+
+        heatmapJob = viewModelScope.launch {
+            _uiState.update { it.copy(isFetchingHeatmap = true) }
+            try {
+                val tiles = calculateHeatmapAreaUseCase(bounds, profile, resolution = 8)
+                _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
+            } catch (e: Exception) {
+                Log.e("MapViewModel", "Error Calc Heatmap", e)
+                _uiState.update { it.copy(isFetchingHeatmap = false) }
+            }
+        }
+    }
+
     fun toggleHeatmap() {
         _uiState.update { it.copy(isHeatmapEnabled = !it.isHeatmapEnabled) }
+        if (!_uiState.value.isHeatmapEnabled) {
+            _uiState.update { it.copy(heatmapTiles = emptyList()) }
+        }
     }
+
 
     fun onMushroomSelected(mushroom: Mushroom) {
         _uiState.update { it.copy(selectedMushroom = mushroom) }
@@ -86,6 +116,9 @@ class MapViewModel @Inject constructor(
         val evaluation: EvaluationResult? = null,
 
         val isHeatmapEnabled: Boolean = false,
+        val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
+        val isFetchingHeatmap: Boolean = false,
+
         val searchQuery: String = ""
     )
 

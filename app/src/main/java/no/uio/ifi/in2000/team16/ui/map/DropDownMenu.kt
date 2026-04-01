@@ -29,7 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun Dropdown(onNavigateToDev: () -> Unit = {}) {
+fun Dropdown(
+    onNavigateToDev: () -> Unit = {},
+    onToggleHeatMap: () -> Unit = {},
+    isHeatmapEnabled: Boolean = false
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -53,12 +57,18 @@ fun Dropdown(onNavigateToDev: () -> Unit = {}) {
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
+
+
             // First section
             DropdownMenuItem(
-                text = { Text("Min side") },
-                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
-                onClick = { /* Do something... */ }
+                text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
+                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+                onClick = {
+                    onToggleHeatMap()
+                    expanded = false
+                }
             )
+
             DropdownMenuItem(
                 text = { Text("Dev") },
                 leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
@@ -71,8 +81,8 @@ fun Dropdown(onNavigateToDev: () -> Unit = {}) {
             HorizontalDivider()
 
             DropdownMenuItem(
-                text = { Text("Kart") },
-                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+                text = { Text("Profil") },
+                leadingIcon = { Icon(Icons.Outlined.Person, contentDescription = null) },
                 onClick = { /* Do something... */ }
             )
         }
