@@ -23,7 +23,6 @@ class LocationForecastDataSource @Inject constructor(
             val response = httpClient.get(url){
                 header("User-Agent", "IN2000 Team 16")
             }.body<MetResponse>()
-                Log.d("T16_Weather_DataSource", "Successfully called LocationForecast API with lat: $lat, lon: $lon")
                 response
             } catch (e: Exception) {
                 Log.e("T16_Weather_DataSource", "Network error when fetching weather from LocationForecast API: ${e.message}", e)

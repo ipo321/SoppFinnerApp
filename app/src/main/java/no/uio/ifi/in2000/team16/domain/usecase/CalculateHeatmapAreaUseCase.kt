@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.domain.usecase
 
+import android.util.Log
 import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
 import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
@@ -15,6 +16,7 @@ import no.uio.ifi.in2000.team16.domain.model.GridPoint
 import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.util.Calendar
+import kotlin.system.measureTimeMillis
 
 
 class CalculateHeatmapAreaUseCase @Inject constructor(
@@ -27,71 +29,111 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
     suspend operator fun invoke(
         bounds: BoundingBox,
         profile: SpeciesProfile,
-        resolution: Int = 8 //Numbers of row/colums in the grid (8 -> = 9x9 = 81 tiles)
+        resolution: Int = 7 //Numbers of row/columns in the grid (8 -> = 9x9 = 81 tiles)
     ): List<HeatmapTile> = coroutineScope {
-        //Find center
-        val centerLat = (bounds.north + bounds.south) / 2
-        val centerLon = (bounds.east + bounds.west) / 2
+        Log.d("T16_UC_Heatmap", "Starting heatmap calculation for ${profile.taxKey} Resolution: $resolution")
 
-        //Single calls
-        val weatherDeferred = async { locationForecastRepository.weatherNext8Hours(centerLat, centerLon) }
-        val occurrencesDeferred = async {
-            mushroomRepository.getMushroomInBoundingBox(
-                north = bounds.north,
-                south = bounds.south,
-                east = bounds.east,
-                west = bounds.west,
-                mushRoomType = profile.taxKey
-            )
-        }
+        var finalTiles: List<HeatmapTile> = emptyList()
 
-        val weather = weatherDeferred.await()
-        val allOccurrencesInBox = occurrencesDeferred.await()
+        val timeTaken = measureTimeMillis {
+            try{
+                finalTiles = coroutineScope {
+                    //Find center
+                    val centerLat = (bounds.north + bounds.south) / 2
+                    val centerLon = (bounds.east + bounds.west) / 2
 
-        //Make the grid to the resolution
-        val gridPoints = generateGridPoints(bounds, rows = resolution, cols = resolution)
+                    Log.d("T16_UC_Heatmap", "Fecthing data from center")
 
-        //Calculate score for each point and detailed calls
-        val heatmapJobs = gridPoints.map { point ->
-            async {
-                //Checking SAT-skog
-                val forestData = forestRepository.getForestDataForHeatmap(point.lat, point.lon)
-                if (forestData == null) return@async null
+                    //Single calls
+                    val weatherDeferred = async { locationForecastRepository.weatherNext8Hours(centerLat, centerLon) }
+                    val occurrencesDeferred = async {
+                        mushroomRepository.getMushroomInBoundingBox(
+                            north = bounds.north,
+                            south = bounds.south,
+                            east = bounds.east,
+                            west = bounds.west,
+                            mushRoomType = profile.taxKey
+                        )
+                    }
 
-                //Checking MET
-                val weatherHistory = frostRepository.weatherHistory(point.lat, point.lon)
+                    val weather = weatherDeferred.await()
+                    val allOccurrencesInBox = occurrencesDeferred.await()
 
-                //Checking Artsdatabanken
-                val historicalFindsCount = allOccurrencesInBox.results?.count { occ ->
-                    val occLat = occ.decimalLatitude ?: return@count false
-                    val occLon = occ.decimalLongitude ?: return@count false
+                    val mushroomFindings = allOccurrencesInBox.results.size
+                    Log.d("T16_UC_Heatmap", "Found $mushroomFindings for ${profile.taxKey}")
 
-                    //Distance from point to occurence
-                    calculateDistance(point.lat, point.lon, occLat, occLon) <= 500.0
+                    //Make the grid to the resolution
+                    val rowRes = (resolution*1.5).toInt()
+                    val gridPoints = generateGridPoints(bounds, rows = rowRes, cols = resolution)
+                    Log.d("T16_UC_Heatmap", "Generated ${gridPoints.size} grid points")
 
-                } ?: 0
+                    //Calculate score for each point and detailed calls
+                    val heatmapJobs = gridPoints.map { point ->
+                        async {
+                            //Checking SAT-skog
+                            val forestData = forestRepository.getForestDataForHeatmap(point.lat, point.lon)
 
-                //Building the context
-                val context = EnvironmentContext(
-                    currentWeather = weather,  //Only from the center of the map
-                    weatherHistory = weatherHistory,
-                    terrainData = null,
-                    ar5 = "Skog", // Since SAT-skog is not null
-                    forestData = forestData,
-                    historicalFinds = historicalFindsCount,
-                    currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
-                )
+                            if (forestData != null) {
 
-                //Run the evaluation
-                val evaluation = scorerProvider.activeHeatScorer.calculateScore(context, profile)
+                                Log.d("T16_UC_Heatmap", "Found forest, calling frost for: ${point.lat}, lon: ${point.lon}")
+                                //Checking MET
+                                val weatherHistory = frostRepository.weatherHistory(point.lat, point.lon)
 
-                //Makes the heatmap tile with a score
-                HeatmapTile(point.lat, point.lon, evaluation.score)
+                                //Checking Artsdatabanken
+                                val historicalFindsCount =
+                                    allOccurrencesInBox.results.count { occ ->
+                                        val occLat = occ.decimalLatitude ?: return@count false
+                                        val occLon = occ.decimalLongitude ?: return@count false
+
+                                        //Distance from point to occurrence
+                                        calculateDistance(
+                                            point.lat,
+                                            point.lon,
+                                            occLat,
+                                            occLon
+                                        ) <= 500.0
+
+                                    }
+
+                                //Building the context
+                                val context = EnvironmentContext(
+                                    currentWeather = weather,  //Only from the center of the map
+                                    weatherHistory = weatherHistory,
+                                    terrainData = null,
+                                    ar5 = "Skog", // Since SAT-skog is not null
+                                    forestData = forestData,
+                                    historicalFinds = historicalFindsCount,
+                                    currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
+                                )
+
+
+                                //Run the evaluation
+                                val evaluation = scorerProvider.activeHeatScorer.calculateScore(context, profile)
+
+                                Log.d("T16_UC_Heatmap", "Score ${evaluation.score} for point ${point.lat}")
+
+                                //Makes the heatmap tile with a score
+                                HeatmapTile(point.lat, point.lon, evaluation.score)
+                            } else {
+                                HeatmapTile(point.lat, point.lon, 0)
+                            }
+                        }
+                    }
+                    heatmapJobs.awaitAll()
+                }
+            } catch (e: Exception) {
+                Log.e("T16_UC_Heatmap", "Error calculating heatmap: ${e.message}", e)
+                finalTiles = emptyList()
             }
         }
+        // Debug
+        if (finalTiles.isEmpty()) {
+            Log.w("T16_UC_Heatmap", "Finished in $timeTaken ms, but 0 tiles generated.")
+        } else {
+            Log.i("T16_UC_Heatmap", "Generated ${finalTiles.size} heatmap-tiles in $timeTaken ms.")
+        }
 
-
-        return@coroutineScope heatmapJobs.awaitAll().filterNotNull()
+        return@coroutineScope finalTiles
     }
 
 

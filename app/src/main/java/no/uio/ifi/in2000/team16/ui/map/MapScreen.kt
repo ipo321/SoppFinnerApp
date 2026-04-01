@@ -27,7 +27,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
-import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -42,6 +43,9 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.Point
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -118,6 +122,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             onCreate(null)
 
             getMapAsync { map ->
+                mapRef = map
                 // The map now uses BASE from MapTiler, this can be changed
                 map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
                     // Logging to see what happens when the map is used
@@ -169,21 +174,28 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
     // Updating the heatMapTiles each time they change
     LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, mapRef) {
         val map = mapRef ?: return@LaunchedEffect
-        val style = map.style ?: return@LaunchedEffect
-        val source = style.getSourceAs<GeoJsonSource>("heatmap-source")
+        map.getStyle { style ->
+            if (style.isFullyLoaded) {
+                val source = style.getSourceAs<GeoJsonSource>("heatmap-source")
 
-        if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
-            val topScore = uiState.heatmapTiles.maxOf { it.score }
-            Log.d("HEATMAP_DEBUG", "Kartet tegner ${uiState.heatmapTiles.size} punkter. Høyeste score er: $topScore")
+                if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
+                    val features = uiState.heatmapTiles.map { tile ->
+                        val point = Point.fromLngLat(tile.lon, tile.lat)
+                        val feature = Feature.fromGeometry(point)
+                        feature.addNumberProperty("score", tile.score)
+                        feature
+                    }
+                    val featureCollection = FeatureCollection.fromFeatures(features)
 
-
-            val geoJson = tilesToGeoJson(uiState.heatmapTiles)
-            source?.setGeoJson(geoJson)
-        } else {
-            source?.setGeoJson("""{ "type": "FeatureCollection", "features": [] }""")
+                    source?.setGeoJson(featureCollection)
+                    Log.d("T16_Map_Heat", "Drew ${features.size} tiles.")
+                } else {
+                    // Empty the map
+                    source?.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+                }
+            }
         }
     }
-
     return mapView
 }
 
@@ -275,8 +287,7 @@ fun addPolygonsToMap(context: Context, style: Style) {
 
 private fun setupHeatmapLayer(style: Style) {
     //  Source
-    val heatmapSource =
-        GeoJsonSource("heatmap-source", """{ "type": "FeatureCollection", "features": [] }""")
+    val heatmapSource = GeoJsonSource("heatmap-source")
     style.addSource(heatmapSource)
 
     // Colour and Size
@@ -294,14 +305,23 @@ private fun setupHeatmapLayer(style: Style) {
                 stop(1.0, rgb(0, 255, 0))     // Green
             )
         ),
-        heatmapRadius(40f),
+        heatmapRadius(
+            interpolate(
+                exponential(1f), zoom(),
+                stop(10, 20f),
+                stop(15, 150f)
+            )
+        ),
+
+
+        heatmapIntensity(0.8f),
         heatmapOpacity(0.6f)
     )
 
     // Putting layer bellow roads and buildings
     var insertBelowLayerId: String? = null
-    style.addLayer(heatmapLayer)
-/*
+    //style.addLayer(heatmapLayer)
+
     for (layer in style.layers) {
         val id = layer.id.lowercase()
         if (id.contains("water") || id.contains("road") || id.contains("building") || layer is SymbolLayer) {
@@ -315,22 +335,5 @@ private fun setupHeatmapLayer(style: Style) {
     } else {
         style.addLayer(heatmapLayer)
     }
-
- */
 }
 
-fun tilesToGeoJson(tiles: List<HeatmapTile>): String {
-    val features = tiles.joinToString(",") { tile ->
-        """
-        {
-          "type": "Feature",
-          "properties": { "score": ${tile.score} },
-          "geometry": {
-            "type": "Point",
-            "coordinates": [${tile.lon}, ${tile.lat}]
-          }
-        }
-        """.trimIndent()
-    }
-    return """{ "type": "FeatureCollection", "features": [$features] }"""
-}

@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.met.frost
 
+import android.util.Log
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -8,7 +9,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
-import kotlin.math.*
 
 
 /*
@@ -29,20 +29,11 @@ class FrostRepository @Inject constructor(
         val data: WeatherHistory,
         val timestamp: Long
     )
-    //
-
-    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val r = 6371000
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
-        val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2).pow(2)
-        return r * 2 * atan2(sqrt(a), sqrt(1 - a))
-    }
 
     suspend fun weatherHistory(lat: Double, lon: Double): WeatherHistory? = coroutineScope{
-
         val currentTime = System.currentTimeMillis()
-        //FIND BEST STATION
+
+        //Find best station
         val stationIdsList = stationLocator.findNearestStation(lat, lon, 50000.0)
 
         //Cache key
@@ -57,12 +48,14 @@ class FrostRepository @Inject constructor(
         if (existingDeferred != null) {
             val cached = existingDeferred.await()
             if (cached != null && (currentTime - cached.timestamp) < cacheMaxAgeMs) {
+                Log.d("T16_Frost_Repository", "Returning cached historical weather for $cacheKey")
                 return@coroutineScope cached.data
             } else {
                 cache.remove(cacheKey)
             }
         }
 
+        Log.d("T16_Frost_Repository", "No cache found, starting API call for $cacheKey")
 
         val deferredResult = cache.getOrPut(cacheKey) {
             async{
@@ -83,11 +76,11 @@ class FrostRepository @Inject constructor(
                     rseries = fastResponse?.data?.tseries
                 }
 
-                val hasValidData = rseries?.any { it.observations?.isNotEmpty() == true } == true
+                val hasValidData = rseries?.any { it.observations.isNotEmpty() } == true
 
                 // FALLBACK
                 if (!hasValidData) {
-                    println("Frost: Fallback for $lat, $lon")
+                    Log.w("T16_Frost_Repository", "No valid data from preset stations. Triggering fallback for lat: $lat, lon: $lon")
                     val slowResponse = dataSource.fetchWeatherFallback(lat, lon, timeRange)
                     rseries = slowResponse?.data?.tseries ?: return@async null
                 }
@@ -101,9 +94,9 @@ class FrostRepository @Inject constructor(
 
                 rseries.forEach { series ->
                     val elementId = series.header?.extra?.element?.id?.lowercase() ?: ""
-                    val values = series.observations?.mapNotNull {
+                    val values = series.observations.mapNotNull {
                         (it.body?.value ?: it.body?.data)?.toDoubleOrNull()
-                    } ?: emptyList()
+                    }
 
                     if (elementId.contains("air_temperature") && !foundTemp && values.isNotEmpty()) {
                         allTempObs.addAll(values)
@@ -127,11 +120,13 @@ class FrostRepository @Inject constructor(
                 )
 
                 if (avgTemp != null || totalRain != null) {
+                    Log.i("T16_Frost_Repository", "Successfully processed and cached historical weather for $cacheKey")
                     CacheEntry(
                         data = history,
                         timestamp = currentTime
                     )
                 } else {
+                    Log.w("T16_Frost_Repository", "Failed to calculate valid temp/rain for $cacheKey")
                     null
                 }
             }

@@ -2,10 +2,12 @@
   <dictionary name="project">
     <words>
       <w>arealtype</w>
+      <w>artsdatabanken</w>
       <w>bbox</w>
       <w>bonitet</w>
       <w>epsg</w>
       <w>gbif</w>
+      <w>incobs</w>
       <w>lauv</w>
       <w>nibio</w>
       <w>precip</w>
