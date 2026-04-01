@@ -20,6 +20,7 @@ import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
+import kotlinx.coroutines.CancellationException
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -78,7 +79,14 @@ class MapViewModel @Inject constructor(
             _uiState.update { it.copy(isFetchingHeatmap = true) }
             try {
                 val tiles = calculateHeatmapAreaUseCase(bounds, profile, resolution = 8)
-                _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
+
+                if (tiles.isNotEmpty()) {
+                    _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
+                } else {
+                    _uiState.update { it.copy(isFetchingHeatmap = false) }
+                }
+            }catch(e: CancellationException){
+                throw e
             } catch (e: Exception) {
                 Log.e("MapViewModel", "Error Calc Heatmap", e)
                 _uiState.update { it.copy(isFetchingHeatmap = false) }

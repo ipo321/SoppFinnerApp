@@ -27,8 +27,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -145,8 +143,31 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                         )
                         true
                     }
+                    var lastTarget: LatLng? = null
+
                     // Checks if map is still
                     map.addOnCameraIdleListener {
+                        if (map.cameraPosition.zoom < 12.0) {
+                            return@addOnCameraIdleListener
+                        }
+
+                        val currentTarget = map.cameraPosition.target
+                        if (currentTarget != null && lastTarget != null) {
+                            val results = FloatArray(1)
+                            android.location.Location.distanceBetween(
+                                currentTarget.latitude, currentTarget.longitude,
+                                lastTarget!!.latitude, lastTarget!!.longitude,
+                                results
+                            )
+
+                            val distanceInMeters = results[0]
+                            if (distanceInMeters < 200.0) {
+                                return@addOnCameraIdleListener
+                            }
+                        }
+                        lastTarget = currentTarget
+
+
                         val visibleBounds = map.projection.visibleRegion.latLngBounds
 
                         val north = visibleBounds.northEast.latitude
@@ -173,29 +194,34 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
     // Updating the heatMapTiles each time they change
     LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, mapRef) {
-        val map = mapRef ?: return@LaunchedEffect
-        map.getStyle { style ->
-            if (style.isFullyLoaded) {
-                val source = style.getSourceAs<GeoJsonSource>("heatmap-source")
+        val currentMap = mapRef ?: return@LaunchedEffect
 
-                if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
-                    val features = uiState.heatmapTiles.map { tile ->
-                        val point = Point.fromLngLat(tile.lon, tile.lat)
-                        val feature = Feature.fromGeometry(point)
-                        feature.addNumberProperty("score", tile.score)
-                        feature
-                    }
-                    val featureCollection = FeatureCollection.fromFeatures(features)
+        currentMap.getStyle { style ->
+            if (!style.isFullyLoaded) return@getStyle
 
-                    source?.setGeoJson(featureCollection)
-                    Log.d("T16_Map_Heat", "Drew ${features.size} tiles.")
-                } else {
-                    // Empty the map
-                    source?.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
+
+            if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
+                val features = mutableListOf<Feature>()
+
+                for (tile in uiState.heatmapTiles) {
+                    val point = Point.fromLngLat(tile.lon, tile.lat)
+                    val feature = Feature.fromGeometry(point)
+                    feature.addNumberProperty("score", tile.score)
+                    features.add(feature)
                 }
+
+                val featureCollection = FeatureCollection.fromFeatures(features)
+                source.setGeoJson(featureCollection)
+                Log.d("T16_Map_Heat", "Drew ${features.size} tiles on the map natively.")
+
+            } else {
+                // Clear the map safely
+                source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
             }
         }
     }
+
     return mapView
 }
 
@@ -308,8 +334,9 @@ private fun setupHeatmapLayer(style: Style) {
         heatmapRadius(
             interpolate(
                 exponential(1f), zoom(),
-                stop(10, 20f),
-                stop(15, 150f)
+                stop(9, 20f),
+                stop(13, 90f),
+                stop(16, 200f)
             )
         ),
 

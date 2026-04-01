@@ -7,6 +7,7 @@ import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
 import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withTimeoutOrNull
 import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import javax.inject.Inject
@@ -16,6 +17,7 @@ import no.uio.ifi.in2000.team16.domain.model.GridPoint
 import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.util.Calendar
+import kotlinx.coroutines.CancellationException
 import kotlin.system.measureTimeMillis
 
 
@@ -47,19 +49,21 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     //Single calls
                     val weatherDeferred = async { locationForecastRepository.weatherNext8Hours(centerLat, centerLon) }
                     val occurrencesDeferred = async {
-                        mushroomRepository.getMushroomInBoundingBox(
-                            north = bounds.north,
-                            south = bounds.south,
-                            east = bounds.east,
-                            west = bounds.west,
-                            mushRoomType = profile.taxKey
-                        )
+                        withTimeoutOrNull(5000L){
+                            mushroomRepository.getMushroomInBoundingBox(
+                                north = bounds.north,
+                                south = bounds.south,
+                                east = bounds.east,
+                                west = bounds.west,
+                                mushRoomType = profile.taxKey
+                            )
+                        }
                     }
 
                     val weather = weatherDeferred.await()
                     val allOccurrencesInBox = occurrencesDeferred.await()
 
-                    val mushroomFindings = allOccurrencesInBox.results.size
+                    val mushroomFindings = allOccurrencesInBox?.results?.size ?: 0
                     Log.d("T16_UC_Heatmap", "Found $mushroomFindings for ${profile.taxKey}")
 
                     //Make the grid to the resolution
@@ -81,7 +85,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
 
                                 //Checking Artsdatabanken
                                 val historicalFindsCount =
-                                    allOccurrencesInBox.results.count { occ ->
+                                    allOccurrencesInBox?.results?.count { occ ->
                                         val occLat = occ.decimalLatitude ?: return@count false
                                         val occLon = occ.decimalLongitude ?: return@count false
 
@@ -93,7 +97,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                             occLon
                                         ) <= 500.0
 
-                                    }
+                                    } ?: 0
 
                                 //Building the context
                                 val context = EnvironmentContext(
@@ -121,6 +125,9 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     }
                     heatmapJobs.awaitAll()
                 }
+            } catch (e: CancellationException) {
+                Log.d("T16_UC_Heatmap", "Cancel, uses moved map")
+                throw e
             } catch (e: Exception) {
                 Log.e("T16_UC_Heatmap", "Error calculating heatmap: ${e.message}", e)
                 finalTiles = emptyList()
