@@ -341,8 +341,8 @@ private fun setupHeatmapLayer(style: Style) {
         ),
 
 
-        heatmapIntensity(0.8f),
-        heatmapOpacity(0.6f)
+        heatmapIntensity(0.5f),
+        heatmapOpacity(0.3f)
     )
 
     // Putting layer bellow roads and buildings
