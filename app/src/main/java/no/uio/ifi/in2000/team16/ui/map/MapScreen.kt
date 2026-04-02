@@ -204,16 +204,32 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
 
+                val lons = uiState.heatmapTiles.map { it.lon }.distinct().sorted()
+                val lats = uiState.heatmapTiles.map { it.lat }.distinct().sorted()
+
+                val lonStep = lons.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
+                val latStep = lats.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
+
                 for (tile in uiState.heatmapTiles) {
-                    val point = Point.fromLngLat(tile.lon, tile.lat)
-                    val feature = Feature.fromGeometry(point)
+
+                    val polygonPoints = listOf(
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2)),
+                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat - (latStep / 2)),
+                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat + (latStep / 2)),
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat + (latStep / 2)),
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2))
+                    )
+
+                    val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
+                    val feature = Feature.fromGeometry(polygon)
+
                     feature.addNumberProperty("score", tile.score)
                     features.add(feature)
                 }
 
                 val featureCollection = FeatureCollection.fromFeatures(features)
                 source.setGeoJson(featureCollection)
-                Log.d("T16_Map_Heat", "Drew ${features.size} tiles on the map natively.")
+                Log.d("T16_Map_Heat", "Drew ${features.size} grid polygons natively.")
 
             } else {
                 // Clear the map safely
@@ -300,9 +316,9 @@ fun addPolygonsToMap(context: Context, style: Style) {
             // Draws the polygons
             val layer =
                 FillLayer(geoLayer.layerId, geoLayer.sourceId).withProperties(
-                    PropertyFactory.fillColor(geoLayer.color.toColorInt()),
-                    PropertyFactory.fillOpacity(0.5f), // Makes the layer a little transparent
-                    PropertyFactory.fillOutlineColor(android.graphics.Color.BLACK) // Black outline
+                    fillColor(geoLayer.color.toColorInt()),
+                    fillOpacity(0.5f), // Makes the layer a little transparent
+                    fillOutlineColor(android.graphics.Color.BLACK) // Black outline
                 )
             style.addLayer(layer)
         } catch (e: Exception) {
@@ -317,32 +333,22 @@ private fun setupHeatmapLayer(style: Style) {
     style.addSource(heatmapSource)
 
     // Colour and Size
-    val heatmapLayer = HeatmapLayer("heatmap-layer", "heatmap-source")
-    heatmapLayer.setProperties(
-        heatmapWeight(
-            interpolate(linear(), get("score"), stop(0, 0.1f), stop(100, 1.0f))
-        ),
-        heatmapColor(
-            interpolate(
-                linear(), heatmapDensity(),
-                stop(0.0, rgba(0, 255, 0, 0f)), // not visible
-                stop(0.1, rgba(255, 0, 0, 0.3f)),
-                stop(0.5, rgb(255, 255, 0)),  // Yellow
-                stop(1.0, rgb(0, 255, 0))     // Green
-            )
-        ),
-        heatmapRadius(
-            interpolate(
-                exponential(1f), zoom(),
-                stop(9, 20f),
-                stop(13, 90f),
-                stop(16, 200f)
-            )
-        ),
+    val fillLayer = FillLayer("heatmap-layer", "heatmap-source")
 
 
-        heatmapIntensity(0.5f),
-        heatmapOpacity(0.3f)
+    fillLayer.setProperties(
+        fillColor(
+            interpolate(
+                linear(), get("score"),
+                stop(0, rgba(200, 0, 0, 0.4f)),     // red
+                stop(1, rgba(255, 100, 0, 0.5f)),   // Orange
+                stop(50, rgba(255, 255, 0, 0.6f)),// Yellow
+                stop(100, rgba(0, 255, 0, 0.7f))  // Green
+            )
+        ),
+        //Changes the border
+        fillOutlineColor(rgba(0, 0, 0, 0f)),
+        fillOpacity(0.5f)
     )
 
     // Putting layer bellow roads and buildings
@@ -358,9 +364,9 @@ private fun setupHeatmapLayer(style: Style) {
     }
 
     if (insertBelowLayerId != null) {
-        style.addLayerBelow(heatmapLayer, insertBelowLayerId)
+        style.addLayerBelow(fillLayer, insertBelowLayerId)
     } else {
-        style.addLayer(heatmapLayer)
+        style.addLayer(fillLayer)
     }
 }
 

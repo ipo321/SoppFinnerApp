@@ -74,51 +74,68 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     //Calculate score for each point and detailed calls
                     val heatmapJobs = gridPoints.map { point ->
                         async {
-                            //Checking SAT-skog
-                            val forestData = forestRepository.getForestDataForHeatmap(point.lat, point.lon)
+                            try {
+                                //Checking SAT-skog
+                                val forestData =
+                                    forestRepository.getForestDataForHeatmap(point.lat, point.lon)
 
-                            if (forestData != null) {
+                                if (forestData != null) {
 
-                                Log.d("T16_UC_Heatmap", "Found forest, calling frost for: ${point.lat}, lon: ${point.lon}")
-                                //Checking MET
-                                val weatherHistory = frostRepository.weatherHistory(point.lat, point.lon)
+                                    Log.d(
+                                        "T16_UC_Heatmap",
+                                        "Found forest, calling frost for: ${point.lat}, lon: ${point.lon}"
+                                    )
+                                    //Checking MET
+                                    val weatherHistory =
+                                        frostRepository.weatherHistory(point.lat, point.lon)
 
-                                //Checking Artsdatabanken
-                                val historicalFindsCount =
-                                    allOccurrencesInBox?.results?.count { occ ->
-                                        val occLat = occ.decimalLatitude ?: return@count false
-                                        val occLon = occ.decimalLongitude ?: return@count false
+                                    //Checking Artsdatabanken
+                                    val historicalFindsCount =
+                                        allOccurrencesInBox?.results?.count { occ ->
+                                            val occLat = occ.decimalLatitude ?: return@count false
+                                            val occLon = occ.decimalLongitude ?: return@count false
 
-                                        //Distance from point to occurrence
-                                        calculateDistance(
-                                            point.lat,
-                                            point.lon,
-                                            occLat,
-                                            occLon
-                                        ) <= 500.0
+                                            //Distance from point to occurrence
+                                            calculateDistance(
+                                                point.lat,
+                                                point.lon,
+                                                occLat,
+                                                occLon
+                                            ) <= 500.0
 
-                                    } ?: 0
+                                        } ?: 0
 
-                                //Building the context
-                                val context = EnvironmentContext(
-                                    currentWeather = weather,  //Only from the center of the map
-                                    weatherHistory = weatherHistory,
-                                    terrainData = null,
-                                    ar5 = "Skog", // Since SAT-skog is not null
-                                    forestData = forestData,
-                                    historicalFinds = historicalFindsCount,
-                                    currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
-                                )
+                                    //Building the context
+                                    val context = EnvironmentContext(
+                                        currentWeather = weather,  //Only from the center of the map
+                                        weatherHistory = weatherHistory,
+                                        terrainData = null,
+                                        ar5 = "Skog", // Since SAT-skog is not null
+                                        forestData = forestData,
+                                        historicalFinds = historicalFindsCount,
+                                        currentMonth = Calendar.getInstance()
+                                            .get(Calendar.MONTH) + 1
+                                    )
 
 
-                                //Run the evaluation
-                                val evaluation = scorerProvider.activeHeatScorer.calculateScore(context, profile)
+                                    //Run the evaluation
+                                    val evaluation = scorerProvider.activeHeatScorer.calculateScore(
+                                        context,
+                                        profile
+                                    )
 
-                                Log.d("T16_UC_Heatmap", "Score ${evaluation.score} for point ${point.lat}")
+                                    Log.d(
+                                        "T16_UC_Heatmap",
+                                        "Score ${evaluation.score} for point ${point.lat}"
+                                    )
 
-                                //Makes the heatmap tile with a score
-                                HeatmapTile(point.lat, point.lon, evaluation.score)
-                            } else {
+                                    //Makes the heatmap tile with a score
+                                    HeatmapTile(point.lat, point.lon, evaluation.score)
+                                } else {
+                                    HeatmapTile(point.lat, point.lon, 0)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("T16_UC_Heatmap", "Error calculating heatmap tile: ${e.message}", e)
                                 HeatmapTile(point.lat, point.lon, 0)
                             }
                         }
@@ -146,6 +163,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
 
     private fun generateGridPoints(bounds: BoundingBox, rows: Int, cols: Int): List<GridPoint> {
         val points = mutableListOf<GridPoint>()
+
         val latStep = (bounds.north - bounds.south) / rows
         val lonStep = (bounds.east - bounds.west) / cols
 
