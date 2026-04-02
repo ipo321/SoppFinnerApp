@@ -9,7 +9,7 @@ class ScorerProvider @Inject constructor() {
     var activeScorer: MushroomScorer = MushroomScorerV2()
         private set
 
-    var activeHeatScorer: MushroomScorer = MushroomScorerV2()
+    var activeHeatScorer: MushroomScorer = HeatAlgorithmV1()
         private set
 
     fun setAlgorithm(type: AlgorithmType) {
@@ -17,6 +17,7 @@ class ScorerProvider @Inject constructor() {
             AlgorithmType.V1 -> MushroomScorerV1()
             AlgorithmType.V2 -> MushroomScorerV2()
             AlgorithmType.MOCK -> ScoreAlgorithmMock()
+            AlgorithmType.HEAT1 -> HeatAlgorithmV1()
         }
     }
     fun setHeatAlgorithm(type: AlgorithmType) {
@@ -24,10 +25,11 @@ class ScorerProvider @Inject constructor() {
             AlgorithmType.V1 -> MushroomScorerV1()
             AlgorithmType.V2 -> MushroomScorerV2()
             AlgorithmType.MOCK -> ScoreAlgorithmMock()
+            AlgorithmType.HEAT1 -> HeatAlgorithmV1()
         }
     }
 }
 
 enum class AlgorithmType {
-    V1, V2, MOCK
+    V1, V2, MOCK, HEAT1
 }

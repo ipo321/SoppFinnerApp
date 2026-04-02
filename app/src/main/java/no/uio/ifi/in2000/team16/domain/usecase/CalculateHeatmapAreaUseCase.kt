@@ -80,7 +80,6 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                     forestRepository.getForestDataForHeatmap(point.lat, point.lon)
 
                                 if (forestData != null) {
-
                                     Log.d(
                                         "T16_UC_Heatmap",
                                         "Found forest, calling frost for: ${point.lat}, lon: ${point.lon}"
@@ -169,11 +168,11 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
         val step = when {
             mapHeight > 1.2 -> 0.2      //130 km ->  22 km
             mapHeight > 0.6 -> 0.1      //66 km -> 11 km
-            mapHeight > 0.24 -> 0.05     //26 km -> Ruter på 5.5 km
-            mapHeight > 0.12 -> 0.02     //13 km -> Ruter på 2.2 km
-            mapHeight > 0.06 -> 0.01     // 6.6 km -> Ruter på 1.1 km
-            mapHeight > 0.024 -> 0.005    //2.6 km -> Ruter på 550 meter
-            mapHeight > 0.012 -> 0.002    //1.3 km -> Ruter på 220 meter
+            mapHeight > 0.24 -> 0.05     //26 km -> 5.5 km
+            mapHeight > 0.12 -> 0.02     //13 km -> 2.2 km
+            mapHeight > 0.06 -> 0.01     // 6.6 km -> 1.1 km
+            mapHeight > 0.024 -> 0.005    //2.6 km ->  550 m
+            mapHeight > 0.012 -> 0.002    //1.3 km -> 220 m
             else -> 0.001
         }
 

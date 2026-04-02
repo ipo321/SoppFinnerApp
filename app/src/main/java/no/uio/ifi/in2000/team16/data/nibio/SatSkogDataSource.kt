@@ -52,11 +52,11 @@ class SatSkogDataSource @Inject constructor(
         }
     }
 
-    private fun parseResponse(gmlText: String): SatSkogResponse {
+    private fun parseResponse(gmlText: String): SatSkogResponse? {
 
         if (!gmlText.contains("<alder>")){
             Log.d("T16_NIBIO_DataSource", "No forest data found for this location")
-            return SatSkogResponse()
+            return null
         }
 
         fun extractValue(tagName: String): String? {
