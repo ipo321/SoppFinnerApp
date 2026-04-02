@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team16.data.nibio
 
-
+/*
+Data class for the SAT-SKOG API
+ */
 data class SatSkogResponse(
     val treeSpecies: String? = null,
     val sprucePct: Int? = null,

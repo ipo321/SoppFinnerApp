@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.met.frost
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
@@ -34,7 +35,7 @@ class FrostDataSource @Inject constructor(
             }
             response.body<FrostResponse>()
         } catch (e: Exception) {
-            println("Network error Frost: ${e.message}")
+            Log.e("T16_Frost_DataSource","Network error when calling Frost Base API: ${e.message}",e)
             null
         }
     }
@@ -54,7 +55,7 @@ class FrostDataSource @Inject constructor(
             println("Frost API URL: ${response.call.request.url}")
             response.body<FrostResponse>()
         } catch (e: Exception) {
-            println("Network error Frost Fallback: ${e.message}")
+            Log.e("T16_Frost_DataSource","Network error when calling Frost Fallback API: ${e.message}",e)
             null
             }
         }

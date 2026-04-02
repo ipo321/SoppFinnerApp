@@ -1,7 +1,20 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>arealtype</w>
+      <w>artsdatabanken</w>
+      <w>bbox</w>
+      <w>bonitet</w>
+      <w>epsg</w>
+      <w>gbif</w>
+      <w>incobs</w>
+      <w>lauv</w>
+      <w>nibio</w>
+      <w>precip</w>
+      <w>skog</w>
       <w>sopp</w>
+      <w>timeseries</w>
+      <w>treslag</w>
     </words>
   </dictionary>
 </component>

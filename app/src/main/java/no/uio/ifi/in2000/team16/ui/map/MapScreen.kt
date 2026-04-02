@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,14 +26,21 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.data.polygons.Municipalities
+import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.FillLayer
-import org.maplibre.android.style.layers.PropertyFactory
+import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
+import org.maplibre.android.style.layers.PropertyFactory.*
+import org.maplibre.android.style.expressions.Expression.*
+import androidx.compose.runtime.setValue
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.Point
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -74,7 +83,22 @@ fun MapScreen(
                 .align(Alignment.TopEnd)
                 .wrapContentSize()
         ) {
-            Dropdown(onNavigateToDev = onNavigateToDev)
+            Dropdown(
+                onNavigateToDev = onNavigateToDev,
+                isHeatmapEnabled = uiState.isHeatmapEnabled,
+                onToggleHeatMap = {
+                    mapView.getMapAsync { map ->
+                        val bounds = map.projection.visibleRegion.latLngBounds
+                        val currentBox = BoundingBox(
+                            north = bounds.northEast.latitude,
+                            south = bounds.southWest.latitude,
+                            east = bounds.northEast.longitude,
+                            west = bounds.southWest.longitude
+                        )
+                        viewModel.toggleHeatmap(currentBox)
+                    }
+                }
+            )
         }
 
         when (uiState.screenStatus) {
@@ -96,11 +120,17 @@ fun MapScreen(
 
 @Composable
 fun getMapView(viewModel: MapViewModel, context: Context): MapView {
+
+    val uiState by viewModel.uiState.collectAsState()
+    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
+
+
     val mapView = remember {
         MapView(context).apply {
             onCreate(null)
 
             getMapAsync { map ->
+                mapRef = map
                 // The map now uses BASE from MapTiler, this can be changed
                 map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
                     // Logging to see what happens when the map is used
@@ -109,6 +139,10 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     setMapLayout(map)
                     //addPolygonsToMap(context, style)  // No polygons for now
 
+                    //HEATMAP løsning
+                    setupHeatmapLayer(style)    // Makes the heatmap layer
+
+                    // MAP
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
@@ -119,10 +153,99 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                         )
                         true
                     }
+                    var lastTarget: LatLng? = null
+                    var lastZoom: Double = 0.0
+
+                    // Checks if map is still
+                    map.addOnCameraIdleListener() {
+                        val currentZoom = map.cameraPosition.zoom
+
+                        if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
+
+                        val currentTarget = map.cameraPosition.target
+
+                        if (currentTarget != null && lastTarget != null) {
+                            val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
+                            val zoomDiff = kotlin.math.abs(currentZoom - lastZoom)
+
+                            if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
+                                return@addOnCameraIdleListener
+                            }
+                        }
+
+                        lastTarget = currentTarget
+                        lastZoom = currentZoom
+
+                        val visibleBounds = map.projection.visibleRegion.latLngBounds
+
+                        val north = visibleBounds.northEast.latitude
+                        val south = visibleBounds.southWest.latitude
+                        val east = visibleBounds.northEast.longitude
+                        val west = visibleBounds.southWest.longitude
+
+                        val latDiff = north - south
+                        val lonDiff = east - west
+
+                        val expandedBounds = BoundingBox(
+                            north = north + (latDiff * 0.5),
+                            south = south - (latDiff * 0.5),
+                            east = east + (lonDiff * 0.5),
+                            west = west - (lonDiff * 0.5)
+                        )
+
+                        viewModel.fetchHeatmapData(expandedBounds)
+                    }
                 }
             }
         }
     }
+
+    // Updating the heatMapTiles each time they change
+    LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, mapRef) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        currentMap.getStyle { style ->
+            if (!style.isFullyLoaded) return@getStyle
+
+            val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
+
+            if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
+                val features = mutableListOf<Feature>()
+
+                val lons = uiState.heatmapTiles.map { it.lon }.distinct().sorted()
+                val lats = uiState.heatmapTiles.map { it.lat }.distinct().sorted()
+
+                val lonStep = lons.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
+                val latStep = lats.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
+
+                for (tile in uiState.heatmapTiles) {
+
+                    val polygonPoints = listOf(
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2)),
+                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat - (latStep / 2)),
+                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat + (latStep / 2)),
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat + (latStep / 2)),
+                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2))
+                    )
+
+                    val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
+                    val feature = Feature.fromGeometry(polygon)
+
+                    feature.addNumberProperty("score", tile.score)
+                    features.add(feature)
+                }
+
+                val featureCollection = FeatureCollection.fromFeatures(features)
+                source.setGeoJson(featureCollection)
+                Log.d("T16_Map_Heat", "Drew ${features.size} grid polygons natively.")
+
+            } else {
+                // Clear the map safely
+                source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            }
+        }
+    }
+
     return mapView
 }
 
@@ -201,9 +324,9 @@ fun addPolygonsToMap(context: Context, style: Style) {
             // Draws the polygons
             val layer =
                 FillLayer(geoLayer.layerId, geoLayer.sourceId).withProperties(
-                    PropertyFactory.fillColor(geoLayer.color.toColorInt()),
-                    PropertyFactory.fillOpacity(0.5f), // Makes the layer a little transparent
-                    PropertyFactory.fillOutlineColor(android.graphics.Color.BLACK) // Black outline
+                    fillColor(geoLayer.color.toColorInt()),
+                    fillOpacity(0.5f), // Makes the layer a little transparent
+                    fillOutlineColor(android.graphics.Color.BLACK) // Black outline
                 )
             style.addLayer(layer)
         } catch (e: Exception) {
@@ -211,3 +334,47 @@ fun addPolygonsToMap(context: Context, style: Style) {
         }
     }
 }
+
+private fun setupHeatmapLayer(style: Style) {
+    //  Source
+    val heatmapSource = GeoJsonSource("heatmap-source")
+    style.addSource(heatmapSource)
+
+    // Colour and Size
+    val fillLayer = FillLayer("heatmap-layer", "heatmap-source")
+
+
+    fillLayer.setProperties(
+        fillColor(
+            interpolate(
+                linear(), get("score"),
+                stop(0, rgba(200, 0, 0, 0.4f)),     // red
+                stop(1, rgba(255, 100, 0, 0.5f)),   // Orange
+                stop(50, rgba(255, 255, 0, 0.6f)),// Yellow
+                stop(100, rgba(0, 255, 0, 0.7f))  // Green
+            )
+        ),
+        //Changes the border
+        fillOutlineColor(rgba(0, 0, 0, 0f)),
+        fillOpacity(0.5f)
+    )
+
+    // Putting layer bellow roads and buildings
+    var insertBelowLayerId: String? = null
+    //style.addLayer(heatmapLayer)
+
+    for (layer in style.layers) {
+        val id = layer.id.lowercase()
+        if (id.contains("water") || id.contains("road") || id.contains("building") || layer is SymbolLayer) {
+            insertBelowLayerId = layer.id
+            break
+        }
+    }
+
+    if (insertBelowLayerId != null) {
+        style.addLayerBelow(fillLayer, insertBelowLayerId)
+    } else {
+        style.addLayer(fillLayer)
+    }
+}
+

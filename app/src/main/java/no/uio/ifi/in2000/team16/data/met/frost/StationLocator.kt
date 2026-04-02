@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.data.met.frost
 
 import android.content.Context
+import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import no.uio.ifi.in2000.team16.R
 import javax.inject.Inject
@@ -11,14 +12,14 @@ import kotlin.math.*
 
 
 /*
-    Calling Frost with nearest casued the respone time to go from <1 to 8-10 seconds which was not optimal for the app. Without having to find the station the
+    Calling Frost with nearest cased the response time to go from <1 to 8-10 seconds which was not optimal for the app. Without having to find the station the
     call went fast so we downloaded all the stations into a csv. Here we read it and returns the one that is closes based on a probably much simpler calculations
 */
 
 
 @Singleton
 class StationLocator @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
     private val allStations: List<LocalStation> by lazy {
         loadStationsFromCsv()
@@ -29,7 +30,7 @@ class StationLocator @Inject constructor(
         try {
             val inputStream = context.resources.openRawResource(R.raw.weatherstations)
             val reader = BufferedReader(InputStreamReader(inputStream))
-            reader.readLine()
+            reader.readLine() //Skip header line
 
 
             reader.forEachLine { line ->
@@ -49,7 +50,7 @@ class StationLocator @Inject constructor(
             }
             reader.close()
         } catch (e: Exception) {
-            println("Feil ved lesing av weatherstations.csv: ${e.message}")
+            Log.e("T16_Frost_StationLoc", "Error reading weatherstations.csv: ${e.message}", e)
         }
         return stations
     }
@@ -72,6 +73,12 @@ class StationLocator @Inject constructor(
 
         if (nearestRain != null && calculateDistance(lat, lon, nearestRain.lat, nearestRain.lon) <= maxDistMeters) {
             idsToFetch.add(nearestRain.id)
+        }
+
+        if (idsToFetch.isEmpty()) {
+            Log.w("T16_Frost_StationLoc", "No stations found within ${maxDistMeters / 1000}km radius for lat: $lat, lon: $lon")
+        } else {
+            Log.d("T16_Frost_StationLoc", "Found nearest stations: $idsToFetch for lat: $lat, lon: $lon")
         }
 
         return idsToFetch.toList()

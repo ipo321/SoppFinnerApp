@@ -2,15 +2,14 @@ package no.uio.ifi.in2000.team16.data.nibio
 
 import android.util.Log
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /*
-    API for getting weather data from NIBIO and AR5 data
+    API for getting Forest data from NIBIO and their AR5 WMS services. Uses a similar method to
+    SAT-Skog using Get Feature Info and GML.
 */
 
 @Singleton
@@ -42,14 +41,14 @@ class ForestDataSource @Inject constructor(
             val result = match?.groupValues?.get(1)?.trim()
 
             if (result != null) {
-                Log.d("AR5_RESULT", "Successfully extracted arealtype: $result")
+                Log.d("T16_AR5_DataSource", "Successfully fetched AR5 for lat: $lat, lon: $lon")
             } else {
-                Log.w("AR5_RESULT", "No <arealtype> tag found in the response. Coordinate might be outside mapped areas (e.g., in the ocean).")
+                Log.w("T16_AR5_DataSource", "No AR5 data found for lat: $lat, lon: $lon")
             }
 
             result
         } catch (e: Exception) {
-            Log.e("AR5_ERROR", "Network error while fetching AR5 data: ${e.message}", e)
+            Log.e("T16_AR5_DataSource", "Network error when fetching AR5: ${e.message}", e)
             null
         }
     }

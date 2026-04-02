@@ -1,6 +1,11 @@
 package no.uio.ifi.in2000.team16.data.met.locationForecast
 
+import android.util.Log
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team16.domain.model.WeatherData
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -14,7 +19,7 @@ class LocationForecastRepository @Inject constructor(
 ) {
     // In-memory cache, should be made into a room database in the future for better persistence
 
-    private val cache = mutableMapOf<String, CacheEntry>()
+    private val cache = ConcurrentHashMap<String, Deferred<CacheEntry?>>()
     private val cacheMaxAgeMs = 8*60*60*1000L //8 hours
 
     private data class CacheEntry(
@@ -28,7 +33,7 @@ class LocationForecastRepository @Inject constructor(
     }
 
 
-    suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? {
+    suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? = coroutineScope{
 
         //Rounding to two decimals since that is the precision of the weather model (about 1x1 km)
         val roundedLat = roundToTwoDecimals(lat)
@@ -36,61 +41,78 @@ class LocationForecastRepository @Inject constructor(
         val cacheKey = "${roundedLat}_${roundedLon}"
 
         //Checking cache
-        val cachedEntry = cache[cacheKey]
-        val currentTime = System.currentTimeMillis()
+        val existingDeferred = cache[cacheKey]
 
-
-        if (cachedEntry != null && (currentTime - cachedEntry.timestamp) < cacheMaxAgeMs) {
-            return cachedEntry.data
+        if (existingDeferred != null) {
+            val cached = existingDeferred.await()
+            if (cached != null && (System.currentTimeMillis() - cached.timestamp) < cacheMaxAgeMs) {
+                Log.d("T16_Weather_Repo", "Returning cached data for $cacheKey")
+                return@coroutineScope cached.data
+            } else {
+                Log.d("T16_Weather_Repo", "Cache expired for $cacheKey")
+                cache.remove(cacheKey)
+            }
         }
+
+        Log.d("T16_Weather_Repo", "No cache found, fetching new data for $cacheKey")
+
 
         //Fetching data from API
+        val deferredResult = cache.getOrPut(cacheKey) {
+            async {
+                val response = dataSource.fetchWeather(roundedLat, roundedLon)
 
-        val response = dataSource.fetchWeather(lat, lon) ?: return null
-        val next8Hours = response.properties.timeseries.take(8)
-        if (next8Hours.isEmpty()) return null
+                val timeseries = response?.properties?.timeseries ?: run{
+                    Log.w("T16_Weather_Repo", "No timeseries found in response for $cacheKey")
+                    return@async null
+                }
+                val next8Hours = timeseries.take(8)
+                if (next8Hours.isEmpty()) {
+                    Log.w("T16_Weather_Repo", "No timeseries response for $cacheKey")
+                    return@async null
+                }
 
-        val totalRain = next8Hours.sumOf {
-            it.data.next_1_hours?.details?.precipitation_amount ?: 0.0
+                val totalRain = next8Hours.sumOf {
+                    it.data.next_1_hours?.details?.precipitation_amount ?: 0.0
+                }
+
+                val maxWind = next8Hours.mapNotNull {
+                    it.data.instant.details.wind_speed
+                }.maxOrNull()
+
+                val avgTemp = next8Hours.mapNotNull { it.data.instant.details.air_temperature }.average()
+                    .takeIf { !it.isNaN() }
+                val avgHumidity = next8Hours.mapNotNull { it.data.instant.details.relative_humidity }.average()
+                    .takeIf { !it.isNaN() }
+                val avgDewPoint = next8Hours.mapNotNull { it.data.instant.details.dew_point_temperature }.average()
+                    .takeIf { !it.isNaN() }
+                val avgFog = next8Hours.mapNotNull { it.data.instant.details.fog_area_fraction }.average()
+                    .takeIf { !it.isNaN() }
+
+                val generalForecast = next8Hours.firstOrNull()?.data?.next_12_hours
+                val symbol = generalForecast?.summary?.symbol_code
+                val rainProb = generalForecast?.details?.probability_of_precipitation
+
+                val weatherData = WeatherData(
+                    temp = avgTemp,
+                    rain = totalRain,
+                    humidity = avgHumidity,
+                    windSpeed = maxWind,
+                    dewPoint = avgDewPoint,
+                    fogFraction = avgFog,
+                    symbolCode = symbol,
+                    probOfRain = rainProb
+                )
+
+                Log.i("T16_Weather_Repo", "Successfully fetched weather data for $cacheKey")
+
+                CacheEntry(
+                    data = weatherData,
+                    timestamp = System.currentTimeMillis())
+            }
         }
 
-        val maxWind = next8Hours.mapNotNull {
-            it.data.instant.details.wind_speed
-        }.maxOrNull()
-
-        val avgTemp = next8Hours.mapNotNull { it.data.instant.details.air_temperature }.average()
-                .takeIf { !it.isNaN() }
-        val avgHumidity =
-            next8Hours.mapNotNull { it.data.instant.details.relative_humidity }.average()
-                .takeIf { !it.isNaN() }
-        val avgDewPoint =
-            next8Hours.mapNotNull { it.data.instant.details.dew_point_temperature }.average()
-                .takeIf { !it.isNaN() }
-        val avgFog = next8Hours.mapNotNull { it.data.instant.details.fog_area_fraction }.average()
-                .takeIf { !it.isNaN() }
-
-        val generalForecast = next8Hours.firstOrNull()?.data?.next_12_hours
-        val symbol = generalForecast?.summary?.symbol_code
-        val rainProb = generalForecast?.details?.probability_of_precipitation
-
-
-        val weatherData = WeatherData(
-            temp = avgTemp,
-            rain = totalRain,
-            humidity = avgHumidity,
-            windSpeed = maxWind,
-            dewPoint = avgDewPoint,
-            fogFraction = avgFog,
-            symbolCode = symbol,
-            probOfRain = rainProb
-        )
-
-        cache[cacheKey] = CacheEntry(
-            data = weatherData,
-            timestamp = currentTime
-        )
-
-        return weatherData
+        deferredResult.await()?.data
     }
 }
 

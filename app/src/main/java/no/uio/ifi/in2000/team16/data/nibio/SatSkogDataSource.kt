@@ -9,7 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /*
-    API for getting Forest data from NIBIO and their SAT-SKOG
+    API for getting Forest data from NIBIO and their SAT-SKOG.
+    WMS returns images, but using GetFeatureInfo and GML we can get the data we need.
 */
 
 @Singleton
@@ -18,7 +19,7 @@ class SatSkogDataSource @Inject constructor(
 ) {
     suspend fun fetchForest(lat: Double, lon: Double): SatSkogResponse? {
 
-        //Making a square box around the location
+        //Making a tiny square box around the location
         val offset = 0.0001
         val latMin = lat - offset
         val lonMin = lon - offset
@@ -41,13 +42,12 @@ class SatSkogDataSource @Inject constructor(
             val responseText = httpClient.get(url) {
                 header("User-Agent", "IN2000 Team 16 jostein.ibsen@gmail.com")
             }.bodyAsText()
-            println(url)
-            Log.d("NIBIO_DEBUG", "NIBIO: \n$responseText")
+            Log.d("T16_NIBIO_DataSource", "Successfully fetched forest data for lat: $lat, lon: $lon")
             parseResponse(responseText)
 
 
         } catch (e: Exception) {
-            println("Network error SatSkog: ${e.message}")
+            Log.e("T16_NIBIO_DataSource", "Network error when fetching forest data from NIBIO: ${e.message}", e)
             null
         }
     }
@@ -55,7 +55,7 @@ class SatSkogDataSource @Inject constructor(
     private fun parseResponse(gmlText: String): SatSkogResponse {
 
         if (!gmlText.contains("<alder>")){
-            Log.d("NIBIO_DEBUG", "NIBIO: No data on this point")
+            Log.d("T16_NIBIO_DataSource", "No forest data found for this location")
             return SatSkogResponse()
         }
 

@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.met.locationForecast
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -19,11 +20,12 @@ class LocationForecastDataSource @Inject constructor(
         val url = "https://in2000.api.met.no/weatherapi/locationforecast/2.0/complete?lat=$lat&lon=$lon"  //Complete gives fog area fraction and condensation point
 
         return try {
-            httpClient.get(url){
+            val response = httpClient.get(url){
                 header("User-Agent", "IN2000 Team 16")
             }.body<MetResponse>()
+                response
             } catch (e: Exception) {
-                println("Network error Met: ${e.message}")
+                Log.e("T16_Weather_DataSource", "Network error when fetching weather from LocationForecast API: ${e.message}", e)
                 null
         }
 
