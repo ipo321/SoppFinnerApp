@@ -38,6 +38,7 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
+import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
@@ -106,12 +107,13 @@ fun MapScreen(
                 uiState.evaluation?.let { eval ->
                     InfoPopUp(
                         msg = eval.description,
-                        score = eval.score
+                        score = eval.score,
+                        contextData = uiState.currentContext
                     )
                 }
             }
-            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0)
-            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0)
+            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0, contextData = null)
+            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0, contextData = null)
             is ScreenStatus.Idle -> {}
         }
 
@@ -275,11 +277,13 @@ fun LifeCycleObserver(lifecycleOwner: LifecycleOwner, mapView: MapView) {
 fun BoxScope.InfoPopUp(
     msg : String,
     score : Int,
+    contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
     ScoreCard(
         score = score,
         description = msg,
+        contextData = contextData,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()

@@ -142,7 +142,7 @@ class FrostRepository @Inject constructor(
 
         val cached = deferredResult.await()
 
-        if (cached != null && (currentTime - cached.timestamp) < cacheMaxAgeMs) {
+        if (cached != null && (currentTime - cached.timestamp) > cacheMaxAgeMs) {
             cache.remove(cacheKey)
             return@coroutineScope null
            } else if (cached != null) {
