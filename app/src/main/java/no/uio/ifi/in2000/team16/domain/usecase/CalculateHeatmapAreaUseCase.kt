@@ -19,6 +19,8 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.util.Calendar
 import kotlinx.coroutines.CancellationException
 import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.supervisorScope
 
 
 class CalculateHeatmapAreaUseCase @Inject constructor(
@@ -31,15 +33,14 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
     suspend operator fun invoke(
         bounds: BoundingBox,
         profile: SpeciesProfile,
-        resolution: Int = 7 //Numbers of row/columns in the grid (8 -> = 9x9 = 81 tiles)
     ): List<HeatmapTile> = coroutineScope {
-        Log.d("T16_UC_Heatmap", "Starting heatmap calculation for ${profile.taxKey} Resolution: $resolution")
+        Log.d("T16_UC_Heatmap", "Starting heatmap calculation for ${profile.taxKey}")
 
         var finalTiles: List<HeatmapTile> = emptyList()
 
         val timeTaken = measureTimeMillis {
             try{
-                finalTiles = coroutineScope {
+                finalTiles = supervisorScope {
                     //Find center
                     val centerLat = (bounds.north + bounds.south) / 2
                     val centerLon = (bounds.east + bounds.west) / 2
@@ -67,13 +68,12 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     Log.d("T16_UC_Heatmap", "Found $mushroomFindings for ${profile.taxKey}")
 
                     //Make the grid to the resolution
-                    val rowRes = (resolution*1.5).toInt()
-                    val gridPoints = generateGridPoints(bounds, rows = rowRes, cols = resolution)
+                    val gridPoints = generateGridPoints(bounds)
                     Log.d("T16_UC_Heatmap", "Generated ${gridPoints.size} grid points")
 
                     //Calculate score for each point and detailed calls
                     val heatmapJobs = gridPoints.map { point ->
-                        async {
+                        async(Dispatchers.Default) {
                             try {
                                 //Checking SAT-skog
                                 val forestData =
@@ -161,21 +161,38 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
     }
 
 
-    private fun generateGridPoints(bounds: BoundingBox, rows: Int, cols: Int): List<GridPoint> {
+    private fun generateGridPoints(bounds: BoundingBox): List<GridPoint> {
         val points = mutableListOf<GridPoint>()
 
-        val latStep = (bounds.north - bounds.south) / rows
-        val lonStep = (bounds.east - bounds.west) / cols
+        val mapHeight = bounds.north - bounds.south
 
-        for (i in 0..rows) {
-            for (j in 0..cols) {
-                points.add(
-                    GridPoint(
-                        lat = bounds.south + i * latStep,
-                        lon = bounds.west + j * lonStep
-                    )
-                )
+        val step = when {
+            mapHeight > 1.2 -> 0.2      //130 km ->  22 km
+            mapHeight > 0.6 -> 0.1      //66 km -> 11 km
+            mapHeight > 0.24 -> 0.05     //26 km -> Ruter på 5.5 km
+            mapHeight > 0.12 -> 0.02     //13 km -> Ruter på 2.2 km
+            mapHeight > 0.06 -> 0.01     // 6.6 km -> Ruter på 1.1 km
+            mapHeight > 0.024 -> 0.005    //2.6 km -> Ruter på 550 meter
+            mapHeight > 0.012 -> 0.002    //1.3 km -> Ruter på 220 meter
+            else -> 0.001
+        }
+
+        val startLat = kotlin.math.floor(bounds.south / step) * step
+        val endLat = kotlin.math.ceil(bounds.north / step) * step
+        val startLon = kotlin.math.floor(bounds.west / step) * step
+        val endLon = kotlin.math.ceil(bounds.east / step) * step
+
+        var currentLat = startLat
+        while (currentLat <= endLat + (step / 2)) {
+            var currentLon = startLon
+            while (currentLon <= endLon + (step / 2)) {
+                val cleanLat = String.format(java.util.Locale.US, "%.5f", currentLat).toDouble()
+                val cleanLon = String.format(java.util.Locale.US, "%.5f", currentLon).toDouble()
+
+                points.add(GridPoint(cleanLat, cleanLon))
+                currentLon += step
             }
+            currentLat += step
         }
     return points
     }

@@ -33,9 +33,6 @@ import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.FillLayer
-import org.maplibre.android.style.layers.HeatmapLayer
-import org.maplibre.android.style.layers.PropertyFactory
-import org.maplibre.android.style.layers.PropertyFactory.heatmapWeight
 import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.layers.PropertyFactory.*
@@ -86,9 +83,22 @@ fun MapScreen(
                 .align(Alignment.TopEnd)
                 .wrapContentSize()
         ) {
-            Dropdown(onNavigateToDev = onNavigateToDev,
+            Dropdown(
+                onNavigateToDev = onNavigateToDev,
                 isHeatmapEnabled = uiState.isHeatmapEnabled,
-                onToggleHeatMap = { viewModel.toggleHeatmap() })
+                onToggleHeatMap = {
+                    mapView.getMapAsync { map ->
+                        val bounds = map.projection.visibleRegion.latLngBounds
+                        val currentBox = BoundingBox(
+                            north = bounds.northEast.latitude,
+                            south = bounds.southWest.latitude,
+                            east = bounds.northEast.longitude,
+                            west = bounds.southWest.longitude
+                        )
+                        viewModel.toggleHeatmap(currentBox)
+                    }
+                }
+            )
         }
 
         when (uiState.screenStatus) {
@@ -144,29 +154,27 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                         true
                     }
                     var lastTarget: LatLng? = null
+                    var lastZoom: Double = 0.0
 
                     // Checks if map is still
-                    map.addOnCameraIdleListener {
-                        if (map.cameraPosition.zoom < 12.0) {
-                            return@addOnCameraIdleListener
-                        }
+                    map.addOnCameraIdleListener() {
+                        val currentZoom = map.cameraPosition.zoom
+
+                        if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
 
                         val currentTarget = map.cameraPosition.target
-                        if (currentTarget != null && lastTarget != null) {
-                            val results = FloatArray(1)
-                            android.location.Location.distanceBetween(
-                                currentTarget.latitude, currentTarget.longitude,
-                                lastTarget!!.latitude, lastTarget!!.longitude,
-                                results
-                            )
 
-                            val distanceInMeters = results[0]
-                            if (distanceInMeters < 200.0) {
+                        if (currentTarget != null && lastTarget != null) {
+                            val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
+                            val zoomDiff = kotlin.math.abs(currentZoom - lastZoom)
+
+                            if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
                                 return@addOnCameraIdleListener
                             }
                         }
-                        lastTarget = currentTarget
 
+                        lastTarget = currentTarget
+                        lastZoom = currentZoom
 
                         val visibleBounds = map.projection.visibleRegion.latLngBounds
 

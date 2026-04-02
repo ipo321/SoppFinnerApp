@@ -78,7 +78,7 @@ class MapViewModel @Inject constructor(
         heatmapJob = viewModelScope.launch {
             _uiState.update { it.copy(isFetchingHeatmap = true) }
             try {
-                val tiles = calculateHeatmapAreaUseCase(bounds, profile, resolution = 8)
+                val tiles = calculateHeatmapAreaUseCase(bounds, profile)
 
                 if (tiles.isNotEmpty()) {
                     _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
@@ -94,10 +94,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun toggleHeatmap() {
-        _uiState.update { it.copy(isHeatmapEnabled = !it.isHeatmapEnabled) }
-        if (!_uiState.value.isHeatmapEnabled) {
+    fun toggleHeatmap(currentBounds: BoundingBox?) {
+        val newState = !_uiState.value.isHeatmapEnabled
+        _uiState.update { it.copy(isHeatmapEnabled = newState) }
+
+        if (!newState) {
             _uiState.update { it.copy(heatmapTiles = emptyList()) }
+        } else if (currentBounds != null) {
+            fetchHeatmapData(currentBounds)
         }
     }
 
