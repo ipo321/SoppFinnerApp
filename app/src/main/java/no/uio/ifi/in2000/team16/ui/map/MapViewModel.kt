@@ -36,14 +36,26 @@ class MapViewModel @Inject constructor(
 
     init{
         viewModelScope.launch {
-            val defaultMushroom = speciesRepository.getMushroomByName("Skarlagen vårbeger")
-            _uiState.update { it.copy(selectedMushroom = defaultMushroom) }
-            try {
-                getEnvironmentContextUseCase(59.91, 10.75, defaultMushroom.profile) //Warmup to get scorer quicker
-            } catch (e: Exception){
+            speciesRepository.selectedMushroom.collect { mushroom ->
+                _uiState.update { it.copy(selectedMushroom = mushroom) }
+                try {
+                    getEnvironmentContextUseCase(
+                        59.91,
+                        10.75,
+                        mushroom.profile
+                    ) //Warmup to get scorer quicker
+                } catch (e: Exception) {
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            speciesRepository.favoriteMushrooms.collect { favs ->
+                _uiState.update { it.copy(favoriteMushrooms = favs.take(3)) }
             }
         }
     }
+
     fun onMapClicked(lat: Double, lon: Double) {
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
@@ -71,14 +83,14 @@ class MapViewModel @Inject constructor(
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
         if (!_uiState.value.isHeatmapEnabled) return
-        val profile = _uiState.value.selectedMushroom?.profile ?: return
+        val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         heatmapJob?.cancel()
 
         heatmapJob = viewModelScope.launch {
             _uiState.update { it.copy(isFetchingHeatmap = true) }
             try {
-                val tiles = calculateHeatmapAreaUseCase(bounds, profile)
+                val tiles = calculateHeatmapAreaUseCase(bounds, currentMushroom.profile)
 
                 if (tiles.isNotEmpty()) {
                     _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
@@ -107,7 +119,9 @@ class MapViewModel @Inject constructor(
 
 
     fun onMushroomSelected(mushroom: Mushroom) {
-        _uiState.update { it.copy(selectedMushroom = mushroom) }
+        viewModelScope.launch {
+            speciesRepository.updateSelectedMushroom(mushroom)
+        }
     }
 
     fun updateSearchQuery(query: String) {
@@ -126,11 +140,10 @@ class MapViewModel @Inject constructor(
         val selectedMushroom: Mushroom? = null,
         val currentContext: EnvironmentContext? = null,
         val evaluation: EvaluationResult? = null,
-
+        val favoriteMushrooms: List<Mushroom> = emptyList(),
         val isHeatmapEnabled: Boolean = false,
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
-
         val searchQuery: String = ""
     )
 

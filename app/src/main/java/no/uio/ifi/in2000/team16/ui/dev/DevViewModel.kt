@@ -30,13 +30,18 @@ class DevViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DevUiState())
     val uiState: StateFlow<DevUiState> = _uiState.asStateFlow()
 
+
     init {
-        val mushrooms = speciesRepository.getAllMushrooms()
+        val allMushrooms = speciesRepository.getAllMushrooms()
         _uiState.update { it.copy(
-            availableMushrooms = mushrooms,
-            selectedMushroom = mushrooms.firstOrNull(),
+            availableMushrooms = allMushrooms,
             activeAlgorithm = scorerProvider.activeScorer.javaClass.simpleName
-        ) }
+        )}
+        viewModelScope.launch {
+            speciesRepository.selectedMushroom.collect { globalSelectedMushroom ->
+                _uiState.update { it.copy(selectedMushroom = globalSelectedMushroom) }
+            }
+        }
     }
 
     fun onAlgorithmSelected(version: String) {
@@ -51,7 +56,9 @@ class DevViewModel @Inject constructor(
         _uiState.update { it.copy(activeAlgorithm = version) }
     }
     fun onMushroomSelected(mushroom: Mushroom) {
-        _uiState.update { it.copy(selectedMushroom = mushroom) }
+        viewModelScope.launch {
+            speciesRepository.updateSelectedMushroom(mushroom)
+        }
     }
 
     fun recalculate(context: EnvironmentContext?) {

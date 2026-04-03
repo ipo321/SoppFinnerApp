@@ -87,6 +87,9 @@ fun MapScreen(
             Dropdown(
                 onNavigateToDev = onNavigateToDev,
                 isHeatmapEnabled = uiState.isHeatmapEnabled,
+                favoriteMushrooms = uiState.favoriteMushrooms,
+                selectedMushroom = uiState.selectedMushroom,
+                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
                 onToggleHeatMap = {
                     mapView.getMapAsync { map ->
                         val bounds = map.projection.visibleRegion.latLngBounds
