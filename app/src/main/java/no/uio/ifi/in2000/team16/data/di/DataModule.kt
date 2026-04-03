@@ -50,7 +50,7 @@ object DataModule {
             }
             // Gives URL, HTTP-status.
             // Change to LogLevel.ALL if u wanna debug the whole response.
-            level = LogLevel.INFO
+            level = LogLevel.ALL  //INFO
         }
     }.apply {
             // Give time used for network communication
