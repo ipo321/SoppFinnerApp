@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.data.network
+package no.uio.ifi.in2000.team16.data.di
 
 import android.util.Log
 import dagger.Module
@@ -16,14 +16,21 @@ import io.ktor.client.plugins.plugin
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 /*
-    Object creates an Http client
+    Object creates an Http client and the Storage module
  */
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "mushroom_prefs")
 
 @Module
 @InstallIn(SingletonComponent::class)
-object KtorClient {
+object DataModule {
     @Provides
     @Singleton
     fun provideHttpClient(): HttpClient = HttpClient(Android) {
@@ -53,5 +60,11 @@ object KtorClient {
                 Log.d("T16_Network_Time", "Call tok ${System.currentTimeMillis() - start} ms")
                 call
             }
+    }
+    // DataStore provide
+    @Provides
+    @Singleton
+    fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return context.dataStore
     }
 }

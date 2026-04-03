@@ -56,6 +56,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.preferences.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -85,6 +87,9 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.52")
     ksp("com.google.dagger:hilt-compiler:2.52")
+
+    //DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     //SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
