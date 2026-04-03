@@ -12,7 +12,7 @@ even when new version of the algorithm is made
 
 
 interface MushroomScorer {
-    fun calculateScore(context: EnvironmentContext, species: SpeciesProfile): EvaluationResult
+    suspend fun calculateScore(context: EnvironmentContext, species: SpeciesProfile): EvaluationResult
 }
 
 

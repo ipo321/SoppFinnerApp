@@ -10,7 +10,7 @@ First version of the heatmap algorithm, it has the most important kill switches 
 */
 
 class HeatAlgorithmV1 : MushroomScorer {
-    override fun calculateScore(                    //Overrides the Interface
+    override suspend fun calculateScore(                    //Overrides the Interface
         context: EnvironmentContext,
         species: SpeciesProfile
     ): EvaluationResult {

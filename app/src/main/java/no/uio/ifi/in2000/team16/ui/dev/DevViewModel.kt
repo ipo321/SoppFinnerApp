@@ -48,7 +48,8 @@ class DevViewModel @Inject constructor(
         val type = when(version) {
             "V1" -> AlgorithmType.V1
             "V2" -> AlgorithmType.V2
-            "MOCK" -> AlgorithmType.MOCK
+            "Mock" -> AlgorithmType.MOCK
+            "AI" -> AlgorithmType.AI1
             else -> AlgorithmType.V2
         }
 
