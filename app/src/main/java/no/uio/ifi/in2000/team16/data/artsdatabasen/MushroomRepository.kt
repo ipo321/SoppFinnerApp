@@ -63,7 +63,7 @@ class MushroomRepository @Inject constructor(
         lon: Double,
         radiusKm: Double = 3.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 10
+        limit: Int = 50
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
