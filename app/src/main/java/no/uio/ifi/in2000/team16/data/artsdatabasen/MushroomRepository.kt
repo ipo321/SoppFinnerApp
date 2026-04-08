@@ -35,7 +35,7 @@ class MushroomRepository @Inject constructor(
         lat: Double,
         lon: Double,
         taxonKey: String,
-        radiusKm: Double = 1.0,
+        radiusKm: Double = 5.0,
     ): Int {
         val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
         return result.count
