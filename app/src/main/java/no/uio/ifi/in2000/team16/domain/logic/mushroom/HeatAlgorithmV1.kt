@@ -62,7 +62,7 @@ class HeatAlgorithmV1 : MushroomScorer {
 
 
         //Bonus
-        val findsBoost = HistoricalFindsScorer.evaluate(context.historicalFinds)
+        val findsBoost = HistoricalFindsScorer.evaluate(context.historicalFindCount)
         totalScore += (findsBoost * 10.0)
 
         val description = buildDescription(forestTotal, historyTotal, currentTotal)

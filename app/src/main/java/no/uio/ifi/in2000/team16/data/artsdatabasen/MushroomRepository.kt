@@ -31,6 +31,7 @@ class MushroomRepository @Inject constructor(
         }
         return result.toMushroom()
     }
+
     suspend fun getSpeciesCountNearLocation(
         lat: Double,
         lon: Double,
@@ -40,6 +41,8 @@ class MushroomRepository @Inject constructor(
         val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
         return result.count
     }
+
+
 
 
     //returns an int with how many mushrooms are in the area

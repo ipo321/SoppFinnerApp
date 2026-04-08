@@ -21,6 +21,7 @@ import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
+import no.uio.ifi.in2000.team16.data.artsdatabasen.OccurrenceResult
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -144,7 +145,7 @@ class MapViewModel @Inject constructor(
         val isHeatmapEnabled: Boolean = false,
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = ""
+        val searchQuery: String = "",
     )
 
     sealed class ScreenStatus{
