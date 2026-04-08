@@ -9,6 +9,9 @@ import kotlin.math.cos
 repository that can search for mushrooms and get information about them
 and the amount of mushrooms spotting in a certain area.
 use getSpeciesNearLocation with latitude, longitude and species profile.
+amount of mushroom results have a default limit that can be adjusted (limit)
+and a default radius that can be adjusted (radiusKm).
+
 */
 
 
