@@ -61,9 +61,9 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 10.0,
+        radiusKm: Double = 3.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 100
+        limit: Int = 10
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
@@ -101,7 +101,7 @@ class MushroomRepository @Inject constructor(
         east: Double,
         west: Double,
         mushRoomType: String,
-        limit: Int = 500
+        limit: Int = 10
     ): OccurrenceResult {
         return mushroomDataSource.getOccurrencesNearLocation(
             mushRoomType = mushRoomType,

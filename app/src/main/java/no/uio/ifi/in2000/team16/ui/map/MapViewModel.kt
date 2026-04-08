@@ -153,6 +153,7 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
+        //val isHistoricalFinds: Boolean = false  // add this
     )
 
     sealed class ScreenStatus{

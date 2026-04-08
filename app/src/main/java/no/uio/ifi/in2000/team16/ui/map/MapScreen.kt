@@ -39,6 +39,7 @@ import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
@@ -146,7 +147,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
                     //HEATMAP løsning
                     setupHeatmapLayer(style)    // Makes the heatmap layer
-
+                    setupHistoricalFindsLayer(style)
                     // MAP
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
@@ -206,13 +207,25 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
     }
 
     // Updating the heatMapTiles each time they change
-    LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, mapRef) {
+    LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, uiState.currentContext?.historicalFinds, mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
         currentMap.getStyle { style ->
             if (!style.isFullyLoaded) return@getStyle
 
             val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
+
+
+            val findsSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
+            val finds = uiState.currentContext?.historicalFinds ?: emptyList()
+            val features = finds
+                .filter { it.decimalLatitude != null && it.decimalLongitude != null }
+                .map { occ ->
+                    Feature.fromGeometry(
+                        Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
+                    )
+                }
+            findsSource.setGeoJson(FeatureCollection.fromFeatures(features))
 
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
@@ -385,3 +398,16 @@ private fun setupHeatmapLayer(style: Style) {
     }
 }
 
+private fun setupHistoricalFindsLayer(style: Style) {
+    val source = GeoJsonSource("historical-finds-source")
+    style.addSource(source)
+
+    val circleLayer = CircleLayer("historical-finds-layer", "historical-finds-source")
+    circleLayer.setProperties(
+        circleRadius(6f),
+        circleColor("#8B4513"),   // brown pin color
+        circleStrokeWidth(1.5f),
+        circleStrokeColor("#FFFFFF")
+    )
+    style.addLayer(circleLayer)
+}
