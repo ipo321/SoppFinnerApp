@@ -6,6 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -91,6 +92,7 @@ class MushroomDataSource @Inject constructor(
                     parameters.append("limit", limit.toString())   //Amount of results.
                 }
             }
+            Log.d("T16_Mushroom_DataSource", "GBIF request URL: ${response.request.url}")
 
             //println("GBIF request URL: ${response.request.url}")
             if (response.status.value != 200) {

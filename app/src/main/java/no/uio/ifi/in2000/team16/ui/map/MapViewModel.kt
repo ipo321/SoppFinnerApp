@@ -67,6 +67,13 @@ class MapViewModel @Inject constructor(
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
+                Log.d(
+                    "T16_MapViewModel_MushroomLocation",
+                    "Clicked ($lat, $lon) -> ${context.historicalFindCount} occurrences: " +
+                            context.historicalFinds.take(2).joinToString { occ ->
+                                "${occ.species ?: occ.scientificName}@${occ.decimalLatitude},${occ.decimalLongitude}"
+                            }
+                )
                 _uiState.update {
                     it.copy(
                         screenStatus = ScreenStatus.Success,

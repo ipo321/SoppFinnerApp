@@ -40,7 +40,7 @@ class SpeciesDataSource @Inject constructor(){
         SpeciesProfile(
             name = "Steinsopp",
             type = 1,
-            taxKey = "5954874",
+            taxKey = "5954958",
             activeMonths = listOf(8, 9, 10), //Later in season
             killTemp = 0.0,
             optimalTemp = 13.0,
