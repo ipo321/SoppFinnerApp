@@ -33,6 +33,7 @@ class MapViewModel @Inject constructor(
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
 
     private var heatmapJob: Job? = null // cancel old calculations
+    private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
 
     init{
         viewModelScope.launch {
@@ -83,6 +84,7 @@ class MapViewModel @Inject constructor(
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
         if (!_uiState.value.isHeatmapEnabled) return
+        savedBounds = bounds
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         heatmapJob?.cancel()
@@ -114,6 +116,7 @@ class MapViewModel @Inject constructor(
             _uiState.update { it.copy(heatmapTiles = emptyList()) }
         } else if (currentBounds != null) {
             fetchHeatmapData(currentBounds)
+            savedBounds = currentBounds
         }
     }
 
@@ -121,6 +124,7 @@ class MapViewModel @Inject constructor(
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
+            savedBounds?.let { fetchHeatmapData(it) }
         }
     }
 
