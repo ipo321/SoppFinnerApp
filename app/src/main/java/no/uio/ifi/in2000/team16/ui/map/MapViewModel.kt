@@ -125,6 +125,10 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun toggleHistoricalFinds() {
+        _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
+    }
+
 
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
@@ -153,7 +157,7 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
-        //val isHistoricalFinds: Boolean = false  // add this
+        val isHistoricalFindsEnabled: Boolean = false  // add this
     )
 
     sealed class ScreenStatus{
