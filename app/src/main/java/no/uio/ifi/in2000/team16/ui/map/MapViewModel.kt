@@ -63,6 +63,14 @@ class MapViewModel @Inject constructor(
             _uiState.update { it.copy(screenStatus = ScreenStatus.Loading) }
             try {
                 val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)  // Have to add species selection here as well, but needs to update usecase and
+                Log.d("T16_MapClickData", """
+                Retrieved data for ($lat, $lon):
+                - Current Weather: ${context.currentWeather}
+                - Weather History: ${context.weatherHistory}
+                - AR5: ${context.ar5}
+                - Forest Data: ${context.forestData}
+                - Historical Finds: ${context.historicalFinds}
+            """.trimIndent())
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
