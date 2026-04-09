@@ -207,13 +207,40 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             }
         }
     }
+    //Mushroom finding pins
+    // Updating the pins each time they change
+    LaunchedEffect(
+        uiState.currentContext?.historicalFinds,
+        uiState.isHistoricalFindsEnabled,
+        mapRef
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
 
-    // Updating the heatMapTiles and the location pinns each time they change
+        val features = finds
+            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
+            .map { occ ->
+                Feature.fromGeometry(
+                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
+                )
+            }
+
+        currentMap.getStyle { style ->
+            if (!style.isFullyLoaded) return@getStyle
+            val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
+
+            if (uiState.isHistoricalFindsEnabled) {
+                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
+            } else {
+                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            }
+        }
+    }
+
+    // Updating the heatMapTiles each time they change
     LaunchedEffect(
         uiState.heatmapTiles,
         uiState.isHeatmapEnabled,
-        uiState.currentContext?.historicalFinds,
-        uiState.isHistoricalFindsEnabled,
         mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
@@ -222,22 +249,6 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             if (!style.isFullyLoaded) return@getStyle
 
             val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
-            val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
-
-            // Updates the location of pinns if enabled
-            if (uiState.isHistoricalFindsEnabled) {
-                val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-                val features = finds
-                    .filter { it.decimalLatitude != null && it.decimalLongitude != null }
-                    .map { occ ->
-                        Feature.fromGeometry(
-                            Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
-                        )
-                    }
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
-           } else {
-               locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-           }
 
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
