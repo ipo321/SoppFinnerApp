@@ -9,9 +9,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
-//will return the spices by name
-//Returns Kantarell (first object) object if the name is wrong
-//It can get a list of Specie all spices
+// Will return the species by name
+// Returns Kantarell (first object) object if the name is wrong
+// It can get a list of all species
 
 
 class SpeciesRepoTest{

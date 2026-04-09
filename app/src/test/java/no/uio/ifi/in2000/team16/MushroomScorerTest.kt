@@ -41,7 +41,7 @@ class MushroomScorerTest {
                 mushroom).score
                     in 0..100
         )
-        // The score should be in interval 0 <= .. <= 100 when given negative numbers because Scorers.kt takes cares of this
+        // The score should be in interval 0 <= ... <= 100 when given negative numbers because Scorers.kt takes cares of this
         assert(
             scorer.calculateScore(makeMockContext(
                 humidity = -50.0,

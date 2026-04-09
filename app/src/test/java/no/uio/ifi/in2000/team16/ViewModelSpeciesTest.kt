@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team16
 
 import io.mockk.every
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
@@ -12,19 +13,16 @@ import org.junit.Test
 
 
 class ViewModelSpeciesTest () {
-
-
     /*
-   En test for MushroomInfoViewModel
+   A test for MushroomInfoViewModel
    ---------------------------------
-   Testen sjekker om viewmodel mottar en sopp
+   The test checks if the viewmodel receives a mushroom
 
-   Krav:
-   Holde på den valgte soppen
-   Motta en sopp man trykker på
-   Oppdater soppvalget
-
-     */
+   Requirements:
+   Hold the chosen mushroom
+   Receive a mushroom when clicking on one
+   Update mushroom choice
+*/
 
     @Test
     fun getMushroom() {
@@ -35,8 +33,12 @@ class ViewModelSpeciesTest () {
         )
         every { mockRepository.getAllMushrooms() } returns mockMushrooms
         val viewModel = MushroomInfoViewModel(mockRepository)
-        val newMushroom = viewModel.mushrooms[1]
+        // Initial state: should hold the chosen mushroom
         assertNotNull(viewModel.selectedMushroom)
-        assertNotEquals(newMushroom, viewModel.selectedMushroom)
+        assertEquals(mockMushrooms[0], viewModel.selectedMushroom)
+        // Should update mushroom choice
+        viewModel.selectMushroom(mockMushrooms[1])
+        assertEquals(mockMushrooms[1], viewModel.selectedMushroom)
+        // ^- assertEquals is better practice than assertNotEquals
     }
 }

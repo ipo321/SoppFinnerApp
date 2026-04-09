@@ -24,7 +24,7 @@ class SpeciesTest {
         assertEquals("This ACTUALLY works :)", listAllSpecies.count(),
             speciesDS.amount)
 
-        //!! Says we guarantee the value returned wont be null, and if it is , crash the program
+        //!! Says we guarantee the value returned won't be null, and if it is, crash the program
         assertEquals("This also ACTUALLY works :O",
             listAllSpecies.find{it.name == "Kantarell"}!!.optimalTemp, 18.0)
 
