@@ -20,20 +20,46 @@ class MushroomScorerTest {
         val speciesDS = SpeciesDataSource()
         val mushroom = speciesDS.allSpeciesProfiles[0] // Kantarell
 
-        // The score should be in interval 0 <= .. <= 100
+        // The score should be in interval 0 <= ... <= 100 when given "normal" values
         assert(
             scorer.calculateScore(makeMockContext(), mushroom).score
-                    in 0..100)
+                    in 0..100
+        )
+        // The score should be in interval 0 <= ... <= 100 when given boundary values
+        assert(
+            scorer.calculateScore(
+                makeMockContext(
+                    temp = 150.0, // Extremely hot
+                    humidity = 0.0, // Lowest possible humidity
+                    windSpeed = 300.0, // Hurricane wind speed
+                    rain = 500.0, // Flood amount of rain
+                    fogFraction = 0.0, // Lowest possible fog fraction
+                    dewPoint = -100.0, // Extremely low dew point
+                    avgTempPast14Days = -60.0, // Deep freeze
+                    totalRainPast14Days = 0.0, // No rain
+                ),
+                mushroom).score
+                    in 0..100
+        )
+        // The score should be in interval 0 <= .. <= 100 when given negative numbers because Scorers.kt takes cares of this
+        assert(
+            scorer.calculateScore(makeMockContext(
+                humidity = -50.0,
+                rain = -50.0,
+                fogFraction = -50.0
+            ), mushroom).score
+                    in 0..100
+        )
         // Score should increase when humidity is high
         assert(
-            scorer.calculateScore(makeMockContext(), mushroom).score >
-                    scorer.calculateScore(makeMockContext(humidity = 10.123), mushroom).score
+            scorer.calculateScore(makeMockContext(humidity = 100.0), mushroom).score >
+                    scorer.calculateScore(makeMockContext(humidity = 0.0), mushroom).score
         )
         // Score should be 0 when current month is wrong
         assertEquals("Score should be 0 when current month is wrong",
-            0, scorer.calculateScore(makeMockContext(month = 1), mushroom).score)
-
-        // Handles null data
+            0, scorer.calculateScore(makeMockContext(month = 1), mushroom).score
+        )
+        // The calculation should handle null data
         assert(
             scorer.calculateScore(makeMockContext(null, null, null,
                 null, null, null, null, null,
@@ -52,19 +78,19 @@ class MushroomScorerTest {
 
 
     fun makeMockContext(
-        temp: Double? = 8.237499999999999,
+        temp: Double? = 8.0,
         rain: Double? = 0.0,
-        humidity: Double? = 72.375,
+        humidity: Double? = 70.0,
         windSpeed: Double? = 3.0,
-        dewPoint: Double? = 3.2125000000000004,
+        dewPoint: Double? = 3.0,
         fogFraction: Double? = 0.0,
         symbolCode: String? = "cloudy",
-        probOfRain: Double? = 0.4,
+        probOfRain: Double? = 0.5,
 
-        avgTempPast14Days: Double? = 2.251190473717263,
-        totalRainPast14Days: Double? = 45.000000354,
+        avgTempPast14Days: Double? = 4.0,
+        totalRainPast14Days: Double? = 40.0,
         minTempPast14Days: Double? = -3.0,
-        maxTempPast14Days: Double? = 9.89999962,
+        maxTempPast14Days: Double? = 12.0,
 
         terrainData: TerrainData? = null,
         ar5: String? = "Skog",
