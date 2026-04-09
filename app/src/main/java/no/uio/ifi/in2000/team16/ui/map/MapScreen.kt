@@ -207,29 +207,29 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             }
         }
     }
-    //Mushroom finding pinns
-    // Updating the pinns each time they change
+    //Mushroom finding pins
+    // Updating the pins each time they change
     LaunchedEffect(
         uiState.currentContext?.historicalFinds,
         uiState.isHistoricalFindsEnabled,
         mapRef
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
+        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
+
+        val features = finds
+            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
+            .map { occ ->
+                Feature.fromGeometry(
+                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
+                )
+            }
 
         currentMap.getStyle { style ->
             if (!style.isFullyLoaded) return@getStyle
-
             val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
 
             if (uiState.isHistoricalFindsEnabled) {
-                val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-                val features = finds
-                    .filter { it.decimalLatitude != null && it.decimalLongitude != null }
-                    .map { occ ->
-                        Feature.fromGeometry(
-                            Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
-                        )
-                    }
                 locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
             } else {
                 locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
