@@ -15,6 +15,7 @@ import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 
 
 //
@@ -23,7 +24,7 @@ const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
-
+const val MUSHROOM_LIST_SCREEN = "mushroomList"
 
 @Composable
 fun Navigation(
@@ -76,6 +77,14 @@ fun Navigation(
                     }
                 )
             }
+            composable(MUSHROOM_LIST_SCREEN) {
+                MushroomListScreen(
+                    onMushroomClick = {
+                        navController.navigate(MUSHROOM_INFO_SCREEN)
+                    }
+                )
+            }
+
         }
     }
 }
