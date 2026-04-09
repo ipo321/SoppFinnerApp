@@ -39,7 +39,7 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB5DAA4))
+            .background(Color(0xFF426914))
             .padding(24.dp)
     ){
         Text(
@@ -53,7 +53,7 @@ fun MushroomListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF3F7DAD))
+                .background(Color(0xFF426914))
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -80,7 +80,7 @@ fun MushroomListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
+            .background(Color(0xFF8DC2EA))
             .padding(12.dp)
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically

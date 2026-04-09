@@ -33,7 +33,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Soppesiden",
             icon = Icons.Default.Favorite,
-            route = MUSHROOM_INFO_SCREEN
+            route = MUSHROOM_LIST_SCREEN
         ),
 
         BottombarNavItem(

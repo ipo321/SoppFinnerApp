@@ -43,7 +43,7 @@ see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
  */
 @Composable
 fun MushroomInfoScreen(
-    onNavigateHome: () -> Unit,
+    onNavigateBack: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()) {
 
 
@@ -57,12 +57,20 @@ fun MushroomInfoScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Button(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text("Tilbake")
+        }
+
         Text(text = "Aldri spis sopp du er usikker på." +
                 " se soppkontroll.no for mere informasjon",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold)
 
-        Box {
+        /*Box {
         Button(onClick = { expanded = true }) {
             Text(selected.commonName)
         }
@@ -80,7 +88,7 @@ fun MushroomInfoScreen(
                 )
             }
         }
-    }
+    }*/
         // Mushroom image in a green circle
         Box(
             modifier = Modifier
@@ -111,13 +119,6 @@ fun MushroomInfoScreen(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = onNavigateHome,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Tilbake til kart")
-        }
     }
 }
 @Composable
