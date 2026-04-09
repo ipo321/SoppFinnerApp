@@ -103,9 +103,20 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.drawerlayout:drawerlayout:1.2.0")
     implementation("androidx.navigation:navigation-compose:2.8.3")
+
+    // MockK
+    testImplementation("io.mockk:mockk:1.14.9")
 }
 
 ksp {
     arg("dagger.fastInit", "enabled")
     arg("dagger.stacktraceJs", "true")
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion("2.0.21")
+        }
+    }
 }

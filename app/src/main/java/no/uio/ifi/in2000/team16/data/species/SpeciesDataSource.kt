@@ -16,7 +16,7 @@ class SpeciesDataSource @Inject constructor(){
     var amount: Int = 0
 
 
-    private val allSpeciesProfiles = listOf(
+    val allSpeciesProfiles = listOf(
         SpeciesProfile(
             name = "Kantarell",
             type = 1,
@@ -118,7 +118,7 @@ class SpeciesDataSource @Inject constructor(){
         return allMushrooms
     }
 
-    fun getAmountofMushrooms(): Int {
+    fun getAmountOfMushrooms(): Int {
         return amount
     }
 }
