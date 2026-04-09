@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16
 
-
 import io.mockk.every
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
@@ -8,11 +7,10 @@ import junit.framework.TestCase.assertNotNull
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
-import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 
-class ViewModelSpeciesTest () {
+class MushroomInfoViewModelTest () {
     /*
    A test for MushroomInfoViewModel
    ---------------------------------
@@ -25,7 +23,7 @@ class ViewModelSpeciesTest () {
 */
 
     @Test
-    fun getMushroom() {
+    fun selectMushroom() {
         val mockRepository = mockk<SpeciesRepository>(relaxed = true)
         val mockMushrooms = listOf(
             mockk<Mushroom>(relaxed = true),
@@ -39,6 +37,6 @@ class ViewModelSpeciesTest () {
         // Should update mushroom choice
         viewModel.selectMushroom(mockMushrooms[1])
         assertEquals(mockMushrooms[1], viewModel.selectedMushroom)
-        // ^- assertEquals is better practice than assertNotEquals
+        // assertEquals is better practice than assertNotEquals
     }
 }
