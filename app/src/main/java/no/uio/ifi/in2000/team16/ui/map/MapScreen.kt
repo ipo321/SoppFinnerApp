@@ -207,24 +207,20 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             }
         }
     }
-
-    // Updating the heatMapTiles and the location pinns each time they change
+    //Mushroom finding pinns
+    // Updating the pinns each time they change
     LaunchedEffect(
-        uiState.heatmapTiles,
-        uiState.isHeatmapEnabled,
         uiState.currentContext?.historicalFinds,
         uiState.isHistoricalFindsEnabled,
-        mapRef) {
+        mapRef
+    ) {
         val currentMap = mapRef ?: return@LaunchedEffect
-
 
         currentMap.getStyle { style ->
             if (!style.isFullyLoaded) return@getStyle
 
-            val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
             val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
 
-            // Updates the location pinns iff enabled
             if (uiState.isHistoricalFindsEnabled) {
                 val finds = uiState.currentContext?.historicalFinds ?: emptyList()
                 val features = finds
@@ -235,9 +231,24 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                         )
                     }
                 locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
-           } else {
-               locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))  // this was missing!
-           }
+            } else {
+                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            }
+        }
+    }
+
+    // Updating the heatMapTiles each time they change
+    LaunchedEffect(
+        uiState.heatmapTiles,
+        uiState.isHeatmapEnabled,
+        mapRef) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+
+        currentMap.getStyle { style ->
+            if (!style.isFullyLoaded) return@getStyle
+
+            val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
 
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
