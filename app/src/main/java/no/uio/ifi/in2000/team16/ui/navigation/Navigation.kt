@@ -71,7 +71,7 @@ fun Navigation(
             composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
                 val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
                 MushroomListScreen(
-                    onMushroomClick = { navController.navigate(MUSHROOM_INFO_SCREEN) },
+                    navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
                     viewModel = viewModel
                 )
             }

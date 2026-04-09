@@ -224,7 +224,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             val source = style.getSourceAs<GeoJsonSource>("heatmap-source") ?: return@getStyle
             val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
 
-            // Updates the location pinns iff enabled
+            // Updates the location of pinns if enabled
             if (uiState.isHistoricalFindsEnabled) {
                 val finds = uiState.currentContext?.historicalFinds ?: emptyList()
                 val features = finds
@@ -236,7 +236,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     }
                 locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
            } else {
-               locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))  // this was missing!
+               locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
            }
 
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
