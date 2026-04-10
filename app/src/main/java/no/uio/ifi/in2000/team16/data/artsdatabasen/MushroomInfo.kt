@@ -29,8 +29,6 @@ data class Occurrence(
     val scientificName: String? = null,
     val species: String? = null,
     val speciesKey: Int? = null,
-    val genus: String? = null,
-    val genusKey: Int? = null,
     val decimalLatitude: Double? = null,
     val decimalLongitude: Double? = null,
     val year: Int? = null,

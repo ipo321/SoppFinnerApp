@@ -114,7 +114,7 @@ fun ContextGridSection(context: EnvironmentContext) {
 
         SectionHeader("Lokasjonsparametere")
         GridRow("AR5", context.ar5 ?: "N/A", "Måned", context.currentMonth.toString())
-        GridRow("Funn", "${context.historicalFinds} stk", "", "")
+        GridRow("Funn", "${context.historicalFindCount} stk", "", "")
     }
 }
 

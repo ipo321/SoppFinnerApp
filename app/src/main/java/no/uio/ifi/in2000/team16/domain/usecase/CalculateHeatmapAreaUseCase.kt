@@ -111,7 +111,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                         terrainData = null,
                                         ar5 = "Skog", // Since SAT-skog is not null
                                         forestData = forestData,
-                                        historicalFinds = historicalFindsCount,
+                                        historicalFindCount = historicalFindsCount,
                                         currentMonth = Calendar.getInstance()
                                             .get(Calendar.MONTH) + 1
                                     )

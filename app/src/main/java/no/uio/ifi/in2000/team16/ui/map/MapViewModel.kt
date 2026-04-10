@@ -22,6 +22,7 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
 
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
@@ -67,6 +68,13 @@ class MapViewModel @Inject constructor(
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
+                Log.d(
+                    "T16_MapViewModel_MushroomLocation",
+                    "Clicked ($lat, $lon) -> ${context.historicalFindCount} occurrences: " +
+                            context.historicalFinds.take(2).joinToString { occ ->
+                                "${occ.species ?: occ.scientificName}@${occ.decimalLatitude},${occ.decimalLongitude}"
+                            }
+                )
                 _uiState.update {
                     it.copy(
                         screenStatus = ScreenStatus.Success,
@@ -120,6 +128,10 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun toggleHistoricalFinds() {
+        _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
+    }
+
 
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
@@ -148,7 +160,8 @@ class MapViewModel @Inject constructor(
         val isHeatmapEnabled: Boolean = false,
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val isHistoricalFindsEnabled: Boolean = false  // add this
     )
 
     sealed class ScreenStatus{

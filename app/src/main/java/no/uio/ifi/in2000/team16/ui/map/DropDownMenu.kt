@@ -37,7 +37,9 @@ fun Dropdown(
     isHeatmapEnabled: Boolean = false,
     favoriteMushrooms: List<Mushroom> = emptyList(),
     selectedMushroom: Mushroom? = null,
-    onMushroomSelected: (Mushroom) -> Unit = {}
+    onMushroomSelected: (Mushroom) -> Unit = {},
+    isHistoricalFindsEnabled: Boolean,
+    onToggleHistoricalFinds: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -70,6 +72,15 @@ fun Dropdown(
                 leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
                 onClick = {
                     onToggleHeatMap()
+                    expanded = false
+                }
+            )
+
+            DropdownMenuItem(
+                text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
+                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+                onClick = {
+                    onToggleHistoricalFinds()
                     expanded = false
                 }
             )
@@ -116,7 +127,9 @@ fun Dropdown(
 @Preview(showBackground = true)
 @Composable
 fun DropdownPreview() {
-    Dropdown(onNavigateToDev = {})
+    Dropdown(onNavigateToDev = {},
+        isHistoricalFindsEnabled = false,
+        onToggleHistoricalFinds = {})
 }
 
 
