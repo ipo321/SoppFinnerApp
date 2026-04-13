@@ -14,7 +14,7 @@ import org.junit.Test
 // It can get a list of all species
 
 
-class SpeciesRepoTest{
+class SpeciesRepoTest {
     val speciesDS = SpeciesDataSource()
     val mockDataStore = mockk<DataStore<Preferences>>(relaxed = true)
     val repo = SpeciesRepository(speciesDS, mockDataStore)
@@ -33,7 +33,7 @@ class SpeciesRepoTest{
     }
 
     @Test
-    fun wrongNamesearch() {
+    fun wrongNameSearch() {
         val species = repo.getMushroomByName("wrong")
         assertEquals("Kantarell", species.commonName)
     }
