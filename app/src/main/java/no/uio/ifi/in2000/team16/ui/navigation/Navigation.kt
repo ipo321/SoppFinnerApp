@@ -51,7 +51,7 @@ fun Navigation(
                     viewModel = mapViewModel,
                 )
             }
-            composable(Screen.MinSide.rout) {
+            composable(Screen.MinSide.route) {
                 MinSide()
             }
             composable(DEV_SCREEN) {

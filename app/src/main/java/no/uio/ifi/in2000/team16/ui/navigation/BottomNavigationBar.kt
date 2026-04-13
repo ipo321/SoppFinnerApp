@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
@@ -14,37 +15,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-
+import no.uio.ifi.in2000.team16.R
 @Composable
 fun BottomNavigationBar(
     navController: NavController
 ) {
     val navigationItems = listOf(
-        BottombarNavItem(
-            title = "Kart",
-            icon = Icons.Default.Place,
-            route = MAP_SCREEN
-        ),
-        
+
         BottombarNavItem(
             title = "Soppesiden",
-            icon = Icons.Default.Favorite,
+            icon = painterResource(id= R.drawable.black_mushroom),
             route = MUSHROOM_INFO_SCREEN
         ),
+        BottombarNavItem(
+            title = "Kart",
+            icon = rememberVectorPainter(Icons.Default.Place),
+            route = MAP_SCREEN
+        ),
+
 
         BottombarNavItem(
             title = "Min side",
-            icon = Icons.Default.Home,
-            route = Screen.MinSide.rout
+            icon = rememberVectorPainter(Icons.Default.Home),
+            route = Screen.MinSide.route
         )
     )
 
     var selectedNavigationIndex by rememberSaveable {
-        mutableIntStateOf(0)
+        mutableIntStateOf(1)
     }
 
     NavigationBar(
@@ -64,8 +70,9 @@ fun BottomNavigationBar(
                           },
                 icon = {
                     Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.title
+                        painter = item.icon,
+                        contentDescription = item.title,
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
@@ -97,3 +104,4 @@ fun BottomNavigationBarPreview() {
         navController = navController
     )
 }
+

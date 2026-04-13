@@ -82,6 +82,7 @@ fun MapScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .padding(top=25.dp,end=16.dp)
                 .wrapContentSize()
         ) {
             Dropdown(

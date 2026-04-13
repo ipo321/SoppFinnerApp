@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
 @Composable
@@ -42,13 +43,12 @@ fun Dropdown(
     var expanded by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.padding(start =40.dp, top = 40.dp)
-            .size(50.dp).
-        background(Color.White,
-                shape = RoundedCornerShape(20.dp))
+        modifier = Modifier.padding(start =8.dp, top = 40.dp)
+            .size(50.dp)
+            .background(Color.White,
+                shape = RoundedCornerShape(18.dp))
                 .padding(10.dp),
                 contentAlignment = Alignment.Center,
-
 
     ) {
         IconButton(
@@ -61,6 +61,7 @@ fun Dropdown(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
+            offset= DpOffset(x=(-20).dp,y=0.dp)
         ) {
 
 

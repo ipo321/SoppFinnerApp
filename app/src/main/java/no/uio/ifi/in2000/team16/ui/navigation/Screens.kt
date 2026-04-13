@@ -13,7 +13,7 @@ Per nå bare hjelpemetoder for bottom navigation
  */
 
 
-sealed class Screen(val rout: String) {
+sealed class Screen(val route: String) {
 
     object MinSide: Screen("Min_side")
     object Score: Screen("Score")
