@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.minSide
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,16 +19,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
+import androidx.navigation.NavController
 
 
-    @SuppressLint("NotConstructor")
     @Composable
     fun ProfileScreen(
+        navController: NavController,
         viewModel: ProfileScreenViewModel = hiltViewModel()
 
     ){
-        println("AAAAAAAAAAAAAA ProfileScreen loaded AAAAAAAAAAAAAAAAAAAA")
+        //Test to so if its loading in the terminal:
+        println(" ProfileScreen loaded")
         var expanded by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
@@ -47,6 +46,25 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+
+                    //Add a new menuitem for new underscreens
+
+                    DropdownMenuItem(
+                        text = {Text("Settings")},
+                        onClick = {
+                            navController.navigate("profileScreen/settings")
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("History")},
+                        onClick = {
+                            navController.navigate("profileScreen/history")
+                            expanded = false
+                        }
+                    )
+
+
                     //Options is a placeholder for the repository holding all
                     //lesser page-menu-items like "settings
      /*

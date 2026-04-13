@@ -15,7 +15,9 @@ import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
+import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
 
 
 //
@@ -25,6 +27,11 @@ const val DEV_SCREEN = "dev"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
 const val PROFILE_SCREEN = "profileScreen"
+//Under the profile_screen menu:
+const val SETTINGS_SCREEN = "profileScreen/settings"
+const val HISTORY_SCREEN = "profileScreen/history"
+
+
 
 @Composable
 fun Navigation(
@@ -52,8 +59,16 @@ fun Navigation(
                     viewModel = mapViewModel,
                 )
             }
+
             composable(PROFILE_SCREEN) {
-                ProfileScreen()
+                ProfileScreen(navController = navController)
+            }
+            //UNDER-ITEMS for Profile-screen
+            composable(SETTINGS_SCREEN) {
+                SettingsScreen(navController = navController)
+            }
+            composable(HISTORY_SCREEN) {
+                HistoryScreen(navController = navController)
             }
 
             composable(DEV_SCREEN) {
