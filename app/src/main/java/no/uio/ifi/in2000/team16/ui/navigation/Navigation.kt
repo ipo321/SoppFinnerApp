@@ -15,6 +15,7 @@ import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 
 
 //
@@ -23,7 +24,7 @@ const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
-
+const val PROFILE_SCREEN = "profileScreen"
 
 @Composable
 fun Navigation(
@@ -51,9 +52,10 @@ fun Navigation(
                     viewModel = mapViewModel,
                 )
             }
-            composable(Screen.MinSide.rout) {
-                MinSide()
+            composable(PROFILE_SCREEN) {
+                ProfileScreen()
             }
+
             composable(DEV_SCREEN) {
                 val devViewModel: DevViewModel = hiltViewModel()
 
