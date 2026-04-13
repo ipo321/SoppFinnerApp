@@ -135,21 +135,21 @@ class MapViewModel @Inject constructor(
 }
 
 
-    data class MapScreenState(
-        val screenStatus: ScreenStatus = ScreenStatus.Idle,
-        val selectedMushroom: Mushroom? = null,
-        val currentContext: EnvironmentContext? = null,
-        val evaluation: EvaluationResult? = null,
-        val favoriteMushrooms: List<Mushroom> = emptyList(),
-        val isHeatmapEnabled: Boolean = false,
-        val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
-        val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = ""
-    )
+data class MapScreenState(
+    val screenStatus: ScreenStatus = ScreenStatus.Idle,
+    val selectedMushroom: Mushroom? = null,
+    val currentContext: EnvironmentContext? = null,
+    val evaluation: EvaluationResult? = null,
+    val favoriteMushrooms: List<Mushroom> = emptyList(),
+    val isHeatmapEnabled: Boolean = false,
+    val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
+    val isFetchingHeatmap: Boolean = false,
+    val searchQuery: String = ""
+)
 
-    sealed class ScreenStatus{
-        object Idle : ScreenStatus()
-        object Loading : ScreenStatus()
-        object Success : ScreenStatus()
-        data class Error(val message: String) : ScreenStatus()
+sealed class ScreenStatus{
+    object Idle : ScreenStatus()
+    object Loading : ScreenStatus()
+    object Success : ScreenStatus()
+    data class Error(val message: String) : ScreenStatus()
 }
