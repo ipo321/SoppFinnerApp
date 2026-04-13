@@ -39,4 +39,17 @@ class MushroomInfoViewModelTest () {
         assertEquals(mockMushrooms[1], viewModel.selectedMushroom)
         // assertEquals is better practice than assertNotEquals
     }
+
+    // When repository is empty, selected mushroom should be null
+    @Test
+    fun emptyRepository() {
+        val mockRepository = mockk<SpeciesRepository>(relaxed = true)
+        // Sets repository to empty list
+        every { mockRepository.getAllMushrooms() } returns emptyList()
+
+        val viewModel = MushroomInfoViewModel(mockRepository)
+
+        // Mushroom should be null when repository is empty
+        assertEquals(null, viewModel.selectedMushroom)
+    }
 }

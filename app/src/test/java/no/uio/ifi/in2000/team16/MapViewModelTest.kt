@@ -38,7 +38,7 @@ import org.junit.Test
     - State is Loading when data is about to be fetched
     - State is Success when data is fetched
     - State is Error when data fetch fails
-
+    - HeatMap is enabled when toggled, and tiles are fetched
  */
 
 class MapViewModelTest {
