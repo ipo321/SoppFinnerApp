@@ -50,19 +50,48 @@ import androidx.navigation.NavController
                     //Add a new menuitem for new underscreens
 
                     DropdownMenuItem(
-                        text = {Text("Settings")},
+                        text = {Text("Innstillinger")},
                         onClick = {
                             navController.navigate("profileScreen/settings")
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
-                        text = {Text("History")},
+                        text = {Text("Historikk")},
                         onClick = {
                             navController.navigate("profileScreen/history")
                             expanded = false
                         }
                     )
+                    DropdownMenuItem(
+                        text = {Text("Mine soppsteder")},
+                        onClick = {
+                            navController.navigate("profileScreen/shroomSpots")
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("Ansvarserklæring")},
+                        onClick = {
+                            navController.navigate("profileScreen/info")
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("Digital Soppkontroll")},
+                        onClick = {
+                            navController.navigate("profileScreen/shroomControll")
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = {Text("Mushroom-bank")},
+                        onClick = {
+                            navController.navigate("profileScreen/shroomBank")
+                            expanded = false
+                        }
+                    )
+
 
 
                     //Options is a placeholder for the repository holding all
