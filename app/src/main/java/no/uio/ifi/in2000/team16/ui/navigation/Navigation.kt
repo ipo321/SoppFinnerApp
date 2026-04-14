@@ -15,6 +15,7 @@ import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 
 
 //
@@ -22,6 +23,8 @@ const val MAP_SCREEN = "map"
 const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
+
+const val ONBOARDING_SCREEN = "onboarding"
 
 
 
@@ -39,11 +42,23 @@ fun Navigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = MAP_SCREEN,
+            startDestination = ONBOARDING_SCREEN,  // egt MAP_SCREEN dette er kun test
             modifier = modifier.fillMaxSize()
                 .padding(innerPadding)
-        ) {
-            composable(MAP_SCREEN) {
+        ){
+        composable(ONBOARDING_SCREEN) {
+            OnboardingScreen(
+                onFinished = {
+                    navController.navigate(MAP_SCREEN) {
+                        popUpTo(ONBOARDING_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+        /*{
+            composable(ONBOARDING_SCREEN) {
                 MapScreen(
                     onNavigateToDev = {
                         navController.navigate(DEV_SCREEN)
@@ -51,6 +66,8 @@ fun Navigation(
                     viewModel = mapViewModel,
                 )
             }
+
+         */
             composable(Screen.MinSide.route) {
                 MinSide()
             }
