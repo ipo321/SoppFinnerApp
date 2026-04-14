@@ -36,6 +36,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
+/*
+the list screen for the mushroom info side.
+hold each mushroom in a list, and routs to the mushroom info screen when cliked.
+ */
 @Composable
 fun MushroomListScreen(
     navigateToMushroom: () -> Unit,
@@ -83,6 +87,7 @@ fun MushroomListScreen(
     }
 }
 
+//the itemst that will be put in the list
 @Composable
 fun MushroomListItem(
     viewModel: MushroomInfoViewModel,
