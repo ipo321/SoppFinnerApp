@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.platform.LocalContext
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
@@ -34,6 +36,9 @@ fun Navigation(
     navController: NavHostController = rememberNavController()
 ) {
     val mapViewModel: MapViewModel = hiltViewModel()
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val onboardingCompleted = sharedPreferences.getBoolean("has_seen_onboarding", false)
 
     Scaffold(
         bottomBar = {
@@ -42,13 +47,16 @@ fun Navigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = ONBOARDING_SCREEN,  // egt MAP_SCREEN dette er kun test
+            startDestination = if(onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,  // egt MAP_SCREEN dette er kun test
             modifier = modifier.fillMaxSize()
                 .padding(innerPadding)
         ){
         composable(ONBOARDING_SCREEN) {
             OnboardingScreen(
                 onFinished = {
+                    sharedPreferences.edit()
+                        .putBoolean("onboarding_completed", true)
+                        .apply()
                     navController.navigate(MAP_SCREEN) {
                         popUpTo(ONBOARDING_SCREEN) {
                             inclusive = true
@@ -57,8 +65,8 @@ fun Navigation(
                 }
             )
         }
-        /*{
-            composable(ONBOARDING_SCREEN) {
+
+            composable(MAP_SCREEN) {
                 MapScreen(
                     onNavigateToDev = {
                         navController.navigate(DEV_SCREEN)
@@ -67,7 +75,7 @@ fun Navigation(
                 )
             }
 
-         */
+
             composable(Screen.MinSide.route) {
                 MinSide()
             }

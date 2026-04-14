@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import no.uio.ifi.in2000.team16.R
-
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -85,9 +84,10 @@ fun OnboardingScreen(
                 .padding(10.dp)
 
         ) {
+            val isLastPage = pagerState.currentPage == pages.lastIndex
 
             Text(
-                "Skip", style = TextStyle(
+                if(isLastPage) "" else "Skip", style = TextStyle(
                     color = Color(0xFFAAAAAA),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
@@ -99,6 +99,7 @@ fun OnboardingScreen(
             )
 
             Row(
+
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(1f)
             ) {
@@ -122,21 +123,22 @@ fun OnboardingScreen(
                 }
             }
 
-
             Text(
-                "Next", style = TextStyle(
+                text = if (isLastPage) "Finish" else "Next", style = TextStyle(
                     color = Color(0xFF333333),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                 ),
                 modifier = Modifier.clickable {
-                    if (pagerState.currentPage < pages.lastIndex) {
+
+                    if (!isLastPage) {
                         val nextPage = pagerState.currentPage + 1
-                        coroutineScope.launch { pagerState.animateScrollToPage(nextPage) }
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(nextPage)
+                        }
                     } else {
                         onFinished()
                     }
-
                 }
             )
 
