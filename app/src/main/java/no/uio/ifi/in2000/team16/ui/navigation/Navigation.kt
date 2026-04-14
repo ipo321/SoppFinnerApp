@@ -91,10 +91,10 @@ fun Navigation(
                 )
             }
 
-
+/*
             composable(Screen.MinSide.route) {
                 MinSide()
-
+*/
             composable(PROFILE_SCREEN) {
                 ProfileScreen(navController = navController)
             }
