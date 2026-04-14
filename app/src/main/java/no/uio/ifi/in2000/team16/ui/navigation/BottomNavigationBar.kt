@@ -45,7 +45,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Min side",
             icon = rememberVectorPainter(Icons.Default.Home),
-            route = Screen.MinSide.route
+            route = Screen.ProfileScreen.route
         )
     )
 

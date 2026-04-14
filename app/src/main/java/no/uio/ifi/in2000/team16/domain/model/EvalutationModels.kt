@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.domain.model
 
+import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
+
 
 /*
 Dataclasses for handling the information that will be put into the evaluation module. Important to look at for all API and repositories as this is what your repository should return.
@@ -11,7 +13,9 @@ data class EnvironmentContext(
     val terrainData: TerrainData?,
     val ar5: String?,
     val forestData: ForestData?,
-    val historicalFinds: Int = 0,
+    val historicalFindCount: Int = 0,
+    val historicalFinds: List<Occurrence> = emptyList(),
+    val hist: Int = 0,
     val currentMonth: Int
 ) {
     companion object {
@@ -21,7 +25,7 @@ data class EnvironmentContext(
             terrainData = null,
             ar5 = null,
             forestData = null,
-            historicalFinds = 0,
+            historicalFindCount = 0,
             currentMonth = 8 //August
         )
 

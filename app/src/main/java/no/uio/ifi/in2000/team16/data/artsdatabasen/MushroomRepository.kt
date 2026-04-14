@@ -9,6 +9,9 @@ import kotlin.math.cos
 repository that can search for mushrooms and get information about them
 and the amount of mushrooms spotting in a certain area.
 use getSpeciesNearLocation with latitude, longitude and species profile.
+amount of mushroom results have a default limit that can be adjusted (limit)
+and a default radius that can be adjusted (radiusKm).
+
 */
 
 
@@ -31,6 +34,7 @@ class MushroomRepository @Inject constructor(
         }
         return result.toMushroom()
     }
+
     suspend fun getSpeciesCountNearLocation(
         lat: Double,
         lon: Double,
@@ -40,6 +44,8 @@ class MushroomRepository @Inject constructor(
         val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
         return result.count
     }
+
+
 
 
     //returns an int with how many mushrooms are in the area
@@ -58,9 +64,9 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 1.0,
+        radiusKm: Double = 3.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 100
+        limit: Int = 50
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
@@ -98,7 +104,7 @@ class MushroomRepository @Inject constructor(
         east: Double,
         west: Double,
         mushRoomType: String,
-        limit: Int = 500
+        limit: Int = 10
     ): OccurrenceResult {
         return mushroomDataSource.getOccurrencesNearLocation(
             mushRoomType = mushRoomType,

@@ -25,7 +25,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
@@ -39,6 +38,7 @@ import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
@@ -88,6 +88,8 @@ fun MapScreen(
             Dropdown(
                 onNavigateToDev = onNavigateToDev,
                 isHeatmapEnabled = uiState.isHeatmapEnabled,
+                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
                 favoriteMushrooms = uiState.favoriteMushrooms,
                 selectedMushroom = uiState.selectedMushroom,
                 onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
@@ -147,7 +149,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
                     //HEATMAP løsning
                     setupHeatmapLayer(style)    // Makes the heatmap layer
-
+                    setupHistoricalFindsLayer(style)
                     // MAP
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
@@ -205,10 +207,43 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             }
         }
     }
+    //Mushroom finding pins
+    // Updating the pins each time they change
+    LaunchedEffect(
+        uiState.currentContext?.historicalFinds,
+        uiState.isHistoricalFindsEnabled,
+        mapRef
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
+
+        val features = finds
+            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
+            .map { occ ->
+                Feature.fromGeometry(
+                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
+                )
+            }
+
+        currentMap.getStyle { style ->
+            if (!style.isFullyLoaded) return@getStyle
+            val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
+
+            if (uiState.isHistoricalFindsEnabled) {
+                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
+            } else {
+                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+            }
+        }
+    }
 
     // Updating the heatMapTiles each time they change
-    LaunchedEffect(uiState.heatmapTiles, uiState.isHeatmapEnabled, mapRef) {
+    LaunchedEffect(
+        uiState.heatmapTiles,
+        uiState.isHeatmapEnabled,
+        mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
+
 
         currentMap.getStyle { style ->
             if (!style.isFullyLoaded) return@getStyle
@@ -316,33 +351,6 @@ fun setMapLayout(map: MapLibreMap) {
     ui.isHorizontalScrollGesturesEnabled = true
 }
 
-
-// This function is currently not in use, but might come in handy if we want polygons later on
-fun addPolygonsToMap(context: Context, style: Style) {
-    // The layerList is defined in GeoJSonLayer.kt
-    Municipalities.municipalities.forEach { geoLayer ->
-        try {
-            val geoJson = context.assets.open(geoLayer.asset)
-                .bufferedReader().use { it.readText() }
-
-            // Makes the GeoJSon source
-            val source = GeoJsonSource(geoLayer.sourceId, geoJson)
-            style.addSource(source)
-
-            // Draws the polygons
-            val layer =
-                FillLayer(geoLayer.layerId, geoLayer.sourceId).withProperties(
-                    fillColor(geoLayer.color.toColorInt()),
-                    fillOpacity(0.5f), // Makes the layer a little transparent
-                    fillOutlineColor(android.graphics.Color.BLACK) // Black outline
-                )
-            style.addLayer(layer)
-        } catch (e: Exception) {
-            Log.e("MAP", "Error when loading ${geoLayer.asset}", e)
-        }
-    }
-}
-
 private fun setupHeatmapLayer(style: Style) {
     //  Source
     val heatmapSource = GeoJsonSource("heatmap-source")
@@ -386,3 +394,16 @@ private fun setupHeatmapLayer(style: Style) {
     }
 }
 
+private fun setupHistoricalFindsLayer(style: Style) {
+    val source = GeoJsonSource("historical-finds-source")
+    style.addSource(source)
+
+    val circleLayer = CircleLayer("historical-finds-layer", "historical-finds-source")
+    circleLayer.setProperties(
+        circleRadius(6f),
+        circleColor("#8B4513"),   // brown pin color
+        circleStrokeWidth(1.5f),
+        circleStrokeColor("#FFFFFF")
+    )
+    style.addLayer(circleLayer)
+}

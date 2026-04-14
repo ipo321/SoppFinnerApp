@@ -6,11 +6,21 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.request
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
-//Gets data about mushrooms from GBIF API
+/*Gets data about mushrooms from GBIF API
+mainly used for getting occurrences near a location.
+
+can get list of mushrooms in the Artstdatabank.
+getOccurrencesNearLocation is hardcoded with 34 as mushroomkey,->
+-> most calls to the function uses mushroomType witch is a specific code for a mushroom spices
+
+
+ */
+
 
 @Singleton
 class MushroomDataSource @Inject constructor(
@@ -72,7 +82,8 @@ class MushroomDataSource @Inject constructor(
         lonMax: Double,
         limit: Int,
     ): OccurrenceResult {
-        val mushroomkey = "34" //filters what kind of mushrooms we get
+        //filters what kind of mushrooms we get
+        val mushroomkey = "34"
         // 5 — Kingdom Fungi (everything, including mold, yeast etc.)
         //34 — Phylum Basidiomycota (typical mushrooms etc.)
         //35 — Phylum Ascomycota (morels, truffles etc.)
@@ -91,6 +102,7 @@ class MushroomDataSource @Inject constructor(
                     parameters.append("limit", limit.toString())   //Amount of results.
                 }
             }
+            Log.d("T16_Mushroom_DataSource", "GBIF request URL: ${response.request.url}")
 
             //println("GBIF request URL: ${response.request.url}")
             if (response.status.value != 200) {

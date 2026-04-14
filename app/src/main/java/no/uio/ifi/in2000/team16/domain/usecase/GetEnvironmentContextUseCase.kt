@@ -43,12 +43,12 @@ class GetEnvironmentContextUseCase @Inject constructor(
                     //Add other repositories here
 
                     //Only send if we get species or else null, makes it possible to use the function for all species
-                    val speciesCount = if (profile != null) {
+                    val speciesLocations = if (profile != null) {
                         async {
-                            mushroomRepository.getSpeciesCountNearLocation(
+                            mushroomRepository.getMushroomsNearLocation(
                                 lat,
                                 lon,
-                                profile.taxKey
+                                mushRoomType = profile.taxKey
                             )
                         }
                     } else {
@@ -58,7 +58,11 @@ class GetEnvironmentContextUseCase @Inject constructor(
                     val weatherData = weather.await()
                     val forestData = forest.await()
                     val historyData = history.await()
-                    val speciesData = speciesCount?.await() ?: 0
+
+                    val occurrenceResult = speciesLocations?.await()
+                    val historicalFindCount = occurrenceResult?.count ?: 0
+                    val historicalFinds = occurrenceResult?.results ?: emptyList()
+
                     val forestAR5 = AR5.await()
                     val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
 
@@ -68,7 +72,8 @@ class GetEnvironmentContextUseCase @Inject constructor(
                         terrainData = null,
                         ar5 = forestAR5,
                         forestData = forestData,
-                        historicalFinds = speciesData,
+                        historicalFindCount = historicalFindCount,
+                        historicalFinds = historicalFinds,
                         currentMonth = currentMonth
                     )
                 }

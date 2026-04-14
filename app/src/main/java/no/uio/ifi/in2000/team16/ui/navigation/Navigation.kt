@@ -17,6 +17,13 @@ import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
+import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
+import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
+import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
+import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
+import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
+import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 
 
@@ -27,6 +34,15 @@ const val DEV_SCREEN = "dev"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
 const val ONBOARDING_SCREEN = "onboarding"
+
+const val PROFILE_SCREEN = "profileScreen"
+//Under the profile_screen menu:
+const val SETTINGS_SCREEN = "profileScreen/settings"
+const val HISTORY_SCREEN = "profileScreen/history"
+const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
+const val INFO_SCREEN = "profileScreen/info"
+const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControll"
+const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
 
 
@@ -78,7 +94,30 @@ fun Navigation(
 
             composable(Screen.MinSide.route) {
                 MinSide()
+
+            composable(PROFILE_SCREEN) {
+                ProfileScreen(navController = navController)
             }
+            //UNDER-ITEMS for Profile-screen
+            composable(SETTINGS_SCREEN) {
+                SettingsScreen(navController = navController)
+            }
+            composable(HISTORY_SCREEN) {
+                HistoryScreen(navController = navController)
+            }
+            composable(SHROOMSPOT_SCREEN) {
+                ShroomSpotScreen(navController = navController)
+            }
+            composable(INFO_SCREEN) {
+                InfoScreen(navController = navController)
+            }
+            composable(SHROOMCONTROL_SCREEN) {
+                ShroomControlScreen(navController = navController)
+            }
+            composable(SHROOMBANK_SCREEN) {
+                ShroomBankScreen(navController = navController)
+            }
+
             composable(DEV_SCREEN) {
                 val devViewModel: DevViewModel = hiltViewModel()
 

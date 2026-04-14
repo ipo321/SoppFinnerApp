@@ -22,6 +22,7 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
 
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
@@ -33,6 +34,9 @@ class MapViewModel @Inject constructor(
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
 
     private var heatmapJob: Job? = null // cancel old calculations
+    private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
+    private var lastClickedLat: Double? = null  // makes it easy for mushroom change to update location pins and scorecard
+    private var lastClickedLon: Double? = null
 
     init{
         viewModelScope.launch {
@@ -57,6 +61,8 @@ class MapViewModel @Inject constructor(
     }
 
     fun onMapClicked(lat: Double, lon: Double) {
+        lastClickedLat = lat
+        lastClickedLon = lon
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         viewModelScope.launch {
@@ -66,6 +72,13 @@ class MapViewModel @Inject constructor(
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
+                Log.d(
+                    "T16_MapViewModel_MushroomLocation",
+                    "Clicked ($lat, $lon) -> ${context.historicalFindCount} occurrences: " +
+                            context.historicalFinds.take(2).joinToString { occ ->
+                                "${occ.species ?: occ.scientificName}@${occ.decimalLatitude},${occ.decimalLongitude}"
+                            }
+                )
                 _uiState.update {
                     it.copy(
                         screenStatus = ScreenStatus.Success,
@@ -83,6 +96,7 @@ class MapViewModel @Inject constructor(
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
         if (!_uiState.value.isHeatmapEnabled) return
+        savedBounds = bounds
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         heatmapJob?.cancel()
@@ -114,13 +128,23 @@ class MapViewModel @Inject constructor(
             _uiState.update { it.copy(heatmapTiles = emptyList()) }
         } else if (currentBounds != null) {
             fetchHeatmapData(currentBounds)
+            savedBounds = currentBounds
         }
+    }
+
+    fun toggleHistoricalFinds() {
+        _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
     }
 
 
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
+            savedBounds?.let { fetchHeatmapData(it) }
+
+            if (lastClickedLat != null && lastClickedLon != null) {//change mushroom trigges a onMapClicked reload
+                onMapClicked(lastClickedLat!!, lastClickedLon!!)
+            }
         }
     }
 
@@ -144,7 +168,8 @@ class MapViewModel @Inject constructor(
         val isHeatmapEnabled: Boolean = false,
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val isHistoricalFindsEnabled: Boolean = false  // add this
     )
 
     sealed class ScreenStatus{

@@ -15,14 +15,13 @@ Per nå bare hjelpemetoder for bottom navigation
 
 sealed class Screen(val route: String) {
 
-    object MinSide: Screen("Min_side")
-    object Score: Screen("Score")
+    object ProfileScreen: Screen("ProfileScreen")
     object Soppsiden: Screen("Soppsiden")
     object Kart : Screen("Kart")
 
 }
 
-
+/*
 @Composable
 fun MinSide(){
     Box (modifier = Modifier
@@ -35,4 +34,4 @@ fun MinSide(){
         )
     }
 }
-
+*/
