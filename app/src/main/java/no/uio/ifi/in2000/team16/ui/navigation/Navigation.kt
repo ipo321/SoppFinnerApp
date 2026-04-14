@@ -10,11 +10,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.remember
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
 import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
@@ -24,12 +27,14 @@ import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 
 
+
 //
 const val MAP_SCREEN = "map"
 const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
+const val MUSHROOM_LIST_SCREEN = "mushroomList"
 const val PROFILE_SCREEN = "profileScreen"
 //Under the profile_screen menu:
 const val SETTINGS_SCREEN = "profileScreen/settings"
@@ -102,17 +107,38 @@ fun Navigation(
                 )
             }
 
+            composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
+                val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
+                MushroomListScreen(
+                    navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
+                    viewModel = viewModel
+                )
+            }
+
             composable(MUSHROOM_INFO_SCREEN) {
                 MushroomInfoScreen(
-                    onNavigateHome = {
-                        navController.navigate(MAP_SCREEN) {
-                            popUpTo(MAP_SCREEN) {
+                    onNavigateBack = {
+                        navController.navigate(MUSHROOM_LIST_SCREEN) {
+                            popUpTo(MUSHROOM_LIST_SCREEN) {
                                 inclusive = false
                             }
                         }
                     }
                 )
             }
+
+            composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
+                // Get the list screen's back stack entry to share its ViewModel
+                val listEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
+                }
+                val viewModel: MushroomInfoViewModel = hiltViewModel(listEntry)
+                MushroomInfoScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    viewModel = viewModel
+                )
+            }
+
         }
     }
 }

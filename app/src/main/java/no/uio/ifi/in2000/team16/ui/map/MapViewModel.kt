@@ -72,6 +72,7 @@ class MapViewModel @Inject constructor(
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
+
                 Log.d(
                     "T16_MapViewModel_MushroomLocation",
                     "Clicked ($lat, $lon) -> ${context.historicalFindCount} occurrences: " +
@@ -169,7 +170,7 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false  // add this
+        val isHistoricalFindsEnabled: Boolean = false
     )
 
     sealed class ScreenStatus{

@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
 
 import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,11 +16,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,13 +48,17 @@ see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
  */
 @Composable
 fun MushroomInfoScreen(
-    onNavigateHome: () -> Unit,
-    viewModel: MushroomInfoViewModel = hiltViewModel()) {
-
-
-
+    onNavigateBack: () -> Unit,
+    viewModel: MushroomInfoViewModel = hiltViewModel()
+){
     val selected = viewModel.selectedMushroom ?: return  //Return if no mushroom is selected
+    val favorites by viewModel.favoriteMushrooms.collectAsState()
+    val isFavorite = favorites.any { it.commonName == selected.commonName }
+
     var expanded by remember { mutableStateOf(false) }
+
+
+    //main Column
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,30 +66,20 @@ fun MushroomInfoScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //back button
+        Button(
+            onClick = onNavigateBack,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Text("Tilbake")
+        }
+
         Text(text = "Aldri spis sopp du er usikker på." +
                 " se soppkontroll.no for mere informasjon",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold)
 
-        Box {
-        Button(onClick = { expanded = true }) {
-            Text(selected.commonName)
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            viewModel.mushrooms.forEach { mushroom ->
-                DropdownMenuItem(
-                    text = { Text(mushroom.commonName) },
-                    onClick = {
-                        viewModel.selectMushroom(mushroom)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
         // Mushroom image in a green circle
         Box(
             modifier = Modifier
@@ -98,12 +97,30 @@ fun MushroomInfoScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
+        //name text
         Text(text = selected.commonName, fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Text(text = selected.latinName, fontSize = 14.sp, fontStyle = FontStyle.Italic)
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        //favorite toggel icon
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            IconButton(onClick = { viewModel.toggleFavorite(selected) }) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = if (isFavorite) "Fjern fra favoritter" else "Legg til favoritter",
+                    tint = if (isFavorite) Color(0xFFD94F4F) else Color.Gray,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+            Log.d("T16_Mushroom_InfoScreen", "Toggled favorite for ${selected.commonName}" + "  favorites: ${isFavorite}")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        //info badges
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             selected.properties.forEach { property ->
                 MushroomPropertyBadge(property)
@@ -111,13 +128,6 @@ fun MushroomInfoScreen(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        Button(
-            onClick = onNavigateHome,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text("Tilbake til kart")
-        }
     }
 }
 @Composable
