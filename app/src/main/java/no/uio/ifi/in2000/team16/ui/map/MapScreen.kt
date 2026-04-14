@@ -25,7 +25,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import no.uio.ifi.in2000.team16.data.polygons.Municipalities
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
@@ -349,33 +348,6 @@ fun setMapLayout(map: MapLibreMap) {
     ui.isTiltGesturesEnabled = true
     ui.isDoubleTapGesturesEnabled = true
     ui.isHorizontalScrollGesturesEnabled = true
-}
-
-
-// This function is currently not in use, but might come in handy if we want polygons later on
-fun addPolygonsToMap(context: Context, style: Style) {
-    // The layerList is defined in GeoJSonLayer.kt
-    Municipalities.municipalities.forEach { geoLayer ->
-        try {
-            val geoJson = context.assets.open(geoLayer.asset)
-                .bufferedReader().use { it.readText() }
-
-            // Makes the GeoJSon source
-            val source = GeoJsonSource(geoLayer.sourceId, geoJson)
-            style.addSource(source)
-
-            // Draws the polygons
-            val layer =
-                FillLayer(geoLayer.layerId, geoLayer.sourceId).withProperties(
-                    fillColor(geoLayer.color.toColorInt()),
-                    fillOpacity(0.5f), // Makes the layer a little transparent
-                    fillOutlineColor(android.graphics.Color.BLACK) // Black outline
-                )
-            style.addLayer(layer)
-        } catch (e: Exception) {
-            Log.e("MAP", "Error when loading ${geoLayer.asset}", e)
-        }
-    }
 }
 
 private fun setupHeatmapLayer(style: Style) {
