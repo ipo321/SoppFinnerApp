@@ -39,6 +39,9 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -113,9 +116,22 @@ dependencies {
     // See Add the KSP plugin to your project
     ksp("androidx.room:room-compiler:$room_version")
 
- }
+    // Testing
+    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
+
+}
 
 ksp {
     arg("dagger.fastInit", "enabled")
     arg("dagger.stacktraceJs", "true")
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion("2.0.21")
+        }
+    }
 }

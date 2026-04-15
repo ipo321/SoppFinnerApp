@@ -125,7 +125,7 @@ class SpeciesRepository @Inject constructor(
 
 
     fun getMushroomCount(): Int {
-        return speciesDataSource.getAmountofMushrooms()
+        return speciesDataSource.getAmountOfMushrooms()
     }
 
 }

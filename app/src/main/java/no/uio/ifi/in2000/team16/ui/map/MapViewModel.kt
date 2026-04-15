@@ -22,7 +22,6 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
 
-
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
@@ -173,9 +172,9 @@ class MapViewModel @Inject constructor(
         val isHistoricalFindsEnabled: Boolean = false
     )
 
-    sealed class ScreenStatus{
-        object Idle : ScreenStatus()
-        object Loading : ScreenStatus()
-        object Success : ScreenStatus()
-        data class Error(val message: String) : ScreenStatus()
+sealed class ScreenStatus{
+    object Idle : ScreenStatus()
+    object Loading : ScreenStatus()
+    object Success : ScreenStatus()
+    data class Error(val message: String) : ScreenStatus()
 }
