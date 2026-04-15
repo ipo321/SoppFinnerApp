@@ -17,6 +17,7 @@ class MushroomScorerV1 : MushroomScorer {
         val killReason =
             SeasonKillSwitch.check(context.currentMonth, species.activeMonths)
             ?: FrostKillSwitch.check(context.currentWeather?.temp, species.killTemp)
+            ?: UrbanKillSwitch.check(context.ar5)
 
         if (killReason != null) {
             return EvaluationResult(0, killReason)
