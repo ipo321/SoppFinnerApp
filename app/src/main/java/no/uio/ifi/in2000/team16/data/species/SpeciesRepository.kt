@@ -82,13 +82,7 @@ class SpeciesRepository @Inject constructor(
         val currentFavorites = _favoriteMushrooms.value.toMutableList()
 
         //Check if its already in the list
-        var exists = false
-        for (fav in currentFavorites) {
-            if (fav.commonName == mushroom.commonName) {
-                exists = true
-                break
-            }
-        }
+        val exists = currentFavorites.any { it.commonName == mushroom.commonName }
         if (exists) {
             //Remove it if it is
             currentFavorites.remove(mushroom)
@@ -100,9 +94,7 @@ class SpeciesRepository @Inject constructor(
         _favoriteMushrooms.value = currentFavorites
 
         val nameSet = mutableSetOf<String>()
-        for (fav in currentFavorites) {
-            nameSet.add(fav.commonName)
-        }
+        currentFavorites.forEach { nameSet.add(it.commonName) }
         dataStore.edit {it[FAVORITES_KEY] = nameSet }
 
     }
@@ -111,12 +103,8 @@ class SpeciesRepository @Inject constructor(
 
     fun getMushroomByName(name: String): Mushroom {
         val all = speciesDataSource.getAllMushrooms()
-        for (m in all) {
-            if (m.commonName.equals(name, ignoreCase = true)) {
-                return m
-            }
-        }
-        return all[0] // Fallback
+        return all.find { it.commonName.equals(name, ignoreCase = true) }
+            ?: all[0]
     }
 
     fun getAllMushrooms(): List<Mushroom> {
