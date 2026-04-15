@@ -11,7 +11,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
@@ -25,6 +30,8 @@ import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+
+
 
 
 //
@@ -44,6 +51,7 @@ const val INFO_SCREEN = "profileScreen/info"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControll"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
+const val POPUP = "popUpScreen"
 
 
 @Composable
@@ -54,20 +62,33 @@ fun Navigation(
     val mapViewModel: MapViewModel = hiltViewModel()
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-    val onboardingCompleted = sharedPreferences.getBoolean("has_seen_onboarding", false)
+    val onboardingCompleted = sharedPreferences.getBoolean("onbooardingCompleted", false)
+
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    val showBottomBar = currentRoute != ONBOARDING_SCREEN
+    var showStartupPopup by remember { mutableStateOf(onboardingCompleted) }
+
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            if(currentRoute != ONBOARDING_SCREEN){
+                BottomNavigationBar(navController = navController)
+
+            }
         }
-    ) { innerPadding ->
+    )
+
+    { innerPadding ->
+
         NavHost(
             navController = navController,
             startDestination = if(onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,  // egt MAP_SCREEN dette er kun test
             modifier = modifier.fillMaxSize()
                 .padding(innerPadding)
-        ){
-        composable(ONBOARDING_SCREEN) {
+        )
+        { composable(ONBOARDING_SCREEN) {
             OnboardingScreen(
                 onFinished = {
                     sharedPreferences.edit()
@@ -95,6 +116,9 @@ fun Navigation(
             composable(Screen.MinSide.route) {
                 MinSide()
 */
+
+
+
             composable(PROFILE_SCREEN) {
                 ProfileScreen(navController = navController)
             }

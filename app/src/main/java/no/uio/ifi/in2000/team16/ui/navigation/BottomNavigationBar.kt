@@ -54,7 +54,7 @@ fun BottomNavigationBar(
     }
 
     NavigationBar(
-        containerColor = Color.White
+        containerColor = Color(0xFFEDFEED)
     ) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -86,7 +86,7 @@ fun BottomNavigationBar(
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFFFDE8E8),
+                    selectedIconColor = Color(0xFF1E1E1E),
                     indicatorColor = Color(0xFFD4E6CC)
                 )
             )

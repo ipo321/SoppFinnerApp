@@ -52,7 +52,7 @@ fun OnboardingScreen(
         OnBoardModel(
             title = "VIKTIG",
             description = "Soppesiden er ikke en fasit for om soppen er giftig eller ikke. Hvis du er usikker, ikke ta den med!",
-            imageRes = R.drawable.ic_onboarding_3
+            imageRes = R.drawable.warning
         )
     )
 
@@ -85,7 +85,7 @@ fun OnboardingScreen(
 
         ) {
             val isLastPage = pagerState.currentPage == pages.lastIndex
-
+/*
             Text(
                 if(isLastPage) "" else "Skip", style = TextStyle(
                     color = Color(0xFFAAAAAA),
@@ -98,6 +98,8 @@ fun OnboardingScreen(
                 }
             )
 
+
+ */
             Row(
 
                 horizontalArrangement = Arrangement.Center,
@@ -123,6 +125,11 @@ fun OnboardingScreen(
                 }
             }
 
+
+            /*Gjør om finish. Gi den en funksjon/boolean true or false state.
+            Onclick fører til at onboardingCompleted = True
+
+             */
             Text(
                 text = if (isLastPage) "Finish" else "Next", style = TextStyle(
                     color = Color(0xFF333333),

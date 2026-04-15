@@ -47,7 +47,7 @@ fun Dropdown(
     Box(
         modifier = Modifier.padding(start =8.dp, top = 40.dp)
             .size(50.dp)
-            .background(Color.White,
+            .background(Color(0xFFEDFEED),
                 shape = RoundedCornerShape(18.dp))
                 .padding(10.dp),
                 contentAlignment = Alignment.Center,
@@ -57,6 +57,7 @@ fun Dropdown(
             onClick = { expanded = !expanded })
         {
             Icon(Icons.Default.MoreVert,
+                tint = Color(0xFF1E1E1E),
                 contentDescription = "More options",
                 modifier = Modifier.size(50.dp))
         }
