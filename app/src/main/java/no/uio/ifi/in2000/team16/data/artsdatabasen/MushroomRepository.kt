@@ -1,7 +1,9 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
 //import jakarta.inject.Inject
+import android.content.Context
 import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
@@ -16,7 +18,8 @@ and a default radius that can be adjusted (radiusKm).
 
 
 class MushroomRepository @Inject constructor(
-    private val mushroomDataSource: MushroomDataSource
+    private val mushroomDataSource: MushroomDataSource,
+    private val localMushroomDataSource: LocalMushroomDataSource
 ) {
 
     suspend fun searchMushrooms(query: String): List<MushroomInfo> {
@@ -76,8 +79,19 @@ class MushroomRepository @Inject constructor(
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
 
-        return mushroomDataSource.getOccurrencesNearLocation(mushRoomType, latMin, latMax, lonMin, lonMax, limit)
+        val localSpeciesId =
+            if (mushRoomType == "all mushrooms") null
+            else LocalSpeciesIdMapper.fromName(mushRoomType)
+
+        return localMushroomDataSource.getOccurrencesInBoundingBox(
+            latMin = latMin,
+            latMax = latMax,
+            lonMin = lonMin,
+            lonMax = lonMax,
+            localSpeciesId = localSpeciesId
+        )
     }
+
 
     // Convert Species to MushroomInfo
     private fun MushroomSearchResult.toMushroom(): MushroomInfo =
@@ -97,7 +111,6 @@ class MushroomRepository @Inject constructor(
             genusKey = genusKey,
             species = species
         )
-
     suspend fun getMushroomInBoundingBox(
         north: Double,
         south: Double,
@@ -106,14 +119,19 @@ class MushroomRepository @Inject constructor(
         mushRoomType: String,
         limit: Int = 10
     ): OccurrenceResult {
-        return mushroomDataSource.getOccurrencesNearLocation(
-            mushRoomType = mushRoomType,
+        val localSpeciesId =
+            if (mushRoomType == "all mushrooms") null
+            else LocalSpeciesIdMapper.fromName(mushRoomType)
+
+        return localMushroomDataSource.getOccurrencesInBoundingBox(
             latMin = south,
             latMax = north,
             lonMin = west,
             lonMax = east,
-            limit = limit
+            localSpeciesId = localSpeciesId
         )
     }
+
+
 
 }
