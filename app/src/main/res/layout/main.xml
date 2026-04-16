@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -30,8 +31,7 @@
         app:itemIconTint="@drawable/item_selector"
         app:itemTextColor="@drawable/item_selector"
         app:itemRippleColor="@android:color/transparent"
-        app:labelVisibilityMode="labeled" />
-
+        app:labelVisibilityMode="labeled"/>
     <WebView
         android:id="@+id/wmsWebView"
         android:layout_width="0dp"
