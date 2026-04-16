@@ -4,12 +4,22 @@ import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team16.R
 import javax.inject.Inject
 import javax.inject.Singleton
-
+/**
+ * Local data source that loads mushroom occurrence data from a GeoJSON file.
+ *
+ * The GeoJSON file (res/raw/mushroom_map_data) contains mushroom sightings across Norway,
+ * each with a geographic location and a species ID.
+ *
+ * Data is loaded once from disk and then cached in memory for the lifetime of the app.
+ * Use [getOccurrencesInBoundingBox] to query sightings within a geographic area.
+ */
 @Singleton
 class LocalMushroomDataSource @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -19,51 +29,53 @@ class LocalMushroomDataSource @Inject constructor(
     companion object {
         private const val TAG = "T_16_LocalMushroomDataSource"
     }
+    private val mutex = Mutex()
 
-    @Volatile
     private var cachedOccurrences: OccurrenceResult? = null
 
     suspend fun getAllOccurrences(): OccurrenceResult {
-        cachedOccurrences?.let {
-            Log.d(TAG, "Returning ${it.count} occurrences from cache")
-            return it }
-
-        return withContext(Dispatchers.IO) {
-            Log.d(TAG, "Loading mushroom_map_data from raw resources")
+        return cachedOccurrences ?: mutex.withLock {
+            // Check again inside the lock in case another coroutine loaded it first
+            cachedOccurrences ?: loadFromDisk().also { cachedOccurrences = it }
+        }
+    }
+    private suspend fun loadFromDisk(): OccurrenceResult = withContext(Dispatchers.IO) {
+        try {
             val text = context.resources
                 .openRawResource(R.raw.mushroom_map_data)
                 .bufferedReader()
-                .use { it.readText() }
-
-            val geo = json.decodeFromString<GeoJsonFeatureCollection>(text)
-
-            val occurrences = geo.features.mapIndexed { index, feature ->
-                val lon = feature.geometry.coordinates.getOrNull(0)
-                val lat = feature.geometry.coordinates.getOrNull(1)
-                val dateParts = feature.properties.date.split("-")
-
-                Occurrence(
-                    key = index.toLong(),
-                    scientificName = null,
-                    species = null,
-                    speciesKey = null,
-                    localSpeciesId = feature.properties.speciesId,
-                    decimalLatitude = lat,
-                    decimalLongitude = lon,
-                    year = dateParts.getOrNull(0)?.toIntOrNull(),
-                    month = dateParts.getOrNull(1)?.toIntOrNull(),
-                    day = dateParts.getOrNull(2)?.toIntOrNull()
-                )
-            }
-
-            val result = OccurrenceResult(
-                count = occurrences.size,
-                results = occurrences
-            )
-            Log.d(TAG, "Built OccurrenceResult with ${result.count} occurrences")
-            cachedOccurrences = result
-            result
+                .use { it.readText() } //read text form file and automatically closes afterwords.
+            parseGeoJson(text) //sends raw jason string to parse function.
+        }catch (e: Exception) {
+            Log.e(TAG, "Failed to load mushroom data: ${e.message}", e)
+            OccurrenceResult()
         }
+
+}
+
+    private fun parseGeoJson(text: String): OccurrenceResult {
+        val geo = json.decodeFromString<GeoJsonFeatureCollection>(text)
+        val occurrence = geo.features.mapIndexed { index, feature ->
+            featureToOccurrence(index, feature)
+        }
+        return OccurrenceResult(
+            count = occurrence.size,
+            results = occurrence
+        )
+
+    }
+    //changes the geojson feature to an object of occurrence
+    private fun featureToOccurrence(index: Int, feature: GeoJsonFeature): Occurrence {
+        val dateParts = feature.properties.date.split("-")
+        return Occurrence(
+            key = index.toLong(),
+            localSpeciesId = feature.properties.speciesId,
+            decimalLatitude = feature.geometry.coordinates.getOrNull(1),
+            decimalLongitude = feature.geometry.coordinates.getOrNull(0),
+            year  = dateParts.getOrNull(0)?.toIntOrNull(),
+            month = dateParts.getOrNull(1)?.toIntOrNull(),
+            day   = dateParts.getOrNull(2)?.toIntOrNull()
+        )
     }
 
     suspend fun getOccurrencesInBoundingBox(
@@ -71,8 +83,9 @@ class LocalMushroomDataSource @Inject constructor(
         latMax: Double,
         lonMin: Double,
         lonMax: Double,
-        localSpeciesId: Int? // null = all types
+        localSpeciesId: Int? // null = unrecognized species
     ): OccurrenceResult {
+        if (localSpeciesId == null) return OccurrenceResult()
         val all = getAllOccurrences()
         Log.d(
             TAG,
@@ -80,18 +93,15 @@ class LocalMushroomDataSource @Inject constructor(
                     "bbox=[lat:$latMin..$latMax, lon:$lonMin..$lonMax], " +
                     "localSpeciesId=${localSpeciesId ?: "ALL"}"
         )
+        val bySpecies = all.results.filter { it.localSpeciesId == localSpeciesId }
 
-        val bySpecies = if (localSpeciesId == null) {
-            all.results
-        } else {
-            all.results.filter { it.localSpeciesId == localSpeciesId }
-        }
 
         Log.d(TAG, "Species filter result: ${bySpecies.size} occurrences")
 
-        val filtered = bySpecies.filter { occ ->
-            val lat = occ.decimalLatitude
-            val lon = occ.decimalLongitude
+        //filters out all occurrences that are not in the bounding box.
+        val filtered = bySpecies.filter { occurrence ->
+            val lat = occurrence.decimalLatitude
+            val lon = occurrence.decimalLongitude
             if (lat == null || lon == null) return@filter false
             lat in latMin..latMax && lon in lonMin..lonMax
         }

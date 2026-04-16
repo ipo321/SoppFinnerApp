@@ -1,11 +1,9 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
-//import jakarta.inject.Inject
-import android.content.Context
+
+
 import android.util.Log
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlin.Int
 import kotlin.math.cos
 /*
 repository that can search for mushrooms and get information about them
@@ -38,29 +36,9 @@ class MushroomRepository @Inject constructor(
         return result.toMushroom()
     }
 
-    suspend fun getSpeciesCountNearLocation(
-        lat: Double,
-        lon: Double,
-        taxonKey: String,
-        radiusKm: Double = 5.0,
-    ): Int {
-        val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
-        return result.count
-    }
 
 
 
-
-    //returns an int with how many mushrooms are in the area
-    suspend fun getMushroomCountNearLocation(
-        lat: Double,
-        lon: Double,
-        radiusKm: Double = 10.0,
-        mushRoomType: String = "all mushrooms",
-    ): Int {
-        val result = getMushroomsNearLocation(lat, lon, radiusKm, mushRoomType,  0)
-        return result.count
-    }
 
 
     //returns a OccurrenceResult object witch a list of the occurenses inside a radius.
@@ -68,8 +46,8 @@ class MushroomRepository @Inject constructor(
         lat: Double,
         lon: Double,
         radiusKm: Double = 3.0,
-        mushRoomType: String = "all mushrooms",
-        limit: Int = 50
+        mushRoomType: String,
+        //limit: Int = 50
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
         val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
@@ -79,9 +57,7 @@ class MushroomRepository @Inject constructor(
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
 
-        val localSpeciesId =
-            if (mushRoomType == "all mushrooms") null
-            else LocalSpeciesIdMapper.fromName(mushRoomType)
+        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushRoomType)
 
         return localMushroomDataSource.getOccurrencesInBoundingBox(
             latMin = latMin,
@@ -117,11 +93,8 @@ class MushroomRepository @Inject constructor(
         east: Double,
         west: Double,
         mushRoomType: String,
-        limit: Int = 10
     ): OccurrenceResult {
-        val localSpeciesId =
-            if (mushRoomType == "all mushrooms") null
-            else LocalSpeciesIdMapper.fromName(mushRoomType)
+        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushRoomType)
 
         return localMushroomDataSource.getOccurrencesInBoundingBox(
             latMin = south,
@@ -131,6 +104,7 @@ class MushroomRepository @Inject constructor(
             localSpeciesId = localSpeciesId
         )
     }
+
 
 
 
