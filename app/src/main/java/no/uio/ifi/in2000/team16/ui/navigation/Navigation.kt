@@ -1,6 +1,8 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import OnboardingScreen
 import android.content.Context
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -26,7 +28,8 @@ import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
-import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import androidx.core.content.edit
+import no.uio.ifi.in2000.team16.ui.onboard.WelcomeScreen
 
 const val MAP_SCREEN = "map"
 const val DEV_SCREEN = "dev"
@@ -40,10 +43,12 @@ const val INFO_SCREEN = "profileScreen/info"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControll"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    //navController: NavHostController = rememberNavController()
+    navController: NavHostController,
 ) {
     val mapViewModel: MapViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -67,11 +72,26 @@ fun Navigation(
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ) {
+        )
 
+        /*{
+            composable(ONBOARDING_SCREEN) {
+                WelcomeScreen(
+                    navController = navController
+                )
+            }
+
+
+         */
+
+        {composable(route = Screen.Welcome.route) {
+                WelcomeScreen(navController = navController)
+            }
+/*
             composable(ONBOARDING_SCREEN) {
                 OnboardingScreen(
-                    onFinished = { completed ->
+                    onFinished = {
+                        completed ->
                         if (completed) {
                             sharedPreferences.edit()
                                 .putBoolean("onboarding_completed", true)
@@ -87,6 +107,25 @@ fun Navigation(
                 )
             }
 
+
+            composable(ONBOARDING_SCREEN) {
+                OnboardingScreen(
+                    onFinished = {
+                        sharedPreferences.edit {
+                            putBoolean("onboarding_completed", true)
+                        }
+
+                        navController.navigate(MAP_SCREEN) {
+                            popUpTo(ONBOARDING_SCREEN) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
+
+ */
             composable(MAP_SCREEN) {
                 MapScreen(
                     onNavigateToDev = {
