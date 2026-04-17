@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16
 
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
@@ -67,7 +68,7 @@ class MushroomScorerTest {
                 null, null, null, null,
                 null, null, null, null,
                 null, null, null, null,
-                0, 0),
+                emptyList(), 0),
                 mushroom).score
                     in 0..100
         )
@@ -105,7 +106,7 @@ class MushroomScorerTest {
         minElevation: Int? = 330,
         maxElevation: Int? = 361,
 
-        historicalFinds: Int = 0,
+        historicalFinds: List<Occurrence> = emptyList(),
         month: Int = 8
     ): EnvironmentContext {
         return EnvironmentContext(

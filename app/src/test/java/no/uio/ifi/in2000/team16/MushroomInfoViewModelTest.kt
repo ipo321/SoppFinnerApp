@@ -35,7 +35,7 @@ class MushroomInfoViewModelTest () {
         assertNotNull(viewModel.selectedMushroom)
         assertEquals(mockMushrooms[0], viewModel.selectedMushroom)
         // Should update mushroom choice
-        viewModel.selectMushroom(mockMushrooms[1])
+        viewModel.onMushroomSelected(mockMushrooms[1])
         assertEquals(mockMushrooms[1], viewModel.selectedMushroom)
         // assertEquals is better practice than assertNotEquals
     }
