@@ -66,6 +66,7 @@ fun Navigation(
     val mapViewModel: MapViewModel = hiltViewModel()
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
     var onboardingCompleted by remember { mutableStateOf(false) }
     val currentRoute = currentBackStackEntry?.destination?.route
     var showStartPopup by remember { mutableStateOf(true) }
