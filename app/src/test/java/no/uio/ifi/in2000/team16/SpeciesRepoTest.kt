@@ -2,7 +2,14 @@ package no.uio.ifi.in2000.team16
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.preferencesOf
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import org.junit.Assert.assertEquals
@@ -23,25 +30,54 @@ class SpeciesRepoTest {
     @Test
     fun testReturnWithKantarell(){
         val specie = repo.getMushroomByName("Kantarell")
-        assertEquals("Kantarell", specie.commonName)
+        assertEquals("Kantarell", specie?.commonName)
     }
 
     @Test
     fun testReturnWithSteinsopp(){
         val species = repo.getMushroomByName("Steinsopp")
-        assertEquals("Steinsopp", species.commonName)
+        assertEquals("Steinsopp", species?.commonName)
     }
 
     @Test
     fun wrongNameSearch() {
         val species = repo.getMushroomByName("wrong")
-        assertEquals("Kantarell", species.commonName)
+        assertEquals("Kantarell", species?.commonName)
     }
 
     @Test
     fun testGetAllSpecies() {
         val allSpecies = repo.getAllMushrooms()
         assertEquals(3, allSpecies.size)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun toggleFavorites() = runTest {
+        val preferencesState = MutableStateFlow(preferencesOf())
+        every { mockDataStore.data } returns preferencesState
+
+        coEvery { mockDataStore.updateData(any()) } coAnswers {
+            val transform = it.invocation.args[0] as suspend (Preferences) -> Preferences
+            val newPrefs = transform(preferencesState.value)
+            preferencesState.value = newPrefs // Lagre den nye tilstanden
+            newPrefs
+        }
+        // New repo for this test to make sure the mock-setup above is ready before init starts
+        // We can refactor this test later on, but we need to refactor SpeciesRepositories Dispatcher in init
+        // to do it, and that is not allowed in the team activity :(
+        val favoritesRepo = SpeciesRepository(speciesDS, mockDataStore)
+        favoritesRepo.initializeDefaults()
+        // Makes sure the repo has added the three mushrooms
+
+        val initialFavorites = favoritesRepo.favoriteMushrooms.first { it.isNotEmpty() }
+        val favoritesSize = initialFavorites.size
+        val mushroom = favoritesRepo.getMushroomByName("Kantarell")
+
+        favoritesRepo.toggleFavorite(mushroom!!) // Removes this mushroom
+
+        // The size of favorites should now be one less
+        assertEquals(favoritesSize - 1, favoritesRepo.favoriteMushrooms.first().size)
     }
 }
 

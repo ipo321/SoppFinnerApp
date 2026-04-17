@@ -52,7 +52,7 @@ fun MushroomInfoScreen(
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     val selected = viewModel.selectedMushroom ?: return  //Return if no mushroom is selected
-    val favorites by viewModel.favoriteMushrooms.collectAsState()
+    val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
     val isFavorite = favorites.any { it.commonName == selected.commonName }
 
     var expanded by remember { mutableStateOf(false) }
