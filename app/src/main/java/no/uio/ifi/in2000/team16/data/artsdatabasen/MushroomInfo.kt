@@ -1,6 +1,6 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 import kotlinx.serialization.Serializable
-
+import kotlinx.serialization.SerialName
 
 data class MushroomInfo(
     val id: String,
@@ -29,6 +29,7 @@ data class Occurrence(
     val scientificName: String? = null,
     val species: String? = null,
     val speciesKey: Int? = null,
+    val localSpeciesId: Int? = null,
     val decimalLatitude: Double? = null,
     val decimalLongitude: Double? = null,
     val year: Int? = null,
@@ -63,4 +64,30 @@ data class MushroomSearchResult(
     val genus: String? = null,
     val genusKey: Int? = null,
     val species: String? = null
+)
+
+@Serializable
+data class GeoJsonFeatureCollection(
+    val type: String,
+    val features: List<GeoJsonFeature>
+)
+
+@Serializable
+data class GeoJsonFeature(
+    val type: String,
+    val geometry: GeoJsonGeometry,
+    val properties: GeoJsonProperties
+)
+
+@Serializable
+data class GeoJsonGeometry(
+    val type: String,
+    val coordinates: List<Double> // [lon, lat]
+)
+
+@Serializable
+data class GeoJsonProperties(
+    @SerialName("species_id")
+    val speciesId: Int,
+    val date: String
 )

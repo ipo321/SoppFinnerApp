@@ -22,7 +22,6 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
 
-
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
@@ -71,6 +70,7 @@ class MapViewModel @Inject constructor(
                 val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)  // Have to add species selection here as well, but needs to update usecase and
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
+
 
                 Log.d(
                     "T16_MapViewModel_MushroomLocation",
@@ -169,12 +169,12 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false  // add this
+        val isHistoricalFindsEnabled: Boolean = false
     )
 
-    sealed class ScreenStatus{
-        object Idle : ScreenStatus()
-        object Loading : ScreenStatus()
-        object Success : ScreenStatus()
-        data class Error(val message: String) : ScreenStatus()
+sealed class ScreenStatus{
+    object Idle : ScreenStatus()
+    object Loading : ScreenStatus()
+    object Success : ScreenStatus()
+    data class Error(val message: String) : ScreenStatus()
 }

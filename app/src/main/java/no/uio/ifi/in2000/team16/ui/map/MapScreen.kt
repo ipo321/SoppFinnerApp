@@ -150,7 +150,6 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     Log.d("MAP", "Style loaded: ${style.uri}")
 
                     setMapLayout(map)
-                    //addPolygonsToMap(context, style)  // No polygons for now
 
                     //HEATMAP løsning
                     setupHeatmapLayer(style)    // Makes the heatmap layer

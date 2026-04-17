@@ -82,20 +82,13 @@ class MushroomDataSource @Inject constructor(
         lonMax: Double,
         limit: Int,
     ): OccurrenceResult {
-        //filters what kind of mushrooms we get
-        val mushroomkey = "34"
-        // 5 — Kingdom Fungi (everything, including mold, yeast etc.)
-        //34 — Phylum Basidiomycota (typical mushrooms etc.)
-        //35 — Phylum Ascomycota (morels, truffles etc.)
 
         return try {
             val response: HttpResponse = httpClient.get(
                 "$baseUrl/v1/occurrence/search"
             ) {
                 url {
-                    if (mushRoomType == "all mushrooms")//if the taxonKey parameter is empty we search hardcoded scope
-                        parameters.append("phylumKey", mushroomkey)
-                    else parameters.append("taxonKey", mushRoomType)
+                    parameters.append("taxonKey", mushRoomType)
                     parameters.append("decimalLatitude", "$latMin,$latMax")
                     parameters.append("decimalLongitude", "$lonMin,$lonMax")
                     parameters.append("hasCoordinate", "true")

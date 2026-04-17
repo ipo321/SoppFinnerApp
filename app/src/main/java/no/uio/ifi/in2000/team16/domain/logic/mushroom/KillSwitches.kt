@@ -30,7 +30,7 @@ object SlopeKillSwitch{
 object UrbanKillSwitch{
     fun check(arType: String?): String? {
         if (arType == null) return null
-        if (arType != "Skog") return "ikke skog"
+        if (arType != "Skog") return "Dette er ikke skog, så her vokser ingen sopp"
         return null
     }
 }
