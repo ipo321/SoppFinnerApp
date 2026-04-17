@@ -5,6 +5,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import dagger.Provides
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -49,26 +51,26 @@ class SpeciesRepository @Inject constructor(
         if (savedName != null) {
             _selectedMushroom.value = getMushroomByName(savedName)
         }
-
         // Favorite mushrooms
-        val savedFavNames = prefs[FAVORITES_KEY]
+        persistentFavorites(prefs[FAVORITES_KEY])
 
+    }
+
+    private suspend fun persistentFavorites(
+        savedFavNames: Set<String>?
+    ) {
         if (savedFavNames == null ) {
             val defaultFavorites = speciesDataSource.getAllMushrooms().take(3)
             _favoriteMushrooms.value = defaultFavorites
 
             val nameSet = mutableSetOf<String>()
-            for (fav in defaultFavorites) nameSet.add(fav.commonName)
+            defaultFavorites.forEach { nameSet.add(it.commonName) }
             dataStore.edit {it[FAVORITES_KEY] = nameSet }
         } else {
             val all = speciesDataSource.getAllMushrooms()
             val favoriteList = mutableListOf<Mushroom>()
 
-            for (mushroom in all) {
-                if (mushroom.commonName in savedFavNames) {
-                    favoriteList.add(mushroom)
-                }
-            }
+            all.forEach { if (it.commonName in savedFavNames) { favoriteList.add(it) } }
             _favoriteMushrooms.value = favoriteList
         }
     }
