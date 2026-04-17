@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
