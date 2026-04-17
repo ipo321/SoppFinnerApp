@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -11,6 +12,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
@@ -21,10 +28,13 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
 import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
+import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import androidx.core.content.edit
 import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
+import no.uio.ifi.in2000.team16.ui.popUp.StartPopUp
 
 
 
@@ -34,9 +44,11 @@ const val DEV_SCREEN = "dev"
 
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 
+const val ONBOARDING_SCREEN = "onboarding"
+
 const val MUSHROOM_LIST_SCREEN = "mushroomList"
 const val PROFILE_SCREEN = "profileScreen"
-//Under the profile_screen menu:
+
 const val SETTINGS_SCREEN = "profileScreen/settings"
 const val HISTORY_SCREEN = "profileScreen/history"
 const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
@@ -44,26 +56,52 @@ const val INFO_SCREEN = "profileScreen/info"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControll"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
-
-
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+
     val mapViewModel: MapViewModel = hiltViewModel()
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+    var onboardingCompleted by remember { mutableStateOf(false) }
+    val currentRoute = currentBackStackEntry?.destination?.route
+    var showStartPopup by remember { mutableStateOf(true) }
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
-        }
+            if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
+                BottomNavigationBar(navController = navController)
+            }}
     ) { innerPadding ->
+
         NavHost(
             navController = navController,
-            startDestination = MAP_SCREEN,
-            modifier = modifier.fillMaxSize()
+            startDestination = if (onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,
+
+            modifier = modifier
+                .fillMaxSize()
                 .padding(innerPadding)
-        ) {
+        ){
+            composable(ONBOARDING_SCREEN) {
+
+                OnboardingScreen(
+                    onFinished = {
+                        sharedPreferences.edit {
+                            putBoolean("onboarding_completed", true)
+                        }
+                        navController.navigate(MAP_SCREEN) {
+                            popUpTo(ONBOARDING_SCREEN) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
+            }
+
             composable(MAP_SCREEN) {
                 MapScreen(
                     onNavigateToDev = {
@@ -72,6 +110,7 @@ fun Navigation(
                     viewModel = mapViewModel,
                 )
             }
+
 
             composable(PROFILE_SCREEN) {
                 ProfileScreen(navController = navController)
@@ -142,10 +181,6 @@ fun Navigation(
         }
     }
 }
-
-
-
-
 
 
 

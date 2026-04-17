@@ -51,6 +51,7 @@ fun MushroomInfoScreen(
     onNavigateBack: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
+    print("MUSHROM INFOSCREEN LOADED")
     val selected = viewModel.selectedMushroom ?: return  //Return if no mushroom is selected
     val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
     val isFavorite = favorites.any { it.commonName == selected.commonName }

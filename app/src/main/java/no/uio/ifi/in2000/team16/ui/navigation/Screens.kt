@@ -13,11 +13,15 @@ Per nå bare hjelpemetoder for bottom navigation
  */
 
 
-sealed class Screen(val rout: String) {
+sealed class Screen(val route: String) {
 
     object ProfileScreen: Screen("ProfileScreen")
     object Soppsiden: Screen("Soppsiden")
-    object Kart : Screen("Kart")
+    object Map : Screen("Kart")
+    object Welcome : Screen("welcome_screen")
+    object MushroomInfo: Screen("mushroomInfo")
+
+
 
 }
 
