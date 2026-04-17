@@ -84,19 +84,17 @@ REMEMBER? DIALOG? BRO IDK
 TEMP PLACEHOLDER, SIMPLIFIED THE POPUP, I WANT A CUTE PICTURE BUT THIS WILL HAVE TO DO
  */
 @Composable
-fun StartPopUp(){
-
-    var showDialog by remember { mutableStateOf(true) }
-    if(showDialog){
-        AlertDialog(
-            onDismissRequest = {showDialog=false},
-            title = { Text("...advarsel") },
-            text = { Text("ikke dø ") },
-            confirmButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("whatever")
-                }
+fun StartPopUp(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("...advarsel") },
+        text = { Text("ikke dø") },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("okay")
             }
-        )
-    }
+        }
+    )
 }

@@ -72,7 +72,7 @@ fun OnboardingScreen(
                 .padding(10.dp)
         ) {
 
-            // 🔹 Skip (skjules på siste side)
+            /*🔹 Skip (skjules på siste side)
             Text(
                 text = if (isLastPage) "" else "Skip",
                 style = TextStyle(
@@ -84,6 +84,8 @@ fun OnboardingScreen(
                     onFinished()
                 }
             )
+
+             */
 
             // 🔹 Dots indikator
             Row(

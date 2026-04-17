@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
@@ -24,6 +25,7 @@ import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import androidx.core.content.edit
+import no.uio.ifi.in2000.team16.ui.popUp.StartPopUp
 
 
 //
@@ -47,23 +49,27 @@ fun Navigation(
     val mapViewModel: MapViewModel = hiltViewModel()
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-    val onboardingCompleted = sharedPreferences.getBoolean("onboarding_completed", false)
+    var onboardingCompleted by remember { mutableStateOf(false) }
     val currentRoute = currentBackStackEntry?.destination?.route
-    val showBottomBar = currentRoute != ONBOARDING_SCREEN
+    var showStartPopup by remember { mutableStateOf(true) }
 
     Scaffold(
         bottomBar = {
-            if(currentRoute!=ONBOARDING_SCREEN) {
+            if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
                 BottomNavigationBar(navController = navController)
             }}
     ) { innerPadding ->
+
         NavHost(
             navController = navController,
-            startDestination = if(onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,  // egt MAP_SCREEN dette er kun test
-            modifier = modifier.fillMaxSize()
+            startDestination = if (onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,
+
+            modifier = modifier
+                .fillMaxSize()
                 .padding(innerPadding)
         ){
             composable(ONBOARDING_SCREEN) {
+
                 OnboardingScreen(
                     onFinished = {
                         sharedPreferences.edit {
@@ -114,9 +120,8 @@ fun Navigation(
                     }
                 )
             }
-        }
-    }
-}
+        }}}
+
 
 
 
