@@ -101,7 +101,8 @@ class FrostRepository @Inject constructor(
                             allTempObs.addAll(values)
                             foundTemp = true
                         } else if (elementId.contains("precipitation_amount") && !foundRain && values.isNotEmpty()) {
-                            allRainObs.addAll(values)
+                            val cleanRain = values.map { if (it < 0) 0.0 else it }
+                            allRainObs.addAll(cleanRain)
                             foundRain = true
                         }
                     }
@@ -109,7 +110,7 @@ class FrostRepository @Inject constructor(
                     val avgTemp = if (allTempObs.isNotEmpty()) allTempObs.average() else null
                     val minTemp = if (allTempObs.isNotEmpty()) allTempObs.minOrNull() else null
                     val maxTemp = if (allTempObs.isNotEmpty()) allTempObs.maxOrNull() else null
-                    val totalRain = if (allRainObs.isNotEmpty()) allRainObs.sum() else null
+                    val totalRain = if (allRainObs.isNotEmpty()) allRainObs.sum() else 0.0
 
                     val history = WeatherHistory(
                         avgTempPast14Days = avgTemp,
