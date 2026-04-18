@@ -257,20 +257,19 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
 
-                val lons = uiState.heatmapTiles.map { it.lon }.distinct().sorted()
-                val lats = uiState.heatmapTiles.map { it.lat }.distinct().sorted()
+                val tilesToDraw = uiState.heatmapTiles.filter { tile ->
+                    tile.size <= (uiState.currentTileSize * 2.5)
+                }
 
-                val lonStep = lons.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-                val latStep = lats.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-
-                for (tile in uiState.heatmapTiles) {
+                for (tile in tilesToDraw) {
+                    val halfSize = tile.size / 2.0
 
                     val polygonPoints = listOf(
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2))
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize)
                     )
 
                     val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))

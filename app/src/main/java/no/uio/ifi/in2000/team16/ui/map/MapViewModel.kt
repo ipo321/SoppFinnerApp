@@ -21,6 +21,7 @@ import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -101,13 +102,34 @@ class MapViewModel @Inject constructor(
 
         heatmapJob?.cancel()
 
-        heatmapJob = viewModelScope.launch {
-            _uiState.update { it.copy(isFetchingHeatmap = true) }
-            try {
-                val tiles = calculateHeatmapAreaUseCase(bounds, currentMushroom.profile)
+        val mapHeight = bounds.north - bounds.south
+        val targetSize = when {
+            mapHeight > 1.2 -> 0.2
+            mapHeight > 0.6 -> 0.1
+            mapHeight > 0.24 -> 0.05
+            mapHeight > 0.12 -> 0.02
+            mapHeight > 0.06 -> 0.01
+            mapHeight > 0.024 -> 0.005
+            mapHeight > 0.012 -> 0.002
+            else -> 0.001
+        }
 
-                if (tiles.isNotEmpty()) {
-                    _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
+        heatmapJob = viewModelScope.launch {
+            delay(300)
+            _uiState.update { it.copy(isFetchingHeatmap = true, currentTileSize = targetSize) }
+            try {
+                val newTiles = calculateHeatmapAreaUseCase(bounds, currentMushroom.profile)
+
+                if (newTiles.isNotEmpty()) {
+                    _uiState.update { currentState ->
+                        val combinedTiles = (newTiles + currentState.heatmapTiles)
+                            .distinctBy {"${it.lat}_${it.lon}"}
+
+                        currentState.copy(
+                            heatmapTiles = combinedTiles,
+                            isFetchingHeatmap = false
+                        )
+                    }
                 } else {
                     _uiState.update { it.copy(isFetchingHeatmap = false) }
                 }
@@ -115,6 +137,7 @@ class MapViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 Log.e("MapViewModel", "Error Calc Heatmap", e)
+            } finally {
                 _uiState.update { it.copy(isFetchingHeatmap = false) }
             }
         }
@@ -140,6 +163,8 @@ class MapViewModel @Inject constructor(
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
+
+            _uiState.update { it.copy(heatmapTiles = emptyList()) }
             savedBounds?.let { fetchHeatmapData(it) }
 
             if (lastClickedLat != null && lastClickedLon != null) {//change mushroom trigges a onMapClicked reload
@@ -169,7 +194,8 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false
+        val isHistoricalFindsEnabled: Boolean = false,
+        val currentTileSize: Double = 0.2
     )
 
 sealed class ScreenStatus{

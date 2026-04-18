@@ -41,6 +41,8 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
         val timeTaken = measureTimeMillis {
             try{
                 finalTiles = supervisorScope {
+                    val step = getStepSize(bounds.north - bounds.south)
+
                     //Find center
                     val centerLat = (bounds.north + bounds.south) / 2
                     val centerLon = (bounds.east + bounds.west) / 2
@@ -68,11 +70,17 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     Log.d("T16_UC_Heatmap", "Found $mushroomFindings for ${profile.taxKey}")
 
                     //Make the grid to the resolution
-                    val gridPoints = generateGridPoints(bounds)
+                    val gridPoints = generateGridPoints(bounds, step)
+
+                    //Starting with central ones
+                    val sortedPoints = gridPoints.sortedBy { point ->
+                        calculateDistance(centerLat, centerLon, point.lat, point.lon)
+                    }
+
                     Log.d("T16_UC_Heatmap", "Generated ${gridPoints.size} grid points")
 
                     //Calculate score for each point and detailed calls
-                    val heatmapJobs = gridPoints.map { point ->
+                    val heatmapJobs = sortedPoints.map { point ->
                         async(Dispatchers.Default) {
                             try {
                                 //Checking SAT-skog
@@ -93,15 +101,8 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                         allOccurrencesInBox?.results?.count { occ ->
                                             val occLat = occ.decimalLatitude ?: return@count false
                                             val occLon = occ.decimalLongitude ?: return@count false
-
                                             //Distance from point to occurrence
-                                            calculateDistance(
-                                                point.lat,
-                                                point.lon,
-                                                occLat,
-                                                occLon
-                                            ) <= 500.0
-
+                                            calculateDistance(point.lat, point.lon, occLat, occLon) <= 500.0
                                         } ?: 0
 
                                     //Building the context
@@ -116,12 +117,8 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                             .get(Calendar.MONTH) + 1
                                     )
 
-
                                     //Run the evaluation
-                                    val evaluation = scorerProvider.activeHeatScorer.calculateScore(
-                                        context,
-                                        profile
-                                    )
+                                    val evaluation = scorerProvider.activeHeatScorer.calculateScore(context, profile)
 
                                     Log.d(
                                         "T16_UC_Heatmap",
@@ -129,17 +126,72 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                     )
 
                                     //Makes the heatmap tile with a score
-                                    HeatmapTile(point.lat, point.lon, evaluation.score)
+                                    HeatmapTile(point.lat, point.lon, evaluation.score, step)
                                 } else {
-                                    HeatmapTile(point.lat, point.lon, 0)
+                                    HeatmapTile(point.lat, point.lon, 0, step)
                                 }
+                            } catch (e: CancellationException) {
+                                throw e
                             } catch (e: Exception) {
                                 Log.e("T16_UC_Heatmap", "Error calculating heatmap tile: ${e.message}", e)
-                                HeatmapTile(point.lat, point.lon, 0)
+                                HeatmapTile(point.lat, point.lon, 0, step)
                             }
                         }
                     }
-                    heatmapJobs.awaitAll()
+
+                    val originalTiles = heatmapJobs.awaitAll()
+
+                    // Making fake points for higher resolution
+                    val finalTilesList = mutableListOf<HeatmapTile>()
+                    val halfStep = step / 2.0
+
+                    val tileMap = originalTiles.associateBy {
+                        String.format(java.util.Locale.US, "%.5f_%.5f", it.lat, it.lon)
+                    }
+                    for (tile in originalTiles) {
+                        finalTilesList.add(tile.copy(size = halfStep))
+
+                        val rightKey = String.format(java.util.Locale.US, "%.5f_%.5f", tile.lat, tile.lon + step)
+                        val topKey = String.format(java.util.Locale.US, "%.5f_%.5f", tile.lat + step, tile.lon)
+                        val diagKey = String.format(java.util.Locale.US, "%.5f_%.5f", tile.lat + step, tile.lon + step)
+
+                        val right = tileMap[rightKey]
+                        val top = tileMap[topKey]
+                        val diagonal = tileMap[diagKey]
+
+                        if (right != null) {
+                            finalTilesList.add(
+                                HeatmapTile(
+                                    lat = tile.lat,
+                                    lon = tile.lon + halfStep,
+                                    score = (tile.score + right.score) / 2,
+                                    size = halfStep
+                                )
+                            )
+                        }
+                        if (top != null) {
+                            finalTilesList.add(
+                                HeatmapTile(
+                                    lat = tile.lat + halfStep,
+                                    lon = tile.lon,
+                                    score = (tile.score + top.score) / 2,
+                                    size = halfStep
+                                )
+                            )
+                        }
+                        if (right != null && top != null && diagonal != null) {
+                            val avgScore = (tile.score + right.score + top.score + diagonal.score) / 4
+                            finalTilesList.add(
+                                HeatmapTile(
+                                    lat = tile.lat + halfStep,
+                                    lon = tile.lon + halfStep,
+                                    score = avgScore,
+                                    size = halfStep
+                                )
+                            )
+                        }
+                    }
+                    finalTilesList
                 }
             } catch (e: CancellationException) {
                 Log.d("T16_UC_Heatmap", "Cancel, uses moved map")
@@ -159,13 +211,8 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
         return@coroutineScope finalTiles
     }
 
-
-    private fun generateGridPoints(bounds: BoundingBox): List<GridPoint> {
-        val points = mutableListOf<GridPoint>()
-
-        val mapHeight = bounds.north - bounds.south
-
-        val step = when {
+    private fun getStepSize(mapHeight: Double): Double {
+        return when {
             mapHeight > 1.2 -> 0.2      //130 km ->  22 km
             mapHeight > 0.6 -> 0.1      //66 km -> 11 km
             mapHeight > 0.24 -> 0.05     //26 km -> 5.5 km
@@ -175,6 +222,11 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
             mapHeight > 0.012 -> 0.002    //1.3 km -> 220 m
             else -> 0.001
         }
+    }
+    private fun generateGridPoints(bounds: BoundingBox, step: Double): List<GridPoint> {
+        val points = mutableListOf<GridPoint>()
+
+        val mapHeight = bounds.north - bounds.south
 
         val startLat = kotlin.math.floor(bounds.south / step) * step
         val endLat = kotlin.math.ceil(bounds.north / step) * step
