@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.R
+
 @Composable
 fun BottomNavigationBar(
     navController: NavController
@@ -33,7 +34,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Soppesiden",
             icon = painterResource(id= R.drawable.black_mushroom),
-            route = MUSHROOM_INFO_SCREEN
+            route = MUSHROOM_LIST_SCREEN
         ),
         BottombarNavItem(
             title = "Kart",
@@ -45,7 +46,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Min side",
             icon = rememberVectorPainter(Icons.Default.Home),
-            route = Screen.ProfileScreen.route
+            route = PROFILE_SCREEN
         )
     )
 
@@ -104,4 +105,3 @@ fun BottomNavigationBarPreview() {
         navController = navController
     )
 }
-
