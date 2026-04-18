@@ -2,6 +2,8 @@ package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OnnxTensor
+import ai.onnxruntime.OrtEnvironment.getEnvironment
+import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.util.Log
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
@@ -10,11 +12,31 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.nio.FloatBuffer
 
 class MlAlgorithm(private val contextApp: Context) : MushroomScorer {
+
+// Caching
+companion object {
+    private val env by lazy { OrtEnvironment.getEnvironment() }
+    private val sessionCache = java.util.concurrent.ConcurrentHashMap<String, OrtSession>()
+
+    private fun getSession(context: Context, speciesName: String): OrtSession {
+        val name = speciesName.replace("ø", "o").replace("æ", "ae").replace("å", "a").replace(" ", "_")
+        val fileName = "model_$name.onnx"
+        return sessionCache.getOrPut(fileName) {
+            Log.i("T16_MlAlgorithm", "Loading $fileName to memory and caching...")
+            val modelBytes = context.assets.open(fileName).readBytes()
+            env.createSession(modelBytes)
+        }
+    }
+}
+
+
+
+
     override suspend fun calculateScore(                    //Overrides the Interface
         context: EnvironmentContext,
         species: SpeciesProfile
     ): EvaluationResult {
-
+        Log.i("T16_MlAlgorithm", "Running ML algorithm for ${species.name}")
         //Main Weighting options
         val weightML = 0.90
         val weightCurrent = 10.0
@@ -55,15 +77,8 @@ class MlAlgorithm(private val contextApp: Context) : MushroomScorer {
 
         // Machine Model
         try {
-            val env = OrtEnvironment.getEnvironment()
-
-
-            //Handling ø/æ/å in model name
-            val speciesName = species.name.replace("ø", "o").replace("æ", "ae").replace("å", "a")
-            val fileName = "model_${speciesName.replace(" ", "_")}.onnx"
-
-            val modelBytes = contextApp.assets.open(fileName).use { it.readBytes() }
-            val session = env.createSession(modelBytes)
+            val env = getEnvironment()
+            val session = getSession(contextApp, species.name)
 
             val shape = longArrayOf(1, 9)
             val tensor = OnnxTensor.createTensor(env, FloatBuffer.wrap(features), shape)
@@ -80,7 +95,6 @@ class MlAlgorithm(private val contextApp: Context) : MushroomScorer {
 
             tensor.close()
             result.close()
-            session.close()
 
         } catch (e: Exception) {
             Log.e("T16_MlAlgorithm", "Failed to run ONNX for ${species.name}",e)
@@ -116,6 +130,7 @@ class MlAlgorithm(private val contextApp: Context) : MushroomScorer {
 
         val description = buildDescription(mlHabitatScore, currentTotal)
 
+        Log.i("T16_MlAlgorithm", "Finished ML algorithm for ${species.name}")
 
         return EvaluationResult(
             score = totalScore.toInt().coerceIn(0, 100),

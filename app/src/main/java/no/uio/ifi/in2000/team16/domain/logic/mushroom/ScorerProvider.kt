@@ -11,10 +11,10 @@ class ScorerProvider @Inject constructor(
     private val aiAlgorithm: AiAlgorithm
 ) {
 
-    var activeScorer: MushroomScorer = BasicAlgorithm()
+    var activeScorer: MushroomScorer = MlAlgorithm(context)
         private set
 
-    var activeHeatScorer: MushroomScorer = BasicAlgorithm()
+    var activeHeatScorer: MushroomScorer = MlAlgorithm(context)
         private set
 
     fun setAlgorithm(type: AlgorithmType) {
