@@ -19,64 +19,76 @@ class SpeciesDataSource @Inject constructor(){
     val allSpeciesProfiles = listOf(
         SpeciesProfile(
             name = "Kantarell",
-            type = 1,
             taxKey = "5249504",
-            activeMonths = listOf(6, 7, 8, 9, 10),
-            killTemp = -2.0,
-            optimalTemp = 18.0,
-            tempToleranceC = 8.0,
 
-            optimalRainMm = 20.0,
-            maxCurrentRainMm = 5.0,
-            optimalHumidity = 80.0,
+            optimalForestAge = 56.0,
+            minForestAge = 30.0,
+            optimalBonitet = 13.0,
 
-            preferredTreeSpecies = listOf("Gran", "Furu"),
-            minForestAge = 10,
+            spruceAffinity = 0.37f,
+            pineAffinity = 0.32f,
+            broadleafAffinity = 0.21f,
 
-            preferredTerrain = listOf(1, 2),
-            maxSlope = 35.0,
-            windPenaltyThreshold = 8.0
+            optimalAvgTemp = 14.5,
+            hardinessMinTemp = -1.1,
+            maxToleranceTemp = 28.2,
+            optimalTotalRain14d = 108.0,
+
+            activeMonths = listOf(6,7,8,9,10,11),
+            optimalCurrentHumidity = 80.0,
+            maxCurrentRainMm = 15.0,
+
+            minRaw = -0.181f,
+            maxRaw = 0.091f
         ),
         SpeciesProfile(
             name = "Steinsopp",
-            type = 1,
             taxKey = "5954958",
-            activeMonths = listOf(8, 9, 10), //Later in season
-            killTemp = 0.0,
-            optimalTemp = 13.0,
-            tempToleranceC = 6.0,
 
-            optimalRainMm = 25.0,  // Likes moist ground
-            maxCurrentRainMm = 10.0,
-            optimalHumidity = 85.0,
+            optimalForestAge = 54.0,
+            minForestAge = 28.0,
+            optimalBonitet = 13.0,
 
-            preferredTreeSpecies = listOf("Gran", "Furu"),
-            minForestAge = 10,
+            spruceAffinity = 0.40f,
+            pineAffinity = 0.25f,
+            broadleafAffinity = 0.22f,
 
-            preferredTerrain = listOf(1, 3),
-            maxSlope = 25.0,
-            windPenaltyThreshold = 6.0
+            optimalAvgTemp = 14.2,
+            hardinessMinTemp = -0.4,
+            maxToleranceTemp = 27.4,
+            optimalTotalRain14d = 98.8,
+
+            activeMonths = listOf(6, 7, 8, 9, 10, 11),
+            optimalCurrentHumidity = 80.0,
+            maxCurrentRainMm = 15.0,
+
+            minRaw = -0.152f,
+            maxRaw = 0.091f
         ),
 
         SpeciesProfile(
-            name = "Skarlagen vårbeger",
-            type = 1,
-            taxKey = "2594939",
+            name = "Skarlagens vårbeger",
+            taxKey = "8689016",
+
+            optimalForestAge = 36.0,
+            minForestAge = 23.5,
+            optimalBonitet = 14.0,
+
+            spruceAffinity = 0.34f,
+            pineAffinity = 0.08f,
+            broadleafAffinity = 0.55f,
+
+            optimalAvgTemp = 4.6,
+            hardinessMinTemp = -10.3,
+            maxToleranceTemp = 20.5,
+            optimalTotalRain14d = 47.3,
+
             activeMonths = listOf(3, 4, 5),
-            killTemp = -8.0,
-            optimalTemp = 5.0,
-            tempToleranceC = 7.0,
-
-            optimalRainMm = 15.0,
+            optimalCurrentHumidity = 80.0,
             maxCurrentRainMm = 15.0,
-            optimalHumidity = 90.0,
 
-            preferredTreeSpecies = listOf("Lauv"),
-            minForestAge = 15,
-
-            preferredTerrain = listOf(1, 4),
-            maxSlope = 20.0,
-            windPenaltyThreshold = 5.0
+            minRaw = -0.193f,
+            maxRaw = 0.085f
         )
     )
 
@@ -102,14 +114,14 @@ class SpeciesDataSource @Inject constructor(){
             profile = allSpeciesProfiles.find { it.name == "Steinsopp" }!!
         ),
         Mushroom(
-            commonName = "Skarlagen vårbeger",
+            commonName = "Skarlagens vårbeger",
             latinName = "Sarcoscypha austriaca",
             imageRes = R.drawable.rockfungus,
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Skarlagen vårbeger" }!!
+            profile = allSpeciesProfiles.find { it.name == "Skarlagens vårbeger" }!!
         )
     )
 

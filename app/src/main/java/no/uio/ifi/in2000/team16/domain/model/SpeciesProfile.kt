@@ -7,18 +7,29 @@ Dataclass for what information about the mushroom itself that goes into the algo
 
 data class SpeciesProfile(
     val name: String,
-    val type: Int,
     val taxKey: String,
+
+    //Forest data
+    val optimalBonitet: Double,
+    val optimalForestAge: Double,
+    val minForestAge: Double,
+
+    val spruceAffinity: Float,
+    val pineAffinity: Float,
+    val broadleafAffinity: Float,
+
+    //Weather history
+    val optimalAvgTemp: Double,
+    val hardinessMinTemp: Double,
+    val maxToleranceTemp: Double,
+    val optimalTotalRain14d: Double,
+
+    //Hardcoded
     val activeMonths: List<Int>,
-    val killTemp: Double,
-    val optimalTemp: Double,
-    val tempToleranceC: Double,
-    val optimalRainMm: Double,
+    val optimalCurrentHumidity: Double,
     val maxCurrentRainMm: Double,
-    val optimalHumidity: Double,
-    val preferredTreeSpecies: List<String>,
-    val minForestAge: Int,
-    val preferredTerrain: List<Int>,
-    val maxSlope: Double,
-    val windPenaltyThreshold: Double
+
+    //ML specific
+    val minRaw: Float,
+    val maxRaw: Float,
 )

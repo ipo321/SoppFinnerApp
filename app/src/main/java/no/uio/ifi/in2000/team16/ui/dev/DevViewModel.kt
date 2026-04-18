@@ -16,8 +16,8 @@ import javax.inject.Inject
 data class DevUiState(
     val selectedMushroom: Mushroom? = null,
     val availableMushrooms: List<Mushroom> = emptyList(),
-    val availableAlgorithms: List<String> = listOf("V1", "V2", "Mock", "AI"),
-    val activeAlgorithm: String = "V1",
+    val availableAlgorithms: List<String> = listOf("BASIC", "ML", "AI"),
+    val activeAlgorithm: String = "BASIC",
     val lastEvaluation: EvaluationResult? = null
 )
 
@@ -46,11 +46,10 @@ class DevViewModel @Inject constructor(
 
     fun onAlgorithmSelected(version: String) {
         val type = when(version) {
-            "V1" -> AlgorithmType.V1
-            "V2" -> AlgorithmType.V2
-            "Mock" -> AlgorithmType.MOCK
-            "AI" -> AlgorithmType.AI1
-            else -> AlgorithmType.V2
+            "Basic" -> AlgorithmType.BASIC
+            "ML" -> AlgorithmType.ML
+            "AI" -> AlgorithmType.AI
+            else -> AlgorithmType.BASIC
         }
 
         scorerProvider.setAlgorithm(type)

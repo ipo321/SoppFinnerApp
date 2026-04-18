@@ -1,39 +1,38 @@
 package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ScorerProvider @Inject constructor(
-    private val aiAlgorithmV1: AiAlgorithmV1
+    @ApplicationContext private val context: Context,
+    private val aiAlgorithm: AiAlgorithm
 ) {
 
-    var activeScorer: MushroomScorer = MushroomScorerV2()
+    var activeScorer: MushroomScorer = BasicAlgorithm()
         private set
 
-    var activeHeatScorer: MushroomScorer = HeatAlgorithmV1()
+    var activeHeatScorer: MushroomScorer = BasicAlgorithm()
         private set
 
     fun setAlgorithm(type: AlgorithmType) {
         activeScorer = when (type) {
-            AlgorithmType.V1 -> MushroomScorerV1()
-            AlgorithmType.V2 -> MushroomScorerV2()
-            AlgorithmType.MOCK -> ScoreAlgorithmMock()
-            AlgorithmType.HEAT1 -> HeatAlgorithmV1()
-            AlgorithmType.AI1 -> aiAlgorithmV1
+            AlgorithmType.BASIC -> BasicAlgorithm()
+            AlgorithmType.ML -> MlAlgorithm(context)
+            AlgorithmType.AI -> aiAlgorithm
         }
     }
     fun setHeatAlgorithm(type: AlgorithmType) {
         activeHeatScorer = when (type) {
-            AlgorithmType.V1 -> MushroomScorerV1()
-            AlgorithmType.V2 -> MushroomScorerV2()
-            AlgorithmType.MOCK -> ScoreAlgorithmMock()
-            AlgorithmType.HEAT1 -> HeatAlgorithmV1()
-            AlgorithmType.AI1 -> aiAlgorithmV1
+            AlgorithmType.BASIC -> BasicAlgorithm()
+            AlgorithmType.ML -> MlAlgorithm(context)
+            AlgorithmType.AI -> aiAlgorithm
         }
     }
 }
 
 enum class AlgorithmType {
-    V1, V2, MOCK, HEAT1, AI1
+    BASIC, ML, AI
 }
