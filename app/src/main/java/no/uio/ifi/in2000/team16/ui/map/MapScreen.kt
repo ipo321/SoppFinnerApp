@@ -3,13 +3,30 @@ package no.uio.ifi.in2000.team16.ui.map
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import no.uio.ifi.in2000.team16.R
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -38,7 +56,11 @@ import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import org.maplibre.android.style.layers.CircleLayer
@@ -66,11 +88,8 @@ fun MapScreen(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-
     val uiState by viewModel.uiState.collectAsState()
-
-
-
+    val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
     val mapView = getMapView(viewModel, context)
     // mapView is alerted when lifecycle changes
@@ -83,34 +102,38 @@ fun MapScreen(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
-
+        MapSearchBar(
+            textFieldState = searchTextFieldState,
+            onSearch = { },
+            searchResults = listOf()
+        )
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(top=25.dp,end=16.dp)
                 .wrapContentSize()
         ) {
-            Dropdown(
-                onNavigateToDev = onNavigateToDev,
-                isHeatmapEnabled = uiState.isHeatmapEnabled,
-                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-                favoriteMushrooms = uiState.favoriteMushrooms,
-                selectedMushroom = uiState.selectedMushroom,
-                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
-                onToggleHeatMap = {
-                    mapView.getMapAsync { map ->
-                        val bounds = map.projection.visibleRegion.latLngBounds
-                        val currentBox = BoundingBox(
-                            north = bounds.northEast.latitude,
-                            south = bounds.southWest.latitude,
-                            east = bounds.northEast.longitude,
-                            west = bounds.southWest.longitude
-                        )
-                        viewModel.toggleHeatmap(currentBox)
-                    }
-                }
-            )
+//            Dropdown(
+//                onNavigateToDev = onNavigateToDev,
+//                isHeatmapEnabled = uiState.isHeatmapEnabled,
+//                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+//                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+//                favoriteMushrooms = uiState.favoriteMushrooms,
+//                selectedMushroom = uiState.selectedMushroom,
+//                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
+//                onToggleHeatMap = {
+//                    mapView.getMapAsync { map ->
+//                        val bounds = map.projection.visibleRegion.latLngBounds
+//                        val currentBox = BoundingBox(
+//                            north = bounds.northEast.latitude,
+//                            south = bounds.southWest.latitude,
+//                            east = bounds.northEast.longitude,
+//                            west = bounds.southWest.longitude
+//                        )
+//                        viewModel.toggleHeatmap(currentBox)
+//                    }
+//                }
+//            )
         }
 
         when (uiState.screenStatus) {
@@ -128,6 +151,70 @@ fun MapScreen(
             is ScreenStatus.Idle -> {}
         }
 
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapSearchBar(
+    textFieldState: TextFieldState,
+    onSearch: (String) -> Unit,
+    searchResults: List<String>,
+    modifier: Modifier = Modifier,
+    //leadingIcon: @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") },
+    //trailingIcon: @Composable (() -> Unit)? = null,
+    supportingContent: (@Composable (String) -> Unit)? = null,
+    leadingContent: (@Composable () -> Unit)? = null,
+) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+
+    Box(
+        modifier
+            .fillMaxSize()
+            .semantics { isTraversalGroup = true }
+    ) {
+        SearchBar(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .semantics { traversalIndex = 0f },
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = textFieldState.text.toString(),
+                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
+                    onSearch = {
+                        onSearch(textFieldState.text.toString())
+                        expanded = false // closes when search is entered/completed
+                    },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
+                    placeholder = { Text("Søk i kartet") },
+                    leadingIcon = { Icon (Icons.Default.Menu, contentDescription = "Menu") },
+                    trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                )
+            },
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            // Displays search results in a scrollable column
+            LazyColumn {
+                items(count = searchResults.size) { index ->
+                    val result = searchResults[index]
+                    ListItem(
+                        headlineContent = { Text(result) },
+                        supportingContent = supportingContent?.let { { it(result) } },
+                        leadingContent = leadingContent,
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier
+                            .clickable { // each item is clickable
+                                textFieldState.edit { replace(0, length, result) }
+                                expanded = false
+                            }
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
