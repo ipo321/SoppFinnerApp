@@ -34,8 +34,6 @@ class MapViewModel @Inject constructor(
 
     private var heatmapJob: Job? = null // cancel old calculations
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
-    private var lastClickedLat: Double? = null  // makes it easy for mushroom change to update location pins and scorecard
-    private var lastClickedLon: Double? = null
 
     init{
         viewModelScope.launch {
@@ -60,8 +58,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun onMapClicked(lat: Double, lon: Double) {
-        lastClickedLat = lat
-        lastClickedLon = lon
+        _uiState.update { it.copy(lastClickedLat = lat, lastClickedLon = lon) }
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         viewModelScope.launch {
@@ -142,8 +139,10 @@ class MapViewModel @Inject constructor(
             speciesRepository.updateSelectedMushroom(mushroom)
             savedBounds?.let { fetchHeatmapData(it) }
 
-            if (lastClickedLat != null && lastClickedLon != null) {//change mushroom trigges a onMapClicked reload
-                onMapClicked(lastClickedLat!!, lastClickedLon!!)
+            val lat = _uiState.value.lastClickedLat
+            val lon = _uiState.value.lastClickedLon
+            if (lat != null && lon != null) {//change mushroom trigges a onMapClicked reload
+                onMapClicked(lat, lon)
             }
         }
     }
@@ -169,7 +168,9 @@ class MapViewModel @Inject constructor(
         val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false
+        val isHistoricalFindsEnabled: Boolean = false,
+        val lastClickedLat: Double? = null,
+        val lastClickedLon: Double? = null
     )
 
 sealed class ScreenStatus{

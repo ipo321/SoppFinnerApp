@@ -154,6 +154,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     //HEATMAP løsning
                     setupHeatmapLayer(style)    // Makes the heatmap layer
                     setupHistoricalFindsLayer(style)
+                    setupPointMarker(style) // Makes the marker for clicked point
                     // MAP
                     // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
@@ -209,6 +210,22 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                     }
                 }
             }
+        }
+    }
+    // Update pin where clicked with each new click
+    LaunchedEffect(
+        uiState.lastClickedLat,
+        uiState.lastClickedLon,
+        mapRef
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val lat = uiState.lastClickedLat ?: return@LaunchedEffect
+        val lon = uiState.lastClickedLon ?: return@LaunchedEffect
+
+        currentMap.getStyle { style ->
+            val source = style.getSourceAs<GeoJsonSource>("position-source") ?: return@getStyle
+            val point = Point.fromLngLat(lon, lat)
+            source.setGeoJson(Feature.fromGeometry(point))
         }
     }
     //Mushroom finding pins
@@ -406,6 +423,20 @@ private fun setupHistoricalFindsLayer(style: Style) {
     circleLayer.setProperties(
         circleRadius(6f),
         circleColor("#8B4513"),   // brown pin color
+        circleStrokeWidth(1.5f),
+        circleStrokeColor("#FFFFFF")
+    )
+    style.addLayer(circleLayer)
+}
+
+private fun setupPointMarker(style: Style) {
+    val source = GeoJsonSource("position-source")
+    style.addSource(source)
+
+    val circleLayer = CircleLayer("position-layer", "position-source")
+    circleLayer.setProperties(
+        circleRadius(6f),
+        circleColor("#2769DB"),   // blue like google maps
         circleStrokeWidth(1.5f),
         circleStrokeColor("#FFFFFF")
     )
