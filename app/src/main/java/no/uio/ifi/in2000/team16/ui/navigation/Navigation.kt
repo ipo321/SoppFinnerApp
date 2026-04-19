@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
@@ -58,6 +59,15 @@ fun Navigation(
     val currentRoute = currentBackStackEntry?.destination?.route
     val mapViewModel: MapViewModel = hiltViewModel()
 
+    // Separate logic to handle the initial navigation "flicker"
+    LaunchedEffect(onboardingCompleted) {
+        if (onboardingCompleted && currentRoute == ONBOARDING_SCREEN) {
+            navController.navigate(MAP_SCREEN) {
+                popUpTo(ONBOARDING_SCREEN) { inclusive = true }
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
             if (currentRoute != ONBOARDING_SCREEN) {
@@ -67,7 +77,7 @@ fun Navigation(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = if (onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,
+            startDestination = ONBOARDING_SCREEN,
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -160,7 +170,6 @@ fun Navigation(
         }
     }
 }
-
 
 
 

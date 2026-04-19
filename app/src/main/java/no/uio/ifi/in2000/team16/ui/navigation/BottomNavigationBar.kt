@@ -68,7 +68,7 @@ fun BottomNavigationBar(
                         }
                         launchSingleTop = true
                         restoreState = true }
-                          },
+                },
                 icon = {
                     Icon(
                         painter = item.icon,
