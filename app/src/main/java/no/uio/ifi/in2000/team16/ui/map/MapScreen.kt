@@ -177,7 +177,7 @@ fun MapSearchBar(
                         viewModel.onSearchQueryChanged(it) // Collects suggestions while typing
                     },
                     onSearch = { query ->
-                        viewModel.searchAddress(query) { lat, lon ->
+                        viewModel.searchAddressByText(query) { lat, lon ->
                             mapView.getMapAsync { map ->
                                 map.animateCamera(
                                     CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15.0)
@@ -214,13 +214,13 @@ fun MapSearchBar(
             LazyColumn {
                 items(uiState.addressSuggestions) { suggestion ->
                     ListItem(
-                        headlineContent = { Text(suggestion.text) },
+                        headlineContent = { Text("${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}") },
 //                        supportingContent = supportingContent?.let { { it(result) } },
 //                        leadingContent = leadingContent,
 //                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier
                             .clickable { // each item is clickable
-                                viewModel.searchAddress(suggestion.text) { lat, lon ->
+                                viewModel.searchAddress(suggestion) { lat, lon ->
                                     mapView.getMapAsync { map ->
                                         map.animateCamera(
                                             CameraUpdateFactory.newLatLngZoom(
@@ -230,7 +230,8 @@ fun MapSearchBar(
                                     }
                                 }
                                 // updates the searchbar text
-                                textFieldState.edit { replace(0, length, suggestion.text) }
+                                val text = "${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}"
+                                textFieldState.edit { replace(0, length, text) }
                                 searchExpanded = false
                             }
                             .fillMaxWidth()

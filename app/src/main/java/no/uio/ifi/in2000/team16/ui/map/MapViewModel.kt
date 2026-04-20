@@ -21,13 +21,17 @@ import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import no.uio.ifi.in2000.team16.data.arcGIS.ArcGISRepository
 import no.uio.ifi.in2000.team16.data.arcGIS.Suggestion
+import no.uio.ifi.in2000.team16.data.kartverket.Address
+import no.uio.ifi.in2000.team16.data.kartverket.AddressRepository
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
-    private val arcGISRepository: ArcGISRepository,
+    //private val arcGISRepository: ArcGISRepository,
+    private val addressRepository: AddressRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
     private val scorerProvider: ScorerProvider
@@ -159,25 +163,33 @@ class MapViewModel @Inject constructor(
         println("Søker etter: ${_uiState.value.searchQuery}")
     }
 
-    // Method for searching for a location the user typed in the search bar
-    fun searchAddress(query: String, onLocationFound: (lat: Double, lon: Double) -> Unit) {
-        viewModelScope.launch {
-            val location = arcGISRepository.getLocationCoordinates(query)
-            if (location != null) {
-                onLocationFound(location.lat, location.lon)
-            }
-        }
-    }
-
     fun onSearchQueryChanged(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
         searchJob?.cancel() // Cancels ongoing search when search is updated
         searchJob = viewModelScope.launch { // Starts new search
-            val suggestions = arcGISRepository.getSuggestions(query)
+            delay(300) // Makes it wait a little bit before searching, to not spam the API
+            val suggestions = addressRepository.getSuggestions(query)
             _uiState.update { it.copy(addressSuggestions = suggestions) }
         }
     }
 
+    // Method for getting location for address chosen from search, used when search completes
+    fun searchAddress(address: Address, onLocationFound: (lat: Double, lon: Double) -> Unit) {
+        val location = address.representasjonspunkt
+        if (location?.lat != null && location.lon != null) {
+            onLocationFound(location.lat, location.lon)
+        }
+    }
+
+    // Method for finding address from the query, used when user is still searching
+    fun searchAddressByText(query: String, onLocationFound: (Double, Double) -> Unit) {
+        viewModelScope.launch {
+            val location = addressRepository.getLocationCoordinates(query)
+            if (location != null && location.lat != null && location.lon != null) {
+                onLocationFound(location.lat, location.lon)
+            }
+        }
+    }
 }
 data class MapScreenState(
     val screenStatus: ScreenStatus = ScreenStatus.Idle,
@@ -192,7 +204,8 @@ data class MapScreenState(
     val isHistoricalFindsEnabled: Boolean = false,
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
-    val addressSuggestions: List<Suggestion> = emptyList()
+    //val addressSuggestions: List<Suggestion> = emptyList()
+    val addressSuggestions: List<Address> = emptyList()
 )
 
 sealed class ScreenStatus{
