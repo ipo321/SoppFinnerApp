@@ -55,7 +55,10 @@ fun DialogWithImage(
                         .height(160.dp)
                 )
                 Text(
-                    text = "ADVARSEL",
+                    text = "Advarsel",
+                )
+                Text(
+                    text = "Ikke dø!",
                     modifier = Modifier.padding(16.dp),
                 )
                 Row(

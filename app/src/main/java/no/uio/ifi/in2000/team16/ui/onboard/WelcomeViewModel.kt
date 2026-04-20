@@ -16,11 +16,12 @@ class WelcomeViewModel @Inject constructor(
     private val repository: DataStoreRepository
 ) : ViewModel() {
 
-    val onBoardingCompleted: StateFlow<Boolean> = repository.readOnBoardingState()
+    // Using nullable Boolean where null means "loading"
+    val onBoardingCompleted: StateFlow<Boolean?> = repository.readOnBoardingState()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
+            initialValue = null
         )
 
     fun saveOnBoardingState(completed: Boolean) {
