@@ -29,6 +29,7 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -232,6 +233,11 @@ fun MapSearchBar(
                         }
                     },
                     trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFFEDFEED),
+                        unfocusedContainerColor = Color(0xFFEDFEED),
+                        disabledContainerColor = Color(0xFFEDFEED)
+                    )
                 )
             },
             expanded = searchExpanded,

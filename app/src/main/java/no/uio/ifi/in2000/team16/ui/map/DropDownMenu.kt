@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.FlashlightOff
+import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -47,14 +50,19 @@ fun Dropdown(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        offset= DpOffset(x=(-20).dp,y=0.dp)
+        offset= DpOffset(x=0.dp,y=10.dp)
     ) {
 
 
         // First section
         DropdownMenuItem(
             text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
-            leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+            leadingIcon = { if (isHeatmapEnabled) {
+                    Icon(Icons.Outlined.FlashlightOff, contentDescription = "Flashlight Off")
+                } else {
+                    Icon(Icons.Outlined.FlashlightOn, contentDescription = "Flashlight On")
+                }
+            },
             onClick = {
                 onToggleHeatMap()
                 onDismissRequest()
@@ -63,7 +71,7 @@ fun Dropdown(
 
         DropdownMenuItem(
             text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
-            leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+            leadingIcon = { Icon(Icons.Outlined.Book, contentDescription = null) },
             onClick = {
                 onToggleHistoricalFinds()
                 onDismissRequest()
@@ -82,9 +90,9 @@ fun Dropdown(
         HorizontalDivider()
 
         if (favoriteMushrooms.isNotEmpty()) {
-            HorizontalDivider()
+            //HorizontalDivider()
             Text(
-                text = "Hurtigvalg:",
+                text = "Velg sopp som vises på kartet:",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.Gray
