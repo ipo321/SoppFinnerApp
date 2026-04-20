@@ -14,6 +14,7 @@ import no.uio.ifi.in2000.team16.R
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -176,7 +177,8 @@ fun MapSearchBar(
 
     Box(
         modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight(Alignment.Top)
             .semantics { isTraversalGroup = true }
     ) {
         SearchBar(
