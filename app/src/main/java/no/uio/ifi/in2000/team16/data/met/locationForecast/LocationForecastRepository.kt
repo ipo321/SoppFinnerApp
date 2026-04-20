@@ -7,6 +7,7 @@ import kotlinx.coroutines.coroutineScope
 import no.uio.ifi.in2000.team16.domain.model.WeatherData
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.roundToInt
 
 /*
@@ -112,7 +113,13 @@ class LocationForecastRepository @Inject constructor(
             }
         }
 
-        deferredResult.await()?.data
+        return@coroutineScope try {
+            deferredResult.await()?.data
+        } catch (e: Exception) {
+            cache.remove(cacheKey)
+            if (e is CancellationException) throw e
+            null
+        }
     }
 }
 

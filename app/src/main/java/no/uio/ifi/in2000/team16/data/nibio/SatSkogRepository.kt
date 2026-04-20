@@ -9,6 +9,7 @@ import javax.inject.Singleton
 import no.uio.ifi.in2000.team16.domain.model.ForestData
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.cancellation.CancellationException
 
 
 /*
@@ -58,7 +59,13 @@ class SatSkogRepository @Inject constructor(
                 fetchAndMapForestData(lat, lon)
             }
         }
-        deferredResult.await()
+        return@coroutineScope try {
+            deferredResult.await()
+        } catch (e: Exception) {
+            preciseCache.remove(cacheKey)
+            if (e is CancellationException) throw e
+            null
+        }
     }
 
     //Method for lower resolution (heatmap) to prevent unnecessary network calls
@@ -77,7 +84,13 @@ class SatSkogRepository @Inject constructor(
                 getForestData(lat, lon)
             }
         }
-        deferredResult.await()
+        return@coroutineScope try {
+            deferredResult.await()
+        } catch (e: Exception) {
+            heatmapCache.remove(cacheKey)
+            if (e is CancellationException) throw e
+            null
+        }
     }
 }
 

@@ -187,6 +187,13 @@ class MapViewModel @Inject constructor(
         println("Søker etter: ${_uiState.value.searchQuery}")
     }
 
+    fun toggleSatellite() {
+        _uiState.update { it.copy(isSatelliteMode = !it.isSatelliteMode) }
+    }
+
+    fun toggleWmsForest() {
+        _uiState.update { it.copy(showWmsForest = !it.showWmsForest) }
+    }
 }
 
 
@@ -201,7 +208,9 @@ class MapViewModel @Inject constructor(
         val isFetchingHeatmap: Boolean = false,
         val searchQuery: String = "",
         val isHistoricalFindsEnabled: Boolean = false,
-        val currentTileSize: Double = 0.2
+        val currentTileSize: Double = 0.2,
+        val isSatelliteMode: Boolean = false,
+        val showWmsForest: Boolean = false
     )
 
 sealed class ScreenStatus{

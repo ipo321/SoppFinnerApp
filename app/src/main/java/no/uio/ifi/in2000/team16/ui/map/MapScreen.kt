@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import org.maplibre.android.style.layers.Property.NONE
+import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
 import android.util.Log
 import android.view.Gravity
@@ -46,6 +48,9 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import org.maplibre.android.style.layers.RasterLayer
+import org.maplibre.android.style.sources.RasterSource
+import org.maplibre.android.style.sources.TileSet
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -160,18 +165,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
             getMapAsync { map ->
                 mapRef = map
-                // The map now uses BASE from MapTiler, this can be changed
-                map.setStyle("https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq") { style ->
-                    // Logging to see what happens when the map is used
-                    Log.d("MAP", "Style loaded: ${style.uri}")
-
                     setMapLayout(map)
-
-                    //HEATMAP løsning
-                    setupHeatmapLayer(style)    // Makes the heatmap layer
-                    setupHistoricalFindsLayer(style)
-                    // MAP
-                    // Makes the map clickable
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
@@ -226,7 +220,30 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                 }
             }
         }
+    LaunchedEffect(uiState.isSatelliteMode, mapRef) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        val styleUrl = if (uiState.isSatelliteMode)
+                "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
+            else
+                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+
+        currentMap.setStyle(styleUrl) { style ->
+            Log.d("T16_MAP", "Style loaded: ${style.uri}")
+            setupHeatmapLayer(style)
+            setupHistoricalFindsLayer(style)
+            setupForestLayer(style, uiState.showWmsForest)
+        }
     }
+    // WMS
+    LaunchedEffect(uiState.showWmsForest, mapRef) {
+        mapRef?.getStyle { style ->
+            style.getLayer("satskog-layer")?.setProperties(
+                visibility(if (uiState.showWmsForest) VISIBLE else NONE)
+            )
+        }
+    }
+
     //Mushroom finding pins
     // Updating the pins each time they change
     LaunchedEffect(
@@ -236,6 +253,8 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val finds = uiState.currentContext?.historicalFinds ?: emptyList()
+
+
 
         val features = finds
             .filter { it.decimalLatitude != null && it.decimalLongitude != null }
@@ -394,20 +413,9 @@ private fun setupHeatmapLayer(style: Style) {
         fillOpacity(0.5f)
     )
 
-    // Putting layer bellow roads and buildings
-    var insertBelowLayerId: String? = null
-    //style.addLayer(heatmapLayer)
 
-    for (layer in style.layers) {
-        val id = layer.id.lowercase()
-        if (id.contains("water") || id.contains("road") || id.contains("building") || layer is SymbolLayer) {
-            insertBelowLayerId = layer.id
-            break
-        }
-    }
-
-    if (insertBelowLayerId != null) {
-        style.addLayerBelow(fillLayer, insertBelowLayerId)
+    if (style.getLayer("Sand") != null) {
+        style.addLayerBelow(fillLayer, "Sand")
     } else {
         style.addLayer(fillLayer)
     }
@@ -425,4 +433,31 @@ private fun setupHistoricalFindsLayer(style: Style) {
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(circleLayer)
+}
+
+private fun setupForestLayer(style: Style, isVisible: Boolean) {
+    val satskogUrl = "https://wms.nibio.no/cgi-bin/satskog" +
+            "?SERVICE=WMS" +
+            "&VERSION=1.3.0" +
+            "&REQUEST=GetMap" +
+            "&LAYERS=Dominerende_treslag" +
+            "&CRS=EPSG:3857" +
+            "&BBOX={bbox-epsg-3857}" +
+            "&WIDTH=256" +
+            "&HEIGHT=256" +
+            "&FORMAT=image/png" +
+            "&TRANSPARENT=TRUE"
+
+    val wmsSource = RasterSource(
+        "satskog-source",
+        TileSet("2.1.0", satskogUrl),
+        256
+    )
+    style.addSource(wmsSource)
+    val wmsLayer = RasterLayer("satskog-layer", "satskog-source")
+    wmsLayer.setProperties(
+        rasterOpacity(0.2f),
+        visibility(if (isVisible) VISIBLE else NONE)
+    )
+    style.addLayer(wmsLayer)
 }

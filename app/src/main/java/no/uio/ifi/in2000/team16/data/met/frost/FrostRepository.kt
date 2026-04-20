@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.cancellation.CancellationException
 
 
 /*
@@ -141,16 +142,22 @@ class FrostRepository @Inject constructor(
             }
         }
 
-        val cached = deferredResult.await()
+        val cached = try {
+            deferredResult.await()
+        } catch (e: Exception) {
+            cache.remove(cacheKey)
+            if (e is CancellationException) throw e
+            return@coroutineScope null
+        }
 
         if (cached != null && (currentTime - cached.timestamp) > cacheMaxAgeMs) {
             cache.remove(cacheKey)
             return@coroutineScope null
-           } else if (cached != null) {
-                Log.d("T16_Frost_Repository", "Returning historical weather for $cacheKey")
-           }
+        } else if (cached != null) {
+            Log.d("T16_Frost_Repository", "Returning historical weather for $cacheKey")
+        }
 
-        return@coroutineScope deferredResult.await()?.data
+        return@coroutineScope cached?.data
     }
 
 }
