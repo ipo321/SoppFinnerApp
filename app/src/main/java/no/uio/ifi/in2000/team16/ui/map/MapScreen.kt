@@ -20,8 +20,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.SearchBar
@@ -103,16 +105,20 @@ fun MapScreen(
             factory = { mapView }
         )
         MapSearchBar(
+            viewModel = viewModel,
+            uiState = uiState,
+            mapView = mapView,
+            onNavigateToDev = onNavigateToDev,
             textFieldState = searchTextFieldState,
             onSearch = { },
             searchResults = listOf()
         )
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top=25.dp,end=16.dp)
-                .wrapContentSize()
-        ) {
+//        Box(
+//            modifier = Modifier
+//                .align(Alignment.TopEnd)
+//                .padding(top=25.dp,end=16.dp)
+//                .wrapContentSize()
+//        ) {
 //            Dropdown(
 //                onNavigateToDev = onNavigateToDev,
 //                isHeatmapEnabled = uiState.isHeatmapEnabled,
@@ -134,7 +140,7 @@ fun MapScreen(
 //                    }
 //                }
 //            )
-        }
+       // }
 
         when (uiState.screenStatus) {
             is ScreenStatus.Success -> {
@@ -157,16 +163,19 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapSearchBar(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    mapView: MapView,
+    onNavigateToDev: () -> Unit,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     searchResults: List<String>,
     modifier: Modifier = Modifier,
-    //leadingIcon: @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") },
-    //trailingIcon: @Composable (() -> Unit)? = null,
     supportingContent: (@Composable (String) -> Unit)? = null,
     leadingContent: (@Composable () -> Unit)? = null,
 ) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var searchExpanded by rememberSaveable { mutableStateOf(false) }
+    var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier
@@ -183,17 +192,50 @@ fun MapSearchBar(
                     onQueryChange = { textFieldState.edit { replace(0, length, it) } },
                     onSearch = {
                         onSearch(textFieldState.text.toString())
-                        expanded = false // closes when search is entered/completed
+                        searchExpanded = false // closes when search is entered/completed
                     },
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
+                    expanded = searchExpanded,
+                    onExpandedChange = { searchExpanded = it },
                     placeholder = { Text("Søk i kartet") },
-                    leadingIcon = { Icon (Icons.Default.Menu, contentDescription = "Menu") },
+                    leadingIcon = {
+                        Box {
+                            IconButton(onClick = { menuExpanded = !menuExpanded }) {
+                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            }
+                            Dropdown(
+                                expanded = menuExpanded,
+                                onDismissRequest = { menuExpanded = false },
+                                onNavigateToDev = onNavigateToDev,
+                                isHeatmapEnabled = uiState.isHeatmapEnabled,
+                                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+                                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+                                favoriteMushrooms = uiState.favoriteMushrooms,
+                                selectedMushroom = uiState.selectedMushroom,
+                                onMushroomSelected = { mushroom ->
+                                    viewModel.onMushroomSelected(
+                                        mushroom
+                                    )
+                                },
+                                onToggleHeatMap = {
+                                    mapView.getMapAsync { map ->
+                                        val bounds = map.projection.visibleRegion.latLngBounds
+                                        val currentBox = BoundingBox(
+                                            north = bounds.northEast.latitude,
+                                            south = bounds.southWest.latitude,
+                                            east = bounds.northEast.longitude,
+                                            west = bounds.southWest.longitude
+                                        )
+                                        viewModel.toggleHeatmap(currentBox)
+                                    }
+                                }
+                            )
+                        }
+                    },
                     trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 )
             },
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
+            expanded = searchExpanded,
+            onExpandedChange = { searchExpanded = it },
         ) {
             // Displays search results in a scrollable column
             LazyColumn {
@@ -207,7 +249,7 @@ fun MapSearchBar(
                         modifier = Modifier
                             .clickable { // each item is clickable
                                 textFieldState.edit { replace(0, length, result) }
-                                expanded = false
+                                searchExpanded = false
                             }
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp)
@@ -219,8 +261,10 @@ fun MapSearchBar(
 }
 
 @Composable
-fun getMapView(viewModel: MapViewModel, context: Context): MapView {
-
+fun getMapView(
+    viewModel: MapViewModel,
+    context: Context
+): MapView {
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
 

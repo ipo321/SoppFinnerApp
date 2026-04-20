@@ -33,6 +33,8 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
 @Composable
 fun Dropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
     onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
@@ -42,85 +44,65 @@ fun Dropdown(
     isHistoricalFindsEnabled: Boolean,
     onToggleHistoricalFinds: () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier.padding(start =8.dp, top = 40.dp)
-            .size(50.dp)
-            .background(Color(0xFFEDFEED),
-                shape = RoundedCornerShape(18.dp))
-                .padding(10.dp),
-                contentAlignment = Alignment.Center,
-
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        offset= DpOffset(x=(-20).dp,y=0.dp)
     ) {
-        IconButton(
-            onClick = { expanded = !expanded })
-        {
-            Icon(Icons.Default.MoreVert,
-                tint = Color(0xFF1E1E1E),
-                contentDescription = "More options",
-                modifier = Modifier.size(50.dp))
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset= DpOffset(x=(-20).dp,y=0.dp)
-        ) {
 
 
-            // First section
-            DropdownMenuItem(
-                text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
-                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
-                onClick = {
-                    onToggleHeatMap()
-                    expanded = false
-                }
-            )
+        // First section
+        DropdownMenuItem(
+            text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
+            leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+            onClick = {
+                onToggleHeatMap()
+                onDismissRequest()
+            }
+        )
 
-            DropdownMenuItem(
-                text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
-                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
-                onClick = {
-                    onToggleHistoricalFinds()
-                    expanded = false
-                }
-            )
+        DropdownMenuItem(
+            text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
+            leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
+            onClick = {
+                onToggleHistoricalFinds()
+                onDismissRequest()
+            }
+        )
 
-            DropdownMenuItem(
-                text = { Text("Dev") },
-                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                onClick = {
-                    expanded = false
-                    onNavigateToDev()
-                }
-            )
+        DropdownMenuItem(
+            text = { Text("Dev") },
+            leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+            onClick = {
+                onNavigateToDev()
+                onDismissRequest()
+            }
+        )
 
+        HorizontalDivider()
+
+        if (favoriteMushrooms.isNotEmpty()) {
             HorizontalDivider()
-
-            if (favoriteMushrooms.isNotEmpty()) {
-                HorizontalDivider()
-                Text(
-                    text = "Hurtigvalg:",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray
+            Text(
+                text = "Hurtigvalg:",
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
+            )
+            favoriteMushrooms.forEach { mushroom ->
+                val isSelected = mushroom.commonName == selectedMushroom?.commonName
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = mushroom.commonName,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        onMushroomSelected(mushroom)
+                        onDismissRequest()
+                    }
                 )
-                favoriteMushrooms.forEach { mushroom ->
-                    val isSelected = mushroom.commonName == selectedMushroom?.commonName
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = mushroom.commonName,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        },
-                        onClick = {
-                            onMushroomSelected(mushroom)
-                            expanded = false
-                        }
-                    )
-                }
             }
         }
     }
@@ -129,7 +111,10 @@ fun Dropdown(
 @Preview(showBackground = true)
 @Composable
 fun DropdownPreview() {
-    Dropdown(onNavigateToDev = {},
+    Dropdown(
+        expanded = true,
+        onDismissRequest = {},
+        onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
         onToggleHistoricalFinds = {})
 }
