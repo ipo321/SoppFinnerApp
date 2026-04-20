@@ -37,17 +37,20 @@ class MapViewModel @Inject constructor(
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
     private var lastClickedLat: Double? = null  // makes it easy for mushroom change to update location pins and scorecard
     private var lastClickedLon: Double? = null
+    private var debounceJob: Job? = null
 
     init{
         viewModelScope.launch {
             speciesRepository.selectedMushroom.collect { mushroom ->
                 _uiState.update { it.copy(selectedMushroom = mushroom) }
                 try {
-                    getEnvironmentContextUseCase(
+                    val env = getEnvironmentContextUseCase(
                         59.91,
                         10.75,
                         mushroom.profile
                     ) //Warmup to get scorer quicker
+                    val scorer = scorerProvider.activeScorer
+                    scorer.calculateScore(env, mushroom.profile)
                 } catch (e: Exception) {
                 }
             }
@@ -97,48 +100,51 @@ class MapViewModel @Inject constructor(
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
         if (!_uiState.value.isHeatmapEnabled) return
-        savedBounds = bounds
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
-        heatmapJob?.cancel()
+        debounceJob?.cancel()
 
-        val mapHeight = bounds.north - bounds.south
-        val targetSize = when {
-            mapHeight > 1.2 -> 0.2
-            mapHeight > 0.6 -> 0.1
-            mapHeight > 0.24 -> 0.05
-            mapHeight > 0.12 -> 0.02
-            mapHeight > 0.06 -> 0.01
-            mapHeight > 0.024 -> 0.005
-            mapHeight > 0.012 -> 0.002
-            else -> 0.001
-        }
+        debounceJob = viewModelScope.launch {
+            delay(500)
+            heatmapJob?.cancel()
 
-        heatmapJob = viewModelScope.launch {
-            delay(300)
-            _uiState.update { it.copy(isFetchingHeatmap = true, currentTileSize = targetSize) }
-            try {
-                val newTiles = calculateHeatmapAreaUseCase(bounds, currentMushroom.profile)
+            heatmapJob = viewModelScope.launch {
+                _uiState.update { it.copy(isFetchingHeatmap = true) }
 
-                if (newTiles.isNotEmpty()) {
-                    _uiState.update { currentState ->
-                        val combinedTiles = (newTiles + currentState.heatmapTiles)
-                            .distinctBy {"${it.lat}_${it.lon}"}
+                try {
+                    val newTiles = calculateHeatmapAreaUseCase(
+                        bounds = bounds,
+                        profile = currentMushroom.profile,
+                        existingTiles = _uiState.value.heatmapTiles
+                    )
 
-                        currentState.copy(
-                            heatmapTiles = combinedTiles,
-                            isFetchingHeatmap = false
-                        )
+                    if (newTiles.isNotEmpty()) {
+                        val currentSize = newTiles.first().size
+
+                        _uiState.update { currentState ->
+                            val filteredOldTiles = currentState.heatmapTiles.filter {
+                                kotlin.math.abs(it.size - currentSize) < 0.0001
+                            }
+
+                            val combinedTiles = (newTiles + filteredOldTiles)
+                                .distinctBy {
+                                    String.format(java.util.Locale.US, "%.5f_%.5f", it.lat, it.lon)
+                                }
+                                .take(4000)  //Delete for entries longer
+
+                            currentState.copy(
+                                heatmapTiles = combinedTiles,
+                                currentTileSize = currentSize
+                            )
+                        }
                     }
-                } else {
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("T16_MapViewModel_Heat", "Error Calc Heatmap", e)
+                } finally {
                     _uiState.update { it.copy(isFetchingHeatmap = false) }
                 }
-            }catch(e: CancellationException){
-                throw e
-            } catch (e: Exception) {
-                Log.e("MapViewModel", "Error Calc Heatmap", e)
-            } finally {
-                _uiState.update { it.copy(isFetchingHeatmap = false) }
             }
         }
     }

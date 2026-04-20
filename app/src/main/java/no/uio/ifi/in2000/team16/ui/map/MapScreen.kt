@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.Gravity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import no.uio.ifi.in2000.team16.R
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -45,6 +44,8 @@ import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -83,7 +84,14 @@ fun MapScreen(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
-
+        if (uiState.isFetchingHeatmap) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -101,13 +109,21 @@ fun MapScreen(
                 onToggleHeatMap = {
                     mapView.getMapAsync { map ->
                         val bounds = map.projection.visibleRegion.latLngBounds
-                        val currentBox = BoundingBox(
-                            north = bounds.northEast.latitude,
-                            south = bounds.southWest.latitude,
-                            east = bounds.northEast.longitude,
-                            west = bounds.southWest.longitude
+                        val north = bounds.northEast.latitude
+                        val south = bounds.southWest.latitude
+                        val east = bounds.northEast.longitude
+                        val west = bounds.southWest.longitude
+
+                        val latDiff = north - south
+                        val lonDiff = east - west
+
+                        val expandedBounds = BoundingBox(
+                            north = north + (latDiff * 0.2),
+                            south = south - (latDiff * 0.2),
+                            east = east + (lonDiff * 0.4),
+                            west = west - (lonDiff * 0.4)
                         )
-                        viewModel.toggleHeatmap(currentBox)
+                        viewModel.toggleHeatmap(expandedBounds)
                     }
                 }
             )
@@ -145,7 +161,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             getMapAsync { map ->
                 mapRef = map
                 // The map now uses BASE from MapTiler, this can be changed
-                map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
+                map.setStyle("https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq") { style ->
                     // Logging to see what happens when the map is used
                     Log.d("MAP", "Style loaded: ${style.uri}")
 
@@ -199,10 +215,10 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                         val lonDiff = east - west
 
                         val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.5),
-                            south = south - (latDiff * 0.5),
-                            east = east + (lonDiff * 0.5),
-                            west = west - (lonDiff * 0.5)
+                            north = north + (latDiff * 0.2),
+                            south = south - (latDiff * 0.2),
+                            east = east + (lonDiff * 0.4),
+                            west = west - (lonDiff * 0.4)
                         )
 
                         viewModel.fetchHeatmapData(expandedBounds)
@@ -258,7 +274,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
                 val features = mutableListOf<Feature>()
 
                 val tilesToDraw = uiState.heatmapTiles.filter { tile ->
-                    tile.size <= (uiState.currentTileSize * 2.5)
+                    tile.size <= uiState.currentTileSize + 0.00001
                 }
 
                 for (tile in tilesToDraw) {

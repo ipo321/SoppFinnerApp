@@ -33,6 +33,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
     suspend operator fun invoke(
         bounds: BoundingBox,
         profile: SpeciesProfile,
+        existingTiles: List<HeatmapTile> = emptyList()
     ): List<HeatmapTile> = coroutineScope {
         Log.d("T16_UC_Heatmap", "Starting heatmap calculation for ${profile.taxKey}")
 
@@ -43,6 +44,18 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                 finalTiles = supervisorScope {
                     val step = getStepSize(bounds.north - bounds.south)
 
+                    //Make the grid to the resolution
+                    val gridPoints = generateGridPoints(bounds, step)
+                    val halfStep = step / 2.0
+                    val existingTileMap = existingTiles
+                        .filter { kotlin.math.abs(it.size - halfStep) < 0.0001 }
+                        .associateBy { String.format(java.util.Locale.US, "%.5f_%.5f", it.lat, it.lon) }
+
+                    val needsNewData = gridPoints.any { point ->
+                        val key = String.format(java.util.Locale.US, "%.5f_%.5f", point.lat, point.lon)
+                        existingTileMap[key] == null
+                    }
+
                     //Find center
                     val centerLat = (bounds.north + bounds.south) / 2
                     val centerLon = (bounds.east + bounds.west) / 2
@@ -50,9 +63,11 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     Log.d("T16_UC_Heatmap", "Fecthing data from center")
 
                     //Single calls
-                    val weatherDeferred = async { locationForecastRepository.weatherNext8Hours(centerLat, centerLon) }
-                    val occurrencesDeferred = async {
-                        withTimeoutOrNull(5000L){
+                    val weatherDeferred = if (needsNewData) {async { locationForecastRepository.weatherNext8Hours(centerLat, centerLon) }
+                    } else null
+
+                    val occurrencesDeferred = if (needsNewData) { async {
+                        withTimeoutOrNull(5000L) {
                             mushroomRepository.getMushroomInBoundingBox(
                                 north = bounds.north,
                                 south = bounds.south,
@@ -62,15 +77,14 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                             )
                         }
                     }
+                    } else null
 
-                    val weather = weatherDeferred.await()
-                    val allOccurrencesInBox = occurrencesDeferred.await()
+                    val weather = weatherDeferred?.await()
+                    val allOccurrencesInBox = occurrencesDeferred?.await()
 
                     val mushroomFindings = allOccurrencesInBox?.results?.size ?: 0
                     Log.d("T16_UC_Heatmap", "Found $mushroomFindings for ${profile.taxKey}")
 
-                    //Make the grid to the resolution
-                    val gridPoints = generateGridPoints(bounds, step)
 
                     //Starting with central ones
                     val sortedPoints = gridPoints.sortedBy { point ->
@@ -83,6 +97,13 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                     val heatmapJobs = sortedPoints.map { point ->
                         async(Dispatchers.Default) {
                             try {
+                                val key = String.format(java.util.Locale.US, "%.5f_%.5f", point.lat, point.lon)
+                                val cachedTile = existingTileMap[key]
+
+                                if (cachedTile != null) {
+                                    return@async HeatmapTile(point.lat, point.lon, cachedTile.score, step)
+                                }
+
                                 //Checking SAT-skog
                                 val forestData =
                                     forestRepository.getForestDataForHeatmap(point.lat, point.lon)
@@ -143,7 +164,6 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
 
                     // Making fake points for higher resolution
                     val finalTilesList = mutableListOf<HeatmapTile>()
-                    val halfStep = step / 2.0
 
                     val tileMap = originalTiles.associateBy {
                         String.format(java.util.Locale.US, "%.5f_%.5f", it.lat, it.lon)
