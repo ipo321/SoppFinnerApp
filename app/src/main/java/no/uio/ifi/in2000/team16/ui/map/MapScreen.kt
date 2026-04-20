@@ -165,7 +165,7 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
             getMapAsync { map ->
                 mapRef = map
-                    setMapLayout(map)
+                setMapLayout(map)
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
