@@ -6,7 +6,7 @@ import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 
-class AiAlgorithmV1 @Inject constructor(
+class AiAlgorithm @Inject constructor(
     private val aiRepository: AiService
 ) : MushroomScorer {
     override suspend fun calculateScore(

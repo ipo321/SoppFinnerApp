@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import org.maplibre.android.style.layers.Property.NONE
+import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
 import androidx.compose.foundation.lazy.items
 import android.util.Log
@@ -74,6 +76,11 @@ import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import org.maplibre.android.style.layers.RasterLayer
+import org.maplibre.android.style.sources.RasterSource
+import org.maplibre.android.style.sources.TileSet
 import org.maplibre.android.camera.CameraUpdateFactory
 
 /*
@@ -115,6 +122,17 @@ fun MapScreen(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
+
+      
+        if (uiState.isFetchingHeatmap) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        
         MapSearchBar(
             viewModel = viewModel,
             uiState = uiState,
@@ -123,6 +141,42 @@ fun MapScreen(
             textFieldState = searchTextFieldState,
             onSearch = { },
         )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top=25.dp,end=16.dp)
+                .wrapContentSize()
+        ) {
+            Dropdown(
+                onNavigateToDev = onNavigateToDev,
+                isHeatmapEnabled = uiState.isHeatmapEnabled,
+                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+                favoriteMushrooms = uiState.favoriteMushrooms,
+                selectedMushroom = uiState.selectedMushroom,
+                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
+                onToggleHeatMap = {
+                    mapView.getMapAsync { map ->
+                        val bounds = map.projection.visibleRegion.latLngBounds
+                        val north = bounds.northEast.latitude
+                        val south = bounds.southWest.latitude
+                        val east = bounds.northEast.longitude
+                        val west = bounds.southWest.longitude
+
+                        val latDiff = north - south
+                        val lonDiff = east - west
+
+                        val expandedBounds = BoundingBox(
+                            north = north + (latDiff * 0.2),
+                            south = south - (latDiff * 0.2),
+                            east = east + (lonDiff * 0.4),
+                            west = west - (lonDiff * 0.4)
+                        )
+                        viewModel.toggleHeatmap(expandedBounds)
+                    }
+                }
+            )
+        }
 
         when (uiState.screenStatus) {
             is ScreenStatus.Success -> {
@@ -299,19 +353,7 @@ fun getMapView(
 
             getMapAsync { map ->
                 mapRef = map
-                // The map now uses BASE from MapTiler, this can be changed
-                map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
-                    // Logging to see what happens when the map is used
-                    Log.d("MAP", "Style loaded: ${style.uri}")
-
-                    setMapLayout(map)
-
-                    //HEATMAP løsning
-                    setupHeatmapLayer(style)    // Makes the heatmap layer
-                    setupHistoricalFindsLayer(style)
-                    setupPointMarker(style) // Makes the marker for clicked point
-                    // MAP
-                    // Makes the map clickable
+                setMapLayout(map)
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
@@ -355,16 +397,39 @@ fun getMapView(
                         val lonDiff = east - west
 
                         val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.5),
-                            south = south - (latDiff * 0.5),
-                            east = east + (lonDiff * 0.5),
-                            west = west - (lonDiff * 0.5)
+                            north = north + (latDiff * 0.2),
+                            south = south - (latDiff * 0.2),
+                            east = east + (lonDiff * 0.4),
+                            west = west - (lonDiff * 0.4)
                         )
 
                         viewModel.fetchHeatmapData(expandedBounds)
                     }
                 }
             }
+        }
+    LaunchedEffect(uiState.isSatelliteMode, mapRef) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        val styleUrl = if (uiState.isSatelliteMode)
+                "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
+            else
+                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+
+        currentMap.setStyle(styleUrl) { style ->
+            Log.d("T16_MAP", "Style loaded: ${style.uri}")
+            setupHeatmapLayer(style)
+            setupHistoricalFindsLayer(style)
+            setupForestLayer(style, uiState.showWmsForest)
+            setupPointMarker(style)
+        }
+    }
+    // WMS
+    LaunchedEffect(uiState.showWmsForest, mapRef) {
+        mapRef?.getStyle { style ->
+            style.getLayer("satskog-layer")?.setProperties(
+                visibility(if (uiState.showWmsForest) VISIBLE else NONE)
+            )
         }
     }
     // Update pin where clicked with each new click
@@ -392,6 +457,8 @@ fun getMapView(
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val finds = uiState.currentContext?.historicalFinds ?: emptyList()
+
+
 
         val features = finds
             .filter { it.decimalLatitude != null && it.decimalLongitude != null }
@@ -429,20 +496,19 @@ fun getMapView(
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
 
-                val lons = uiState.heatmapTiles.map { it.lon }.distinct().sorted()
-                val lats = uiState.heatmapTiles.map { it.lat }.distinct().sorted()
+                val tilesToDraw = uiState.heatmapTiles.filter { tile ->
+                    tile.size <= uiState.currentTileSize + 0.00001
+                }
 
-                val lonStep = lons.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-                val latStep = lats.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-
-                for (tile in uiState.heatmapTiles) {
+                for (tile in tilesToDraw) {
+                    val halfSize = tile.size / 2.0
 
                     val polygonPoints = listOf(
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2))
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize)
                     )
 
                     val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
@@ -551,20 +617,9 @@ private fun setupHeatmapLayer(style: Style) {
         fillOpacity(0.5f)
     )
 
-    // Putting layer bellow roads and buildings
-    var insertBelowLayerId: String? = null
-    //style.addLayer(heatmapLayer)
 
-    for (layer in style.layers) {
-        val id = layer.id.lowercase()
-        if (id.contains("water") || id.contains("road") || id.contains("building") || layer is SymbolLayer) {
-            insertBelowLayerId = layer.id
-            break
-        }
-    }
-
-    if (insertBelowLayerId != null) {
-        style.addLayerBelow(fillLayer, insertBelowLayerId)
+    if (style.getLayer("Sand") != null) {
+        style.addLayerBelow(fillLayer, "Sand")
     } else {
         style.addLayer(fillLayer)
     }
@@ -582,6 +637,33 @@ private fun setupHistoricalFindsLayer(style: Style) {
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(circleLayer)
+}
+
+private fun setupForestLayer(style: Style, isVisible: Boolean) {
+    val satskogUrl = "https://wms.nibio.no/cgi-bin/satskog" +
+            "?SERVICE=WMS" +
+            "&VERSION=1.3.0" +
+            "&REQUEST=GetMap" +
+            "&LAYERS=Dominerende_treslag" +
+            "&CRS=EPSG:3857" +
+            "&BBOX={bbox-epsg-3857}" +
+            "&WIDTH=256" +
+            "&HEIGHT=256" +
+            "&FORMAT=image/png" +
+            "&TRANSPARENT=TRUE"
+
+    val wmsSource = RasterSource(
+        "satskog-source",
+        TileSet("2.1.0", satskogUrl),
+        256
+    )
+    style.addSource(wmsSource)
+    val wmsLayer = RasterLayer("satskog-layer", "satskog-source")
+    wmsLayer.setProperties(
+        rasterOpacity(0.2f),
+        visibility(if (isVisible) VISIBLE else NONE)
+    )
+    style.addLayer(wmsLayer)
 }
 
 private fun setupPointMarker(style: Style) {

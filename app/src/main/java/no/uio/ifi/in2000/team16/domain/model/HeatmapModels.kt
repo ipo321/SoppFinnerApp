@@ -12,7 +12,8 @@ data class BoundingBox(
 data class HeatmapTile(
     val lat: Double,
     val lon: Double,
-    val score: Int
+    val score: Int,
+    val size: Double
 )
 
 data class GridPoint(

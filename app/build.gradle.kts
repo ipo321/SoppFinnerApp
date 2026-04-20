@@ -125,18 +125,17 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
     //Room-database
-
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-
-    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-    // See Add the KSP plugin to your project
-    ksp("androidx.room:room-compiler:$room_version")
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 
     // Testing
     testImplementation("io.mockk:mockk:1.14.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
+
+    //ONNX
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.1")
 
 }
 
