@@ -141,42 +141,6 @@ fun MapScreen(
             textFieldState = searchTextFieldState,
             onSearch = { },
         )
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(top=25.dp,end=16.dp)
-                .wrapContentSize()
-        ) {
-            Dropdown(
-                onNavigateToDev = onNavigateToDev,
-                isHeatmapEnabled = uiState.isHeatmapEnabled,
-                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-                favoriteMushrooms = uiState.favoriteMushrooms,
-                selectedMushroom = uiState.selectedMushroom,
-                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
-                onToggleHeatMap = {
-                    mapView.getMapAsync { map ->
-                        val bounds = map.projection.visibleRegion.latLngBounds
-                        val north = bounds.northEast.latitude
-                        val south = bounds.southWest.latitude
-                        val east = bounds.northEast.longitude
-                        val west = bounds.southWest.longitude
-
-                        val latDiff = north - south
-                        val lonDiff = east - west
-
-                        val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.2),
-                            south = south - (latDiff * 0.2),
-                            east = east + (lonDiff * 0.4),
-                            west = west - (lonDiff * 0.4)
-                        )
-                        viewModel.toggleHeatmap(expandedBounds)
-                    }
-                }
-            )
-        }
 
         when (uiState.screenStatus) {
             is ScreenStatus.Success -> {
