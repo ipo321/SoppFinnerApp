@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -37,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,16 +62,19 @@ import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
+import kotlinx.coroutines.Job
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
+import org.maplibre.android.camera.CameraUpdateFactory
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -90,6 +95,11 @@ fun MapScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val queryText by remember { mutableStateOf("") }
+    val currentJob = remember { mutableStateOf<Job?>(null) }
+
     val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsState()
     val searchTextFieldState = rememberTextFieldState()
@@ -114,34 +124,6 @@ fun MapScreen(
             onSearch = { },
             searchResults = listOf()
         )
-//        Box(
-//            modifier = Modifier
-//                .align(Alignment.TopEnd)
-//                .padding(top=25.dp,end=16.dp)
-//                .wrapContentSize()
-//        ) {
-//            Dropdown(
-//                onNavigateToDev = onNavigateToDev,
-//                isHeatmapEnabled = uiState.isHeatmapEnabled,
-//                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-//                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-//                favoriteMushrooms = uiState.favoriteMushrooms,
-//                selectedMushroom = uiState.selectedMushroom,
-//                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
-//                onToggleHeatMap = {
-//                    mapView.getMapAsync { map ->
-//                        val bounds = map.projection.visibleRegion.latLngBounds
-//                        val currentBox = BoundingBox(
-//                            north = bounds.northEast.latitude,
-//                            south = bounds.southWest.latitude,
-//                            east = bounds.northEast.longitude,
-//                            west = bounds.southWest.longitude
-//                        )
-//                        viewModel.toggleHeatmap(currentBox)
-//                    }
-//                }
-//            )
-       // }
 
         when (uiState.screenStatus) {
             is ScreenStatus.Success -> {
@@ -190,48 +172,33 @@ fun MapSearchBar(
             inputField = {
                 SearchBarDefaults.InputField(
                     query = textFieldState.text.toString(),
-                    onQueryChange = { textFieldState.edit { replace(0, length, it) } },
-                    onSearch = {
+                    onQueryChange = {
+                        textFieldState.edit { replace(0, length, it) }
+                        viewModel.onSearchQueryChanged(it) // Collects suggestions while typing
+                    },
+                    onSearch = { query ->
+                        viewModel.searchAddress(query) { lat, lon ->
+                            mapView.getMapAsync { map ->
+                                map.animateCamera(
+                                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15.0)
+                                )
+                            }
+                        }
                         onSearch(textFieldState.text.toString())
                         searchExpanded = false // closes when search is entered/completed
                     },
                     expanded = searchExpanded,
                     onExpandedChange = { searchExpanded = it },
                     placeholder = { Text("Søk i kartet") },
-                    leadingIcon = {
-                        Box {
-                            IconButton(onClick = { menuExpanded = !menuExpanded }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu")
-                            }
-                            Dropdown(
-                                expanded = menuExpanded,
-                                onDismissRequest = { menuExpanded = false },
-                                onNavigateToDev = onNavigateToDev,
-                                isHeatmapEnabled = uiState.isHeatmapEnabled,
-                                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-                                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-                                favoriteMushrooms = uiState.favoriteMushrooms,
-                                selectedMushroom = uiState.selectedMushroom,
-                                onMushroomSelected = { mushroom ->
-                                    viewModel.onMushroomSelected(
-                                        mushroom
-                                    )
-                                },
-                                onToggleHeatMap = {
-                                    mapView.getMapAsync { map ->
-                                        val bounds = map.projection.visibleRegion.latLngBounds
-                                        val currentBox = BoundingBox(
-                                            north = bounds.northEast.latitude,
-                                            south = bounds.southWest.latitude,
-                                            east = bounds.northEast.longitude,
-                                            west = bounds.southWest.longitude
-                                        )
-                                        viewModel.toggleHeatmap(currentBox)
-                                    }
-                                }
-                            )
-                        }
-                    },
+                    leadingIcon = { MapMenu(
+                        viewModel = viewModel,
+                        uiState = uiState,
+                        mapView = mapView,
+                        menuExpanded = menuExpanded,
+                        onClick = { menuExpanded = !menuExpanded },
+                        onDismissRequest = { menuExpanded = false },
+                        onNavigateToDev = onNavigateToDev
+                    ) },
                     trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color(0xFFEDFEED),
@@ -245,16 +212,25 @@ fun MapSearchBar(
         ) {
             // Displays search results in a scrollable column
             LazyColumn {
-                items(count = searchResults.size) { index ->
-                    val result = searchResults[index]
+                items(uiState.addressSuggestions) { suggestion ->
                     ListItem(
-                        headlineContent = { Text(result) },
-                        supportingContent = supportingContent?.let { { it(result) } },
-                        leadingContent = leadingContent,
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        headlineContent = { Text(suggestion.text) },
+//                        supportingContent = supportingContent?.let { { it(result) } },
+//                        leadingContent = leadingContent,
+//                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier
                             .clickable { // each item is clickable
-                                textFieldState.edit { replace(0, length, result) }
+                                viewModel.searchAddress(suggestion.text) { lat, lon ->
+                                    mapView.getMapAsync { map ->
+                                        map.animateCamera(
+                                            CameraUpdateFactory.newLatLngZoom(
+                                                LatLng(lat, lon), 15.0 // 15 is how close we want the zoom after searching
+                                            )
+                                        )
+                                    }
+                                }
+                                // updates the searchbar text
+                                textFieldState.edit { replace(0, length, suggestion.text) }
                                 searchExpanded = false
                             }
                             .fillMaxWidth()
@@ -263,6 +239,51 @@ fun MapSearchBar(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MapMenu(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    mapView: MapView,
+    menuExpanded: Boolean,
+    onClick: () -> Unit,
+    onDismissRequest: () -> Unit,
+    onNavigateToDev: () -> Unit,
+
+) {
+    Box {
+        IconButton(onClick = onClick) {
+            Icon(Icons.Default.Menu, contentDescription = "Menu")
+        }
+        Dropdown(
+            expanded = menuExpanded,
+            onDismissRequest = onDismissRequest,
+            onNavigateToDev = onNavigateToDev,
+            isHeatmapEnabled = uiState.isHeatmapEnabled,
+            isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+            onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+            favoriteMushrooms = uiState.favoriteMushrooms,
+            selectedMushroom = uiState.selectedMushroom,
+            onMushroomSelected = { mushroom ->
+                viewModel.onMushroomSelected(
+                    mushroom
+                )
+            },
+            onToggleHeatMap = {
+                mapView.getMapAsync { map ->
+                    val bounds = map.projection.visibleRegion.latLngBounds
+                    val currentBox = BoundingBox(
+                        north = bounds.northEast.latitude,
+                        south = bounds.southWest.latitude,
+                        east = bounds.northEast.longitude,
+                        west = bounds.southWest.longitude
+                    )
+                    viewModel.toggleHeatmap(currentBox)
+                }
+            }
+        )
     }
 }
 

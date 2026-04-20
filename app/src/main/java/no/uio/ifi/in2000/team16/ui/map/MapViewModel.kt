@@ -21,10 +21,13 @@ import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
+import no.uio.ifi.in2000.team16.data.arcGIS.ArcGISRepository
+import no.uio.ifi.in2000.team16.data.arcGIS.Suggestion
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
+    private val arcGISRepository: ArcGISRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
     private val scorerProvider: ScorerProvider
@@ -33,6 +36,7 @@ class MapViewModel @Inject constructor(
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
 
     private var heatmapJob: Job? = null // cancel old calculations
+    private var searchJob: Job? = null // cancel old searches
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
 
     init{
@@ -155,23 +159,41 @@ class MapViewModel @Inject constructor(
         println("Søker etter: ${_uiState.value.searchQuery}")
     }
 
+    // Method for searching for a location the user typed in the search bar
+    fun searchAddress(query: String, onLocationFound: (lat: Double, lon: Double) -> Unit) {
+        viewModelScope.launch {
+            val location = arcGISRepository.getLocationCoordinates(query)
+            if (location != null) {
+                onLocationFound(location.lat, location.lon)
+            }
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        searchJob?.cancel() // Cancels ongoing search when search is updated
+        searchJob = viewModelScope.launch { // Starts new search
+            val suggestions = arcGISRepository.getSuggestions(query)
+            _uiState.update { it.copy(addressSuggestions = suggestions) }
+        }
+    }
+
 }
-
-
-    data class MapScreenState(
-        val screenStatus: ScreenStatus = ScreenStatus.Idle,
-        val selectedMushroom: Mushroom? = null,
-        val currentContext: EnvironmentContext? = null,
-        val evaluation: EvaluationResult? = null,
-        val favoriteMushrooms: List<Mushroom> = emptyList(),
-        val isHeatmapEnabled: Boolean = false,
-        val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
-        val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false,
-        val lastClickedLat: Double? = null,
-        val lastClickedLon: Double? = null
-    )
+data class MapScreenState(
+    val screenStatus: ScreenStatus = ScreenStatus.Idle,
+    val selectedMushroom: Mushroom? = null,
+    val currentContext: EnvironmentContext? = null,
+    val evaluation: EvaluationResult? = null,
+    val favoriteMushrooms: List<Mushroom> = emptyList(),
+    val isHeatmapEnabled: Boolean = false,
+    val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
+    val isFetchingHeatmap: Boolean = false,
+    val searchQuery: String = "",
+    val isHistoricalFindsEnabled: Boolean = false,
+    val lastClickedLat: Double? = null,
+    val lastClickedLon: Double? = null,
+    val addressSuggestions: List<Suggestion> = emptyList()
+)
 
 sealed class ScreenStatus{
     object Idle : ScreenStatus()

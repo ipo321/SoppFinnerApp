@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.FlashlightOff
 import androidx.compose.material.icons.outlined.FlashlightOn
@@ -109,7 +110,8 @@ fun Dropdown(
                     onClick = {
                         onMushroomSelected(mushroom)
                         onDismissRequest()
-                    }
+                    },
+                    trailingIcon = { if (isSelected) Icon(Icons.Outlined.Check, contentDescription = "Check") }
                 )
             }
         }
