@@ -37,16 +37,12 @@ class MushroomRepository @Inject constructor(
     }
 
 
-
-
-
-
-    //returns a OccurrenceResult object witch a list of the occurenses inside a radius.
+    //returns a OccurrenceResult object witch a list of the occurrences and a count inside a radius.
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
         radiusKm: Double = 3.0,
-        mushRoomType: String,
+        mushRoomType: String = "no Mushroom",
         //limit: Int = 50
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
@@ -56,7 +52,7 @@ class MushroomRepository @Inject constructor(
         val latMax = lat + latOffset
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
-
+        //makes mushroomType into an int that can be used in the local data source
         val localSpeciesId = LocalSpeciesIdMapper.fromName(mushRoomType)
 
         return localMushroomDataSource.getOccurrencesInBoundingBox(

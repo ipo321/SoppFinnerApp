@@ -96,7 +96,7 @@ class SpeciesDataSource @Inject constructor(){
         Mushroom(
             commonName = "Kantarell",
             latinName = "Cantharellus cibarius",
-            imageRes = R.drawable.chanterelle,
+            imageRes = R.drawable.cantharelluscibarius,
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -106,7 +106,7 @@ class SpeciesDataSource @Inject constructor(){
         Mushroom(
             commonName = "Steinsopp",
             latinName = "Boletus edulis",
-            imageRes = R.drawable.rockfungus,
+            imageRes = R.drawable.boletusreticulatus,
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -116,13 +116,94 @@ class SpeciesDataSource @Inject constructor(){
         Mushroom(
             commonName = "Skarlagens vårbeger",
             latinName = "Sarcoscypha austriaca",
-            imageRes = R.drawable.rockfungus,
+            imageRes = R.drawable.sarcoscyphaaustriaca,
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
             profile = allSpeciesProfiles.find { it.name == "Skarlagens vårbeger" }!!
+        ),
+        Mushroom(
+            commonName = "Traktkantarel",
+            latinName = "Craterellus tubaeformis",
+            imageRes = R.drawable.funnelchanterell,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+           profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Blek piggsopp",
+            latinName = "Hydnum repandum",
+            imageRes = R.drawable.hedgehog,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Fåresopp",
+            latinName = "albatrellus ovinus",
+            imageRes = R.drawable.sheepfungus,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Granmatriske",
+            latinName = "Lactarius deterrimus",
+            imageRes = R.drawable.gramatriske,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Rødskrubb",
+            latinName = "Leccinum versipelle",
+            imageRes = R.drawable.versipelle,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Brunskrubb",
+            latinName = "Leccinum scabrum",
+            imageRes = R.drawable.scabrum,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Matblekksopp",
+            latinName = "Coprinus comatus",
+            imageRes = R.drawable.coprinuscomatus,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+        ),
+        Mushroom(
+            commonName = "Svart trompetsopp",
+            latinName = "Craterellus cornucopioides",
+            imageRes = R.drawable.craterelluscornucopioides,
+            properties = listOf(
+                MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
+                MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
+            ),
+            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
         )
+
     )
 
     fun getAllMushrooms(): List<Mushroom> {

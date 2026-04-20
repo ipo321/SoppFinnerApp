@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +9,15 @@ plugins {
     alias(libs.plugins.hilt)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
+
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        load(localFile.inputStream())
+    }
+}
+
+val arcgisApiKey: String = localProperties.getProperty("ARCGIS_API_KEY", "")
 
 android {
     namespace = "no.uio.ifi.in2000.team16"
@@ -20,6 +31,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "ARCGIS_API_KEY", "\"$arcgisApiKey\"")
     }
 
     buildTypes {
