@@ -11,7 +11,7 @@ class AddressRepository @Inject constructor(
             val response = addressDataSource.suggest(query)
             response.firstOrNull()
         } catch (e: Exception) {
-            Log.e("ArcGISDataSource", "Error in geocode: ${e.message}")
+            Log.e("AddressDataSource", "Error in geocode: ${e.message}")
             null
         }
     }

@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.content.Context
+import androidx.compose.foundation.lazy.items
 import android.util.Log
 import android.view.Gravity
 import androidx.compose.foundation.clickable
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -122,7 +122,6 @@ fun MapScreen(
             onNavigateToDev = onNavigateToDev,
             textFieldState = searchTextFieldState,
             onSearch = { },
-            searchResults = listOf()
         )
 
         when (uiState.screenStatus) {
@@ -152,10 +151,7 @@ fun MapSearchBar(
     onNavigateToDev: () -> Unit,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
-    searchResults: List<String>,
     modifier: Modifier = Modifier,
-    supportingContent: (@Composable (String) -> Unit)? = null,
-    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -175,6 +171,7 @@ fun MapSearchBar(
                     onQueryChange = {
                         textFieldState.edit { replace(0, length, it) }
                         viewModel.onSearchQueryChanged(it) // Collects suggestions while typing
+                        searchExpanded = true
                     },
                     onSearch = { query ->
                         viewModel.searchAddressByText(query) { lat, lon ->
@@ -211,14 +208,13 @@ fun MapSearchBar(
             onExpandedChange = { searchExpanded = it },
         ) {
             // Displays search results in a scrollable column
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 items(uiState.addressSuggestions) { suggestion ->
                     ListItem(
                         headlineContent = { Text("${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}") },
-//                        supportingContent = supportingContent?.let { { it(result) } },
-//                        leadingContent = leadingContent,
 //                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         modifier = Modifier
+                            .fillMaxWidth()
                             .clickable { // each item is clickable
                                 viewModel.searchAddress(suggestion) { lat, lon ->
                                     mapView.getMapAsync { map ->
@@ -228,14 +224,14 @@ fun MapSearchBar(
                                             )
                                         )
                                     }
+                                    viewModel.onMapClicked(lat, lon)
                                 }
                                 // updates the searchbar text
                                 val text = "${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}"
                                 textFieldState.edit { replace(0, length, text) }
                                 searchExpanded = false
                             }
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            //.padding(horizontal = 16.dp, vertical = 4.dp)
                     )
                 }
             }

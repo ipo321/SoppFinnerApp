@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class AddressDataSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
-    private val baseUrl = "https://ws.geonorge.no/adresser/v1/"
+    private val baseUrl = "https://ws.geonorge.no/adresser/v1"
 
     // Searches while user is writing
     suspend fun suggest(query: String): List<Address> {
@@ -28,7 +28,7 @@ class AddressDataSource @Inject constructor(
             }.body()
             response.adresser
         } catch (e: Exception) {
-            Log.e("ArcGISDataSource", "Error in suggest: ${e.message}")
+            Log.e("AddressDataSource", "Error in suggest: ${e.message}")
             emptyList()
         }
     }

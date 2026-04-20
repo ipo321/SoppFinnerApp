@@ -22,15 +22,12 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import no.uio.ifi.in2000.team16.data.arcGIS.ArcGISRepository
-import no.uio.ifi.in2000.team16.data.arcGIS.Suggestion
 import no.uio.ifi.in2000.team16.data.kartverket.Address
 import no.uio.ifi.in2000.team16.data.kartverket.AddressRepository
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
-    //private val arcGISRepository: ArcGISRepository,
     private val addressRepository: AddressRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
@@ -198,13 +195,12 @@ data class MapScreenState(
     val evaluation: EvaluationResult? = null,
     val favoriteMushrooms: List<Mushroom> = emptyList(),
     val isHeatmapEnabled: Boolean = false,
-    val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
+    val heatmapTiles: List<HeatmapTile> = emptyList(),
     val isFetchingHeatmap: Boolean = false,
     val searchQuery: String = "",
     val isHistoricalFindsEnabled: Boolean = false,
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
-    //val addressSuggestions: List<Suggestion> = emptyList()
     val addressSuggestions: List<Address> = emptyList()
 )
 
