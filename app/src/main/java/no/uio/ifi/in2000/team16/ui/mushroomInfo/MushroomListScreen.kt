@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team16.ui.mushroomInfo
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,7 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,14 +53,14 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF426914))
+            .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp)
     ){
         //topText
         Text(
             text = "Soppsiden",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -66,9 +68,8 @@ fun MushroomListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF426914))
-                .padding(24.dp)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             mushrooms.forEach { mushroom ->
                 MushroomListItem(
@@ -80,7 +81,6 @@ fun MushroomListScreen(
                         navigateToMushroom()
                     }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
@@ -98,7 +98,8 @@ fun MushroomListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF8DC2EA))
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(12.dp)
             .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
@@ -106,24 +107,30 @@ fun MushroomListItem(
         Image(
             painter = painterResource(id = mushroom.imageRes),
             contentDescription = mushroom.commonName,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
         )
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)){
-            Text(mushroom.commonName, fontWeight = FontWeight.Bold)
             Text(
-                mushroom.latinName,
-                fontSize = 12.sp,
-                fontStyle = FontStyle.Italic
+                text = mushroom.commonName,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = mushroom.latinName,
+                style = MaterialTheme.typography.labelMedium,
+                fontStyle = FontStyle.Italic,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         IconButton(onClick = { viewModel.toggleFavorite(mushroom) }){
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
             contentDescription = "is favorite",
-            tint = if (isFavorite) Color(0xFFD94F4F) else Color.Gray,
+            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
             modifier = Modifier.size(18.dp)
         )
         }

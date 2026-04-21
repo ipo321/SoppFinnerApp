@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -55,7 +56,8 @@ fun BottomNavigationBar(
     }
 
     NavigationBar(
-        containerColor = Color(0xFFEDFEED)
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp
     ) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -68,7 +70,7 @@ fun BottomNavigationBar(
                         }
                         launchSingleTop = true
                         restoreState = true }
-                          },
+                },
                 icon = {
                     Icon(
                         painter = item.icon,
@@ -79,16 +81,16 @@ fun BottomNavigationBar(
                 label = {
                     Text(
                         text = item.title,
-                        color = if (index == selectedNavigationIndex) {
-                            Color.Black
-                        } else {
-                            Color.Gray
-                        }
+                        style = MaterialTheme.typography.labelSmall
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1E1E1E),
-                    indicatorColor = Color(0xFFD4E6CC)
+                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             )
         }

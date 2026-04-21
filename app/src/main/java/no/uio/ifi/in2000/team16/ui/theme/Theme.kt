@@ -11,48 +11,79 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
+
+    //Primary
     primary = DarkPrimary,
     onPrimary = DarkPrimaryContainer,
     primaryContainer = DarkPrimaryContainer,
     onPrimaryContainer = DarkPrimary,
+
+    //Secondary
     secondary = DarkSecondary,
     secondaryContainer = DarkPrimary,
     onSecondaryContainer = DarkBackground,
+
+    // The base layer of the app
     background = DarkBackground,
     surface = DarkSurface,
     onSurface = DarkOnSurface,
-    surfaceContainerLowest = DarkSurfaceContainerLowest,
-    surfaceContainerLow = DarkSurfaceContainerLow,
-    surfaceContainer = DarkSurfaceContainerNormal,
-    surfaceContainerHigh = DarkSurfaceContainerHigh,
-    surfaceContainerHighest = DarkSurfaceContainerHighest,
-    outlineVariant = DarkOutlineVariant,
+
+    // Tonal Hierarchy: Use these to create depth and stacked layers without using lines
+    surfaceContainerLowest = DarkSurfaceContainerLowest, // Deepest layer
+    surfaceContainerLow = DarkSurfaceContainerLow, // Main section containers
+    surfaceContainer = DarkSurfaceContainerNormal, // Standard component backgrounds
+    surfaceContainerHigh = DarkSurfaceContainerHigh, // Elevated cards or nested importance
+    surfaceContainerHighest = DarkSurfaceContainerHighest, // Top-level headers or input fields
+
+    // Editorial accents and descriptive hierarchies
+    surfaceVariant = DarkSurfaceContainerHigh, // Used for glass effects (apply opacity in UI)
+    onSurfaceVariant = DarkOnSurface,
+
+    // Outlines and accessibility
+    outlineVariant = DarkOutlineVariant, //"Ghost Borders"
+
+    //toxic/hazardous warnings
     error = DangerError,
     errorContainer = ErrorContainer,
     onErrorContainer = OnErrorContainer
 )
 
 private val LightColorScheme = lightColorScheme(
+
+    //Primary
     primary = PrimaryGreen,
     onPrimary = SurfaceCream,
     primaryContainer = PrimaryContainer,
     onPrimaryContainer = SurfaceCream,
+
+    //Secondary
+    secondary = PrimaryFixed,
     secondaryContainer = PrimaryFixed,
     onSecondaryContainer = OnSurfaceDark,
+
+    // The base layer of the app
     background = SurfaceCream,
     surface = SurfaceCream,
     onSurface = OnSurfaceDark,
+
+    // Tonal Hierarchy: Use these to create depth and stacked layers without using lines
     surfaceContainerLowest = SurfaceContainerLowest,
     surfaceContainerLow = SurfaceContainerLow,
     surfaceContainer = SurfaceContainerNormal,
     surfaceContainerHigh = SurfaceContainerHigh,
     surfaceContainerHighest = SurfaceContainerHighest,
+
+    // Editorial accents and descriptive hierarchies
+    surfaceVariant = SurfaceContainerHigh,
+    onSurfaceVariant = OnSurfaceDark,
+
+    // Outlines and accessibility
+    outlineVariant = OutlineVariantLight, //"Ghost Borders"
+
+    //toxic/hazardous warnings
     error = DangerError,
     errorContainer = ErrorContainer,
-    onErrorContainer = OnErrorContainer,
-    surfaceVariant = SurfaceContainerHigh,
-    outlineVariant = OutlineVariantLight,
-    onSurfaceVariant = OnSurfaceDark
+    onErrorContainer = OnErrorContainer
 )
 
 @Composable
