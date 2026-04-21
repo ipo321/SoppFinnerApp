@@ -5,6 +5,8 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 
+
+//Overlays the screen with a networkScreen of SoppPortal
 @Composable
 fun ShroomControlScreen(){
 
