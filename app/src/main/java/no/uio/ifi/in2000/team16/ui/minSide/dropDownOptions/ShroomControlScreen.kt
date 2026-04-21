@@ -18,49 +18,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
-/*
-@Composable
-fun ShroomControlScreen(
-    navController: NavController,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
-
-){
-    //Test to so if its loading in the terminal:
-    println("ShroomControlScreen loaded")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFD4E6CC))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box{
-            Text("This is the ShroomControlScreen")
-        }
-
-        Box {
-            Button(
-                onClick = {
-                    navController
-                }
-            ) {
-                Text("Go Back")
-            }
-        }
-
-        Box {
-            Button(
-                onClick = {
-                    navController.popBackStack()
-                }
-            ) {
-                Text("Go Back")
-            }
-        }
-    }
-}
-*/
-
 @Composable
 fun ShroomControlScreen(){
 
@@ -68,7 +25,7 @@ fun ShroomControlScreen(){
         WebView(context).apply {
             webViewClient = WebViewClient()
             settings.javaScriptEnabled = true
-            loadUrl("https://soppkontroll.no/")
+            loadUrl("https://app.soppkontroll.no/")
         }
     })
 }
