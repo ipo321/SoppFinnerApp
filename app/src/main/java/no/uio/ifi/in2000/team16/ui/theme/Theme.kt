@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -10,21 +9,24 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import no.uio.ifi.in2000.team16.ui.theme.DangerError
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
     onPrimary = DarkPrimaryContainer,
     primaryContainer = DarkPrimaryContainer,
     onPrimaryContainer = DarkPrimary,
-
+    secondary = DarkSecondary,
     secondaryContainer = DarkPrimary,
     onSecondaryContainer = DarkBackground,
-
     background = DarkBackground,
     surface = DarkSurface,
     onSurface = DarkOnSurface,
-
+    surfaceContainerLowest = DarkSurfaceContainerLowest,
+    surfaceContainerLow = DarkSurfaceContainerLow,
+    surfaceContainer = DarkSurfaceContainerNormal,
+    surfaceContainerHigh = DarkSurfaceContainerHigh,
+    surfaceContainerHighest = DarkSurfaceContainerHighest,
+    outlineVariant = DarkOutlineVariant,
     error = DangerError,
     errorContainer = ErrorContainer,
     onErrorContainer = OnErrorContainer
@@ -33,26 +35,29 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryGreen,
     onPrimary = SurfaceCream,
-
     primaryContainer = PrimaryContainer,
     onPrimaryContainer = SurfaceCream,
-
     secondaryContainer = PrimaryFixed,
     onSecondaryContainer = OnSurfaceDark,
-
     background = SurfaceCream,
     surface = SurfaceCream,
     onSurface = OnSurfaceDark,
-
+    surfaceContainerLowest = SurfaceContainerLowest,
+    surfaceContainerLow = SurfaceContainerLow,
+    surfaceContainer = SurfaceContainerNormal,
+    surfaceContainerHigh = SurfaceContainerHigh,
+    surfaceContainerHighest = SurfaceContainerHighest,
     error = DangerError,
     errorContainer = ErrorContainer,
-    onErrorContainer = OnErrorContainer
+    onErrorContainer = OnErrorContainer,
+    surfaceVariant = SurfaceContainerHigh,
+    outlineVariant = OutlineVariantLight,
+    onSurfaceVariant = OnSurfaceDark
 )
 
 @Composable
 fun Team16Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -69,6 +74,7 @@ fun Team16Theme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
+        shapes = Shapes
     )
 }

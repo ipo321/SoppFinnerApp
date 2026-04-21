@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team16.ui.map
 import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.lazy.items
 import android.util.Log
 import android.view.Gravity
@@ -378,7 +379,10 @@ fun getMapView(
         val styleUrl = if (uiState.isSatelliteMode)
                 "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
-                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+                if(isDarkMode(context))
+                    "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
+                else
+                    "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
 
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
@@ -642,4 +646,9 @@ private fun setupPointMarker(style: Style) {
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(circleLayer)
+}
+
+fun isDarkMode(context: Context): Boolean {
+    val darkModeFlag = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return darkModeFlag == Configuration.UI_MODE_NIGHT_YES
 }

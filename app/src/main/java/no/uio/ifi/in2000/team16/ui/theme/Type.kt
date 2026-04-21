@@ -39,14 +39,14 @@ val Typography = Typography(
 
     //Normal text
     bodyLarge = TextStyle(
-        fontFamily = EditorialSerif,
+        fontFamily = CleanSans,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = EditorialSerif,
+        fontFamily = CleanSans,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
