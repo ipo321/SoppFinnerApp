@@ -22,9 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.ui.navigation.SHROOMCONTROL_SCREEN
 
 
-    @Composable
+@Composable
     fun ProfileScreen(
         navController: NavController,
         viewModel: ProfileScreenViewModel = hiltViewModel()
@@ -79,7 +80,7 @@ import androidx.navigation.NavController
                     DropdownMenuItem(
                         text = {Text("Mine soppsteder")},
                         onClick = {
-                            navController.navigate("profileScreen/shroomSpots")
+                            navController.navigate(SHROOMCONTROL_SCREEN)
                             expanded = false
                         }
                     )
@@ -93,7 +94,7 @@ import androidx.navigation.NavController
                     DropdownMenuItem(
                         text = {Text("Digital Soppkontroll")},
                         onClick = {
-                            navController.navigate("profileScreen/shroomControll")
+                            navController.navigate("profileScreen/shroomControl")
                             expanded = false
                         }
                     )

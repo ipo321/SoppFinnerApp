@@ -35,6 +35,12 @@ android {
         buildConfigField("String", "ARCGIS_API_KEY", "\"$arcgisApiKey\"")
     }
 
+        packaging {
+            jniLibs {
+                useLegacyPackaging = false
+            }
+        }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -135,7 +141,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.0.21")
 
     //ONNX
-    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.1")
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.24.3")
 
 }
 

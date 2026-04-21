@@ -160,7 +160,8 @@ fun MapSearchBar(
 
     Box(
         modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight(Alignment.Top)
             .semantics { isTraversalGroup = true }
     ) {
         SearchBar(
