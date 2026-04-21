@@ -570,15 +570,15 @@ private fun setupHeatmapLayer(style: Style) {
         fillColor(
             interpolate(
                 linear(), get("score"),
-                stop(0, rgba(200, 0, 0, 0.4f)),     // red
-                stop(1, rgba(255, 100, 0, 0.5f)),   // Orange
-                stop(50, rgba(255, 255, 0, 0.6f)),// Yellow
-                stop(100, rgba(0, 255, 0, 0.7f))  // Green
+                stop(0, rgba(248, 113, 113, 0.6f)),     // red
+                stop(15, rgba(251, 146, 60, 0.6f)),   // Orange
+                stop(50, rgba(250, 204, 21, 0.6f)),// Yellow
+                stop(100, rgba(74, 222, 128, 0.6f))  // Green
             )
         ),
         //Changes the border
         fillOutlineColor(rgba(0, 0, 0, 0f)),
-        fillOpacity(0.5f)
+        fillOpacity(1f)
     )
 
 
@@ -596,9 +596,9 @@ private fun setupHistoricalFindsLayer(style: Style) {
     val circleLayer = CircleLayer("historical-finds-layer", "historical-finds-source")
     circleLayer.setProperties(
         circleRadius(6f),
-        circleColor("#8B4513"),   // brown pin color
+        circleColor("#D0ECA8"),   // PrimaryFixed
         circleStrokeWidth(1.5f),
-        circleStrokeColor("#FFFFFF")
+        circleStrokeColor("#1B1C15")  //OnSurfaceDark
     )
     style.addLayer(circleLayer)
 }
