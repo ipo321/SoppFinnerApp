@@ -53,7 +53,7 @@ const val SETTINGS_SCREEN = "profileScreen/settings"
 const val HISTORY_SCREEN = "profileScreen/history"
 const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
 const val INFO_SCREEN = "profileScreen/info"
-const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControll"
+const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControl"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
 @Composable
@@ -70,6 +70,7 @@ fun Navigation(
     var onboardingCompleted by remember { mutableStateOf(false) }
     val currentRoute = currentBackStackEntry?.destination?.route
     var showStartPopup by remember { mutableStateOf(true) }
+
 
     Scaffold(
         bottomBar = {
@@ -129,7 +130,7 @@ fun Navigation(
                 InfoScreen(navController = navController)
             }
             composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController)
+                ShroomControlScreen()
             }
             composable(SHROOMBANK_SCREEN) {
                 ShroomBankScreen(navController = navController)

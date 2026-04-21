@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.minSide
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,10 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 
-
+/*
 @Composable
 fun ShroomControlScreen(
     navController: NavController,
@@ -38,6 +41,16 @@ fun ShroomControlScreen(
         Box {
             Button(
                 onClick = {
+                    navController
+                }
+            ) {
+                Text("Go Back")
+            }
+        }
+
+        Box {
+            Button(
+                onClick = {
                     navController.popBackStack()
                 }
             ) {
@@ -46,4 +59,18 @@ fun ShroomControlScreen(
         }
     }
 }
+*/
+
+@Composable
+fun ShroomControlScreen(){
+
+    AndroidView(factory = {context ->
+        WebView(context).apply {
+            webViewClient = WebViewClient()
+            settings.javaScriptEnabled = true
+            loadUrl("https://soppkontroll.no/")
+        }
+    })
+}
+
 
