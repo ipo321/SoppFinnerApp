@@ -83,12 +83,13 @@ fun Navigation(
     val isAppReady = onboardingCompleted != null && isTimerFinished
     
     // Specifically check if we are going to the map and if the map is ready.
-    // If onboarding is NOT completed, we don't need to wait for the map.
     val isMapReady = onboardingCompleted == false || mapUiState.selectedMushroom != null
 
+    // State to control the visibility of the warning dialog
     var showMapWarning by remember { mutableStateOf(false) }
-    LaunchedEffect(currentRoute) {
-        if (currentRoute == MAP_SCREEN) {
+
+    LaunchedEffect(isAppReady) {
+        if (isAppReady) {
             showMapWarning = true
         }
     }
@@ -106,6 +107,7 @@ fun Navigation(
             painter = painterResource(id = R.drawable.dead_sprite),
             imageDescription = "Warning image"
         )
+
     }
 
     Scaffold(

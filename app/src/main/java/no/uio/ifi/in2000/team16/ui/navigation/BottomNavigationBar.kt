@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import android.hardware.lights.Light
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -24,6 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.theme.BottomBarDark
+import no.uio.ifi.in2000.team16.ui.theme.DarkGreen
+import no.uio.ifi.in2000.team16.ui.theme.LightGreen
+import no.uio.ifi.in2000.team16.ui.theme.LightGreen2
 
 @Composable
 fun BottomNavigationBar(
@@ -53,9 +59,14 @@ fun BottomNavigationBar(
     var selectedNavigationIndex by rememberSaveable {
         mutableIntStateOf(1)
     }
-
+    val isDark = isSystemInDarkTheme()
+    val containerColor = if (isDark) BottomBarDark else LightGreen2
+    val selectedIndicatorColor = if (isDark) LightGreen2 else LightGreen
+    val selectedContentColor = if (isDark) BottomBarDark else BottomBarDark
+    val unselectedContentColor = if (isDark) LightGreen2 else BottomBarDark
+    val selectedTextColor = if (isDark) LightGreen2 else BottomBarDark
     NavigationBar(
-        containerColor = Color(0xFFEDFEED)
+        containerColor = containerColor
     ) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -79,18 +90,21 @@ fun BottomNavigationBar(
                 label = {
                     Text(
                         text = item.title,
-                        color = if (index == selectedNavigationIndex) {
-                            Color.Black
-                        } else {
-                            Color.Gray
-                        }
+
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color(0xFF1E1E1E),
-                    indicatorColor = Color(0xFFD4E6CC)
+                    selectedIconColor = selectedContentColor,
+                    selectedTextColor = selectedTextColor,
+                    indicatorColor = selectedIndicatorColor,
+                    unselectedIconColor = unselectedContentColor,
+                    unselectedTextColor = unselectedContentColor
                 )
             )
+//                    selectedIconColor = DarkGreen,
+//                    indicatorColor = LightGreen
+
+
         }
     }
 }
