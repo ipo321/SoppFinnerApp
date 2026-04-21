@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.map
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,10 +45,15 @@ fun Dropdown(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    val isDark = isSystemInDarkTheme()
+    val containerColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFEDFEED)
+    val iconColor = if (isDark) Color(0xFFEDFEED) else Color(0xFF1E1E1E)
+
     Box(
         modifier = Modifier.padding(start =8.dp, top = 40.dp)
             .size(50.dp)
-            .background(Color(0xFFEDFEED),
+            .background(
+                color = containerColor,
                 shape = RoundedCornerShape(18.dp))
                 .padding(10.dp),
                 contentAlignment = Alignment.Center,
@@ -57,7 +63,7 @@ fun Dropdown(
             onClick = { expanded = !expanded })
         {
             Icon(Icons.Default.MoreVert,
-                tint = Color(0xFF1E1E1E),
+                tint = iconColor,
                 contentDescription = "More options",
                 modifier = Modifier.size(50.dp))
         }
