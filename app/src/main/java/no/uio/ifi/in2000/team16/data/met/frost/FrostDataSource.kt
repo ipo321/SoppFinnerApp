@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class FrostDataSource @Inject constructor(
     private val httpClient: HttpClient
 ) {
-    private val elements = "air_temperature,sum(precipitation_amount P1D)"
+    private val elements = "air_temperature,sum(precipitation_amount P1D),precipitation_amount"
     private val authUser = "d3b7c216-1329-47bb-b09e-c22b6353cc0b"
 
     suspend fun fetchWeather(stationIds: String, timeRange: String): FrostResponse? {

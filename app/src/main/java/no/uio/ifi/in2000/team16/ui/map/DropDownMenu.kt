@@ -2,14 +2,17 @@ package no.uio.ifi.in2000.team16.ui.map
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.FlashlightOff
+import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +37,8 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
 @Composable
 fun Dropdown(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
     onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
@@ -43,90 +48,71 @@ fun Dropdown(
     isHistoricalFindsEnabled: Boolean,
     onToggleHistoricalFinds: () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    val isDark = isSystemInDarkTheme()
-    val containerColor = if (isDark) Color(0xFF1E1E1E) else Color(0xFFEDFEED)
-    val iconColor = if (isDark) Color(0xFFEDFEED) else Color(0xFF1E1E1E)
-
-    Box(
-        modifier = Modifier.padding(start =8.dp, top = 40.dp)
-            .size(50.dp)
-            .background(
-                color = containerColor,
-                shape = RoundedCornerShape(18.dp))
-                .padding(10.dp),
-                contentAlignment = Alignment.Center,
-
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        offset= DpOffset(x=0.dp,y=10.dp)
     ) {
-        IconButton(
-            onClick = { expanded = !expanded })
-        {
-            Icon(Icons.Default.MoreVert,
-                tint = iconColor,
-                contentDescription = "More options",
-                modifier = Modifier.size(50.dp))
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset= DpOffset(x=(-20).dp,y=0.dp)
-        ) {
 
 
-            // First section
-            DropdownMenuItem(
-                text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
-                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
-                onClick = {
-                    onToggleHeatMap()
-                    expanded = false
+        // First section
+        DropdownMenuItem(
+            text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
+            leadingIcon = { if (isHeatmapEnabled) {
+                    Icon(Icons.Outlined.FlashlightOff, contentDescription = "Flashlight Off")
+                } else {
+                    Icon(Icons.Outlined.FlashlightOn, contentDescription = "Flashlight On")
                 }
+            },
+            onClick = {
+                onToggleHeatMap()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
+            text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
+            leadingIcon = { Icon(Icons.Outlined.Book, contentDescription = null) },
+            onClick = {
+                onToggleHistoricalFinds()
+                onDismissRequest()
+            }
+        )
+
+        DropdownMenuItem(
+            text = { Text("Dev") },
+            leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+            onClick = {
+                onNavigateToDev()
+                onDismissRequest()
+            }
+        )
+
+        HorizontalDivider()
+
+        if (favoriteMushrooms.isNotEmpty()) {
+            //HorizontalDivider()
+            Text(
+                text = "Velg sopp som vises på kartet:",
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.Gray
             )
-
-            DropdownMenuItem(
-                text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
-                leadingIcon = { Icon(Icons.Outlined.Create, contentDescription = null) },
-                onClick = {
-                    onToggleHistoricalFinds()
-                    expanded = false
-                }
-            )
-
-            DropdownMenuItem(
-                text = { Text("Dev") },
-                leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                onClick = {
-                    expanded = false
-                    onNavigateToDev()
-                }
-            )
-
-            HorizontalDivider()
-
-            if (favoriteMushrooms.isNotEmpty()) {
-                HorizontalDivider()
-                Text(
-                    text = "Hurtigvalg:",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray
+            favoriteMushrooms.forEach { mushroom ->
+                val isSelected = mushroom.commonName == selectedMushroom?.commonName
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = mushroom.commonName,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
+                    },
+                    onClick = {
+                        onMushroomSelected(mushroom)
+                        onDismissRequest()
+                    },
+                    trailingIcon = { if (isSelected) Icon(Icons.Outlined.Check, contentDescription = "Check") }
                 )
-                favoriteMushrooms.forEach { mushroom ->
-                    val isSelected = mushroom.commonName == selectedMushroom?.commonName
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = mushroom.commonName,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        },
-                        onClick = {
-                            onMushroomSelected(mushroom)
-                            expanded = false
-                        }
-                    )
-                }
             }
         }
     }
@@ -135,7 +121,10 @@ fun Dropdown(
 @Preview(showBackground = true)
 @Composable
 fun DropdownPreview() {
-    Dropdown(onNavigateToDev = {},
+    Dropdown(
+        expanded = true,
+        onDismissRequest = {},
+        onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
         onToggleHistoricalFinds = {})
 }

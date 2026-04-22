@@ -5,6 +5,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
@@ -33,6 +34,33 @@ fun DevScreen(
         Button(onClick = onNavigateBack) {
             Text("← Tilbake til kart")
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Kartinnstillinger", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Satellittmodus")
+            Switch(
+                checked = mapState.isSatelliteMode,
+                onCheckedChange = { mapViewModel.toggleSatellite() }
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Vis NIBIO Skoglag (WMS)")
+            Switch(
+                checked = mapState.showWmsForest,
+                onCheckedChange = { mapViewModel.toggleWmsForest() }
+            )
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
         Spacer(modifier = Modifier.height(16.dp))
         Text("Utvikler Konsoll", fontSize = 24.sp, fontWeight = FontWeight.Bold)

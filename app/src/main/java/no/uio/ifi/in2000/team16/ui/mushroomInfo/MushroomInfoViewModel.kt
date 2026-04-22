@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
@@ -23,7 +23,7 @@ class MushroomInfoViewModel @Inject constructor(
         if (mushrooms.isNotEmpty()) mushrooms[0] else null
     )
         private set
-    val favoriteMushrooms: StateFlow<List<Mushroom>> = repository.favoriteMushrooms
+    val favoriteMushrooms: Flow<List<Mushroom>> = repository.favoriteMushrooms
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             selectedMushroom = mushroom

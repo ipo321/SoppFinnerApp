@@ -8,6 +8,7 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 
 /*
     Repository for the AR5 API, than handles the data output and puts it into a ForestData module from the evaluation module.
@@ -33,6 +34,12 @@ class ForestRepository @Inject constructor(
                 forestDataSource.fetchArealType(lat, lon)
             }
         }
-        deferredResult.await()
+        return@coroutineScope try {
+            deferredResult.await()
+        } catch (e: Exception) {
+            cache.remove(cacheKey)
+            if (e is CancellationException) throw e
+            null
+        }
     }
 }

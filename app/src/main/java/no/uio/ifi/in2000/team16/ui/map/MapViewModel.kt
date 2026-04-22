@@ -21,10 +21,15 @@ import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
+import no.uio.ifi.in2000.team16.data.kartverket.Address
+import no.uio.ifi.in2000.team16.data.kartverket.AddressRepository
+
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
+    private val addressRepository: AddressRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
     private val scorerProvider: ScorerProvider
@@ -33,20 +38,22 @@ class MapViewModel @Inject constructor(
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
 
     private var heatmapJob: Job? = null // cancel old calculations
+    private var searchJob: Job? = null // cancel old searches
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
-    private var lastClickedLat: Double? = null  // makes it easy for mushroom change to update location pins and scorecard
-    private var lastClickedLon: Double? = null
+    private var debounceJob: Job? = null
 
     init{
         viewModelScope.launch {
             speciesRepository.selectedMushroom.collect { mushroom ->
                 _uiState.update { it.copy(selectedMushroom = mushroom) }
                 try {
-                    getEnvironmentContextUseCase(
+                    val env = getEnvironmentContextUseCase(
                         59.91,
                         10.75,
                         mushroom.profile
                     ) //Warmup to get scorer quicker
+                    val scorer = scorerProvider.activeScorer
+                    scorer.calculateScore(env, mushroom.profile)
                 } catch (e: Exception) {
                 }
             }
@@ -60,8 +67,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun onMapClicked(lat: Double, lon: Double) {
-        lastClickedLat = lat
-        lastClickedLon = lon
+        _uiState.update { it.copy(lastClickedLat = lat, lastClickedLon = lon) }
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         viewModelScope.launch {
@@ -96,26 +102,51 @@ class MapViewModel @Inject constructor(
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
         if (!_uiState.value.isHeatmapEnabled) return
-        savedBounds = bounds
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
-        heatmapJob?.cancel()
+        debounceJob?.cancel()
 
-        heatmapJob = viewModelScope.launch {
-            _uiState.update { it.copy(isFetchingHeatmap = true) }
-            try {
-                val tiles = calculateHeatmapAreaUseCase(bounds, currentMushroom.profile)
+        debounceJob = viewModelScope.launch {
+            delay(500)
+            heatmapJob?.cancel()
 
-                if (tiles.isNotEmpty()) {
-                    _uiState.update { it.copy(heatmapTiles = tiles, isFetchingHeatmap = false) }
-                } else {
+            heatmapJob = viewModelScope.launch {
+                _uiState.update { it.copy(isFetchingHeatmap = true) }
+
+                try {
+                    val newTiles = calculateHeatmapAreaUseCase(
+                        bounds = bounds,
+                        profile = currentMushroom.profile,
+                        existingTiles = _uiState.value.heatmapTiles
+                    )
+
+                    if (newTiles.isNotEmpty()) {
+                        val currentSize = newTiles.first().size
+
+                        _uiState.update { currentState ->
+                            val filteredOldTiles = currentState.heatmapTiles.filter {
+                                kotlin.math.abs(it.size - currentSize) < 0.0001
+                            }
+
+                            val combinedTiles = (newTiles + filteredOldTiles)
+                                .distinctBy {
+                                    String.format(java.util.Locale.US, "%.5f_%.5f", it.lat, it.lon)
+                                }
+                                .take(4000)  //Delete for entries longer
+
+                            currentState.copy(
+                                heatmapTiles = combinedTiles,
+                                currentTileSize = currentSize
+                            )
+                        }
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("T16_MapViewModel_Heat", "Error Calc Heatmap", e)
+                } finally {
                     _uiState.update { it.copy(isFetchingHeatmap = false) }
                 }
-            }catch(e: CancellationException){
-                throw e
-            } catch (e: Exception) {
-                Log.e("MapViewModel", "Error Calc Heatmap", e)
-                _uiState.update { it.copy(isFetchingHeatmap = false) }
             }
         }
     }
@@ -140,10 +171,14 @@ class MapViewModel @Inject constructor(
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
+
+            _uiState.update { it.copy(heatmapTiles = emptyList()) }
             savedBounds?.let { fetchHeatmapData(it) }
 
-            if (lastClickedLat != null && lastClickedLon != null) {//change mushroom trigges a onMapClicked reload
-                onMapClicked(lastClickedLat!!, lastClickedLon!!)
+            val lat = _uiState.value.lastClickedLat
+            val lon = _uiState.value.lastClickedLon
+            if (lat != null && lon != null) {//change mushroom trigges a onMapClicked reload
+                onMapClicked(lat, lon)
             }
         }
     }
@@ -156,21 +191,60 @@ class MapViewModel @Inject constructor(
         println("Søker etter: ${_uiState.value.searchQuery}")
     }
 
+    fun toggleSatellite() {
+        _uiState.update { it.copy(isSatelliteMode = !it.isSatelliteMode) }
+    }
+
+    fun toggleWmsForest() {
+        _uiState.update { it.copy(showWmsForest = !it.showWmsForest) }
+    }
+    
+    fun onSearchQueryChanged(query: String) {
+        _uiState.update { it.copy(searchQuery = query) }
+        searchJob?.cancel() // Cancels ongoing search when search is updated
+        searchJob = viewModelScope.launch { // Starts new search
+            delay(300) // Makes it wait a little bit before searching, to not spam the API
+            val suggestions = addressRepository.getSuggestions(query)
+            _uiState.update { it.copy(addressSuggestions = suggestions) }
+        }
+    }
+
+    // Method for getting location for address chosen from search, used when search completes
+    fun searchAddress(address: Address, onLocationFound: (lat: Double, lon: Double) -> Unit) {
+        val location = address.representasjonspunkt
+        if (location?.lat != null && location.lon != null) {
+            onLocationFound(location.lat, location.lon)
+        }
+    }
+    
+    // Method for finding address from the query, used when user is still searching
+    fun searchAddressByText(query: String, onLocationFound: (Double, Double) -> Unit) {
+        viewModelScope.launch {
+            val location = addressRepository.getLocationCoordinates(query)
+            if (location != null && location.lat != null && location.lon != null) {
+                onLocationFound(location.lat, location.lon)
+            }
+        }
+    }
 }
-
-
-    data class MapScreenState(
-        val screenStatus: ScreenStatus = ScreenStatus.Idle,
-        val selectedMushroom: Mushroom? = null,
-        val currentContext: EnvironmentContext? = null,
-        val evaluation: EvaluationResult? = null,
-        val favoriteMushrooms: List<Mushroom> = emptyList(),
-        val isHeatmapEnabled: Boolean = false,
-        val heatmapTiles: List<HeatmapTile> = emptyList(), // NY!
-        val isFetchingHeatmap: Boolean = false,
-        val searchQuery: String = "",
-        val isHistoricalFindsEnabled: Boolean = false
-    )
+data class MapScreenState(
+    val screenStatus: ScreenStatus = ScreenStatus.Idle,
+    val selectedMushroom: Mushroom? = null,
+    val currentContext: EnvironmentContext? = null,
+    val evaluation: EvaluationResult? = null,
+    val favoriteMushrooms: List<Mushroom> = emptyList(),
+    val isHeatmapEnabled: Boolean = false,
+    val heatmapTiles: List<HeatmapTile> = emptyList(),
+    val isFetchingHeatmap: Boolean = false,
+    val searchQuery: String = "",
+    val isHistoricalFindsEnabled: Boolean = false,
+    val currentTileSize: Double = 0.2,           
+    val isSatelliteMode: Boolean = false,        
+    val showWmsForest: Boolean = false,
+    val lastClickedLat: Double? = null,
+    val lastClickedLon: Double? = null,
+    val addressSuggestions: List<Address> = emptyList()
+)
 
 sealed class ScreenStatus{
     object Idle : ScreenStatus()
