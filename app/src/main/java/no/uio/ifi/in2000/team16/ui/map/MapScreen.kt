@@ -5,6 +5,7 @@ import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.location.LocationListener
 import android.location.LocationManager
 import androidx.compose.foundation.lazy.items
@@ -133,8 +134,7 @@ fun MapScreen(
         }
     }
 
-    // mapView is alerted when lifecycle changes
-    LifeCycleObserver(lifecycleOwner, mapView)
+
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -170,7 +170,6 @@ fun MapScreen(
         //disposes of the GPS listner(to avoid leaks)
         onDispose{locationManager.removeUpdates(listener)}
     }
-    LifeCycleObserver(mapView)
 
     Box(
         modifier = Modifier.fillMaxSize()
