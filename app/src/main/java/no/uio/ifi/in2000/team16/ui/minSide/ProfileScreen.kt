@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,9 +22,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.ui.navigation.SHROOMCONTROL_SCREEN
 
 
-    @Composable
+@Composable
     fun ProfileScreen(
         navController: NavController,
         viewModel: ProfileScreenViewModel = hiltViewModel()
@@ -34,17 +37,28 @@ import androidx.navigation.NavController
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFD4E6CC))
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box {
-                Button(onClick = { expanded = true }) {
-                    Text("DropDown Menu")
+                Button(
+                    onClick = { expanded = true },
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(
+                        text = "Meny",
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainerLow)
                 ) {
 
                     //Add a new menuitem for new underscreens
@@ -66,7 +80,7 @@ import androidx.navigation.NavController
                     DropdownMenuItem(
                         text = {Text("Mine soppsteder")},
                         onClick = {
-                            navController.navigate("profileScreen/shroomSpots")
+                            navController.navigate(SHROOMCONTROL_SCREEN)
                             expanded = false
                         }
                     )
@@ -80,7 +94,7 @@ import androidx.navigation.NavController
                     DropdownMenuItem(
                         text = {Text("Digital Soppkontroll")},
                         onClick = {
-                            navController.navigate("profileScreen/shroomControll")
+                            navController.navigate("profileScreen/shroomControl")
                             expanded = false
                         }
                     )

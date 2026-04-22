@@ -17,20 +17,7 @@ data class EnvironmentContext(
     val historicalFinds: List<Occurrence> = emptyList(),
     val hist: Int = 0,
     val currentMonth: Int
-) {
-    companion object {
-        val Mock = EnvironmentContext(
-            currentWeather = null,
-            weatherHistory = null,
-            terrainData = null,
-            ar5 = null,
-            forestData = null,
-            historicalFindCount = 0,
-            currentMonth = 8 //August
-        )
-
-    }
-}
+)
 
 data class WeatherData(
     val temp: Double?,
