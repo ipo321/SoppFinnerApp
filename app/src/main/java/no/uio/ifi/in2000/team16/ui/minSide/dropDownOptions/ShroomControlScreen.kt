@@ -4,11 +4,16 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 
 
 //Overlays the screen with a networkScreen of SoppPortal
 @Composable
-fun ShroomControlScreen(){
+fun ShroomControlScreen(
+    navController: NavController,
+    viewModel: ProfileScreenViewModel = hiltViewModel()
+){
 
     AndroidView(factory = {context ->
         WebView(context).apply {

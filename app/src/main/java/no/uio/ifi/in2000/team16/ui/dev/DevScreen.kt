@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.dev
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,9 +28,10 @@ fun DevScreen(
     val context = mapState.currentContext
 
     Column(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
         .fillMaxSize()
         .padding(16.dp)
-        .verticalScroll(rememberScrollState()) // Gjør hele skjermen scrollbar
+        .verticalScroll(rememberScrollState())
     ) {
         Button(onClick = onNavigateBack) {
             Text("← Tilbake til kart")
@@ -67,7 +69,6 @@ fun DevScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- To-kolonne oppsett for valg av algoritme og art ---
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Algoritme", fontWeight = FontWeight.Bold)
@@ -78,8 +79,6 @@ fun DevScreen(
                 MushroomDropdown(devState) { devViewModel.onMushroomSelected(it) }
             }
         }
-
-        // --- Rekalkuler-knappen tar hele bredden ---
         Button(
             onClick = { devViewModel.recalculate(context) },
             modifier = Modifier
@@ -105,7 +104,6 @@ fun DevScreen(
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-        // --- Miljødata i to kolonner ---
         Text("Siste lagrede kontekst", fontWeight = FontWeight.Bold, fontSize = 18.sp)
         if (context == null) {
             Text("Ingen data. Trykk på kartet først.", fontStyle = FontStyle.Italic, color = Color.Gray)

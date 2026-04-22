@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import no.uio.ifi.in2000.team16.ui.theme.*
+import androidx.compose.ui.graphics.lerp
 
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
@@ -46,7 +49,7 @@ fun ScoreCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
 
     ) {
@@ -57,17 +60,10 @@ fun ScoreCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //The Score Cirlce itself:
-            Card(
+            Surface(
                 modifier = Modifier.size(100.dp),
                 shape = CircleShape,
-                colors = CardDefaults.cardColors(
-                    containerColor = when {
-                        score > 70 -> Color(0xFF4CAF50)
-                        score > 40 -> Color(0xFFFFC107)
-                        else -> Color(0xFFF44336)
-                    }
-                )
-
+                color = getInterpolatedScoreColor(score)
             ) {
                 Box(
                     modifier = Modifier
@@ -78,7 +74,7 @@ fun ScoreCard(
                     Text(
                         text = score.toString(),
                         style = MaterialTheme.typography.headlineMedium,
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
 
@@ -124,7 +120,7 @@ fun ScoreCard(
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Været nå", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                        Text(text = "Været nå", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             val symbolCode = contextData?.currentWeather?.symbolCode
                             if (symbolCode != null) {
@@ -155,7 +151,18 @@ fun ScoreCard(
 @Composable
 fun InfoItem(label: String, value: String){
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
     }
 }
+
+
+fun getInterpolatedScoreColor(score: Int): Color {
+    val s = score.coerceIn(0, 100).toFloat()
+    return when {
+        s <= 15f -> lerp(ScoreLow, ScoreMediumLow, s / 15f)
+        s <= 50f -> lerp(ScoreMediumLow, ScoreMediumHigh, (s - 15f) / 35f)
+        else -> lerp(ScoreMediumHigh, ScoreHigh, (s - 50f) / 50f)
+    }
+}
+
