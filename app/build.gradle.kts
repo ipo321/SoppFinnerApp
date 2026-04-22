@@ -17,8 +17,6 @@ val localProperties = Properties().apply {
     }
 }
 
-val arcgisApiKey: String = localProperties.getProperty("ARCGIS_API_KEY", "")
-
 android {
     namespace = "no.uio.ifi.in2000.team16"
     compileSdk = 36
@@ -31,8 +29,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "ARCGIS_API_KEY", "\"$arcgisApiKey\"")
     }
 
         packaging {

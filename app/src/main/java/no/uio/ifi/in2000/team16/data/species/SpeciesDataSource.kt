@@ -249,6 +249,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Kantarell",
             latinName = "Cantharellus cibarius",
             imageRes = R.drawable.cantharelluscibarius,
+            bioRes = R.string.kantarell_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -259,6 +260,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Steinsopp",
             latinName = "Boletus edulis",
             imageRes = R.drawable.boletusreticulatus,
+            bioRes = R.string.steinsopp_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -269,6 +271,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Skarlagens vårbeger",
             latinName = "Sarcoscypha austriaca",
             imageRes = R.drawable.sarcoscyphaaustriaca,
+            bioRes = R.string.skarlagen_vårbeger_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -276,9 +279,10 @@ class SpeciesDataSource @Inject constructor(){
             profile = allSpeciesProfiles.find { it.name == "Skarlagens vårbeger" }!!
         ),
         Mushroom(
-            commonName = "Traktkantarel",
+            commonName = "Traktkantarell",
             latinName = "Craterellus tubaeformis",
             imageRes = R.drawable.funnelchanterell,
+            bioRes = R.string.traktantarell_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -289,6 +293,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Blek piggsopp",
             latinName = "Hydnum repandum",
             imageRes = R.drawable.hedgehog,
+            bioRes = R.string.blek_piggsopp_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -299,6 +304,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Fåresopp",
             latinName = "albatrellus ovinus",
             imageRes = R.drawable.sheepfungus,
+            bioRes = R.string.fåresopp_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -309,6 +315,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Granmatriske",
             latinName = "Lactarius deterrimus",
             imageRes = R.drawable.gramatriske,
+            bioRes = R.string.granmatriske_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -319,6 +326,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Rødskrubb",
             latinName = "Leccinum versipelle",
             imageRes = R.drawable.versipelle,
+            bioRes = R.string.rødskrubb_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -329,6 +337,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Brunskrubb",
             latinName = "Leccinum scabrum",
             imageRes = R.drawable.scabrum,
+            bioRes = R.string.brunskrubb_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -339,6 +348,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Matblekksopp",
             latinName = "Coprinus comatus",
             imageRes = R.drawable.coprinuscomatus,
+            bioRes = R.string.matblekksopp.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
@@ -349,6 +359,7 @@ class SpeciesDataSource @Inject constructor(){
             commonName = "Svart trompetsopp",
             latinName = "Craterellus cornucopioides",
             imageRes = R.drawable.craterelluscornucopioides,
+            bioRes = R.string.svart_trompetsopp_bio.toString(),
             properties = listOf(
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
