@@ -2,8 +2,10 @@ package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +32,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
@@ -49,6 +47,7 @@ fun MushroomListScreen(
 ){
     val mushrooms = viewModel.mushrooms
     val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
+    val selectedMushroom = viewModel.selectedMushroom
     //main Column
     Column(
         modifier = Modifier
@@ -62,8 +61,8 @@ fun MushroomListScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
-
         Spacer(modifier = Modifier.height(16.dp))
+
         //list column with all the mushrooms.
         Column(
             modifier = Modifier
@@ -71,17 +70,43 @@ fun MushroomListScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            mushrooms.forEach { mushroom ->
+            Text(
+            text = "Favoritter",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+            mushrooms.filter { favorites.any { fav -> fav.commonName == it.commonName } }.forEach{ mushroom ->
                 MushroomListItem(
                     viewModel = viewModel,
                     mushroom = mushroom,
                     isFavorite = favorites.any { it.commonName == mushroom.commonName },
+                    isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
-                        navigateToMushroom()
-                    }
+                    },
+                    navigateToMushroom = navigateToMushroom
                 )
             }
+            Text(
+                text = "Øvrige",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            mushrooms.filterNot { favorites.any { fav -> fav.commonName == it.commonName } }.forEach { mushroom ->
+                MushroomListItem(
+                    viewModel = viewModel,
+                    mushroom = mushroom,
+                    isFavorite = favorites.any { it.commonName == mushroom.commonName },
+                    isSelected = selectedMushroom?.commonName == mushroom.commonName,
+                    onClick = {
+                        viewModel.onMushroomSelected(mushroom)
+                    },
+                    navigateToMushroom = navigateToMushroom
+                )
+            }
+
         }
 
     }
@@ -93,15 +118,17 @@ fun MushroomListItem(
     viewModel: MushroomInfoViewModel,
     mushroom: Mushroom,
     isFavorite: Boolean,
+    isSelected: Boolean,
     onClick: () -> Unit,
+    navigateToMushroom: () -> Unit,
 ) {
+    val cardModifier = mushroomCardModifier(isSelected)
+
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .padding(12.dp)
-            .clickable { onClick() },
+        modifier = cardModifier
+            .clickable { onClick() }
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -113,7 +140,7 @@ fun MushroomListItem(
                 .clip(CircleShape)
         )
         Spacer(Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)){
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = mushroom.commonName,
                 style = MaterialTheme.typography.titleLarge,
@@ -126,13 +153,58 @@ fun MushroomListItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        IconButton(onClick = { viewModel.toggleFavorite(mushroom) }){
-        Icon(
-            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = "is favorite",
-            tint = if (isFavorite) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
-            modifier = Modifier.size(18.dp)
-        )
+        Box(
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .size(28.dp)
+                .border(
+                    width = 2.dp,
+                    shape = MaterialTheme.shapes.extraSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                .clickable {navigateToMushroom()},
+            contentAlignment = Alignment.Center
+        ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "go to mushroom",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
         }
     }
+
+@Composable
+private fun mushroomCardModifier(
+    isSelected: Boolean
+): Modifier {
+    val base = Modifier.fillMaxWidth()
+
+    return if (isSelected) {
+        base
+            .clip(MaterialTheme.shapes.medium)
+            .border(
+                width = 4.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = MaterialTheme.shapes.medium
+            )
+            .background(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = MaterialTheme.shapes.medium
+            )
+    } else {
+        base
+            .clip(MaterialTheme.shapes.medium)
+            .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = MaterialTheme.shapes.medium
+            )
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                shape = MaterialTheme.shapes.medium
+            )
+    }
 }
+
