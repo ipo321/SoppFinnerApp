@@ -52,7 +52,7 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp)
     ){
         //topText
@@ -162,7 +162,9 @@ fun MushroomListItem(
                     shape = MaterialTheme.shapes.extraSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                .clickable {navigateToMushroom()},
+                .clickable {
+                    viewModel.onMushroomViewing(mushroom)
+                    navigateToMushroom()},
             contentAlignment = Alignment.Center
         ) {
                 Icon(

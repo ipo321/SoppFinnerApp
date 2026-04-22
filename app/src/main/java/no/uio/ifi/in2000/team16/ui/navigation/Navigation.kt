@@ -245,6 +245,7 @@ fun Navigation(
                     val viewModel: MushroomInfoViewModel = hiltViewModel(listEntry)
                     MushroomInfoScreen(
                         onNavigateBack = { navController.popBackStack() },
+                        onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
                         viewModel = viewModel
                     )
                 }
