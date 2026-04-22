@@ -5,10 +5,14 @@ import androidx.compose.foundation.Image
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
@@ -26,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
@@ -50,18 +55,21 @@ fun MushroomInfoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(24.dp),
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //back button
-        OutlinedButton(
-            onClick = onNavigateBack,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Text("Tilbake")
-        }
+
+            Text(
+                text = "< Utforsk",
+                modifier = Modifier.fillMaxWidth().clickable { onNavigateBack() },
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.headlineSmall
+
+            )
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -127,7 +135,7 @@ fun MushroomInfoScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         //favorite toggel icon
-        Row(
+        /*Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
@@ -140,7 +148,7 @@ fun MushroomInfoScreen(
                 )
             }
             Log.d("T16_Mushroom_InfoScreen", "Toggled favorite for ${selected.commonName}" + "  favorites: ${isFavorite}")
-        }
+        }*/
 
         Spacer(modifier = Modifier.height(16.dp))
         //info badges
@@ -154,8 +162,32 @@ fun MushroomInfoScreen(
                 Spacer(modifier = Modifier.width(16.dp))
             }
         }
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(16.dp))
 
+        //favorite button
+
+        OutlinedButton(
+            onClick = { viewModel.toggleFavorite(selected) },
+            modifier = Modifier.wrapContentSize()
+        ) {
+            Icon(imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+            Spacer(Modifier.width(8.dp))
+            Text(if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Om soppen",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(id = selected.bioRes.toInt()),
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 @Composable

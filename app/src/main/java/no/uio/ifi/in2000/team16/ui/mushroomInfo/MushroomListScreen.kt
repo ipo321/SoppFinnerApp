@@ -52,7 +52,7 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp)
     ){
         //topText
