@@ -1,9 +1,11 @@
 package no.uio.ifi.in2000.team16
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Modifier
 
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -36,5 +38,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-

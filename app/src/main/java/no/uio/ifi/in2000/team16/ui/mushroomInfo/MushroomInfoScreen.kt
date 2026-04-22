@@ -5,30 +5,14 @@ import androidx.compose.foundation.Image
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.style.TextAlign
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -64,30 +50,55 @@ fun MushroomInfoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD4E6CC))
+            .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //back button
-        Button(
+        OutlinedButton(
             onClick = onNavigateBack,
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge
         ) {
             Text("Tilbake")
         }
 
-        Text(text = "Aldri spis sopp du er usikker på." +
-                " se soppkontroll.no for mere informasjon",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.errorContainer,
+            shape = MaterialTheme.shapes.large
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = "Aldri spis sopp du er usikker på.\nSe soppkontroll.no for mer informasjon.",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Mushroom image in a green circle
         Box(
             modifier = Modifier
                 .size(200.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF8FAF82)),
+                .background(MaterialTheme.colorScheme.errorContainer),
             contentAlignment = Alignment.Center
         ) {
 
@@ -101,8 +112,17 @@ fun MushroomInfoScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         //name text
-        Text(text = selected.commonName, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Text(text = selected.latinName, fontSize = 14.sp, fontStyle = FontStyle.Italic)
+        Text(
+            text = selected.commonName,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = selected.latinName,
+            style = MaterialTheme.typography.labelMedium,
+            fontStyle = FontStyle.Italic,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -124,9 +144,14 @@ fun MushroomInfoScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         //info badges
-        Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             selected.properties.forEach { property ->
                 MushroomPropertyBadge(property)
+                Spacer(modifier = Modifier.width(16.dp))
             }
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -135,25 +160,29 @@ fun MushroomInfoScreen(
 }
 @Composable
 fun MushroomPropertyBadge(property: MushroomProperty) {
-    val borderColor = if (property.isNegative) Color(0xFFD94F4F) else Color(0xFF7A9B6E)
-    val bgColor     = if (property.isNegative) Color(0xFFFDE8E8) else Color(0xFFE8F0E2)
+    val borderColor = if (property.isNegative) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    val bgColor     = if (property.isNegative) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(64.dp)
                 .clip(CircleShape)
                 .background(bgColor)
-                .border(2.5.dp, borderColor, CircleShape),
+                .border(1.5.dp, borderColor.copy(alpha = 0.5f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = property.iconRes),
                 contentDescription = property.label,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(32.dp)
             )
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = property.label, fontSize = 12.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = property.label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }

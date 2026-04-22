@@ -13,35 +13,85 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-    onBackground = DarkGreen,
 
+    //Primary
+    primary = DarkPrimary,
+    onPrimary = DarkPrimaryContainer,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkPrimary,
 
-    )
+    //Secondary
+    secondary = DarkSecondary,
+    secondaryContainer = DarkPrimary,
+    onSecondaryContainer = DarkBackground,
+
+    // The base layer of the app
+    background = DarkBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+
+    // Tonal Hierarchy: Use these to create depth and stacked layers without using lines
+    surfaceContainerLowest = DarkSurfaceContainerLowest, // Deepest layer
+    surfaceContainerLow = DarkSurfaceContainerLow, // Main section containers
+    surfaceContainer = DarkSurfaceContainerNormal, // Standard component backgrounds
+    surfaceContainerHigh = DarkSurfaceContainerHigh, // Elevated cards or nested importance
+    surfaceContainerHighest = DarkSurfaceContainerHighest, // Top-level headers or input fields
+
+    // Editorial accents and descriptive hierarchies
+    surfaceVariant = DarkSurfaceContainerHigh, // Used for glass effects (apply opacity in UI)
+    onSurfaceVariant = DarkOnSurface,
+
+    // Outlines and accessibility
+    outlineVariant = DarkOutlineVariant, //"Ghost Borders"
+
+    //toxic/hazardous warnings
+    error = DangerError,
+    errorContainer = ErrorContainer,
+    onErrorContainer = OnErrorContainer
+)
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    //Primary
+    primary = PrimaryGreen,
+    onPrimary = SurfaceCream,
+    primaryContainer = PrimaryContainer,
+    onPrimaryContainer = SurfaceCream,
+
+    //Secondary
+    secondary = PrimaryFixed,
+    secondaryContainer = PrimaryFixed,
+    onSecondaryContainer = OnSurfaceDark,
+
+    // The base layer of the app
+    background = SurfaceCream,
+    surface = SurfaceCream,
+    onSurface = OnSurfaceDark,
+
+    // Tonal Hierarchy: Use these to create depth and stacked layers without using lines
+    surfaceContainerLowest = SurfaceContainerLowest,
+    surfaceContainerLow = SurfaceContainerLow,
+    surfaceContainer = SurfaceContainerNormal,
+    surfaceContainerHigh = SurfaceContainerHigh,
+    surfaceContainerHighest = SurfaceContainerHighest,
+
+    // Editorial accents and descriptive hierarchies
+    surfaceVariant = SurfaceContainerHigh,
+    onSurfaceVariant = OnSurfaceDark,
+
+    // Outlines and accessibility
+    outlineVariant = OutlineVariantLight, //"Ghost Borders"
+
+    //toxic/hazardous warnings
+    error = DangerError,
+    errorContainer = ErrorContainer,
+    onErrorContainer = OnErrorContainer
 )
 
 @Composable
 fun Team16Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -57,6 +107,7 @@ fun Team16Theme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
+        shapes = Shapes
     )
 }

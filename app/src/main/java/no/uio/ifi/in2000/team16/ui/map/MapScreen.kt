@@ -1,35 +1,38 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import android.Manifest
 import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
+import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.location.LocationListener
+import android.location.LocationManager
 import androidx.compose.foundation.lazy.items
 import android.util.Log
 import android.view.Gravity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import no.uio.ifi.in2000.team16.R
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -46,10 +49,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
@@ -59,26 +61,25 @@ import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.layers.FillLayer
-import org.maplibre.android.style.layers.SymbolLayer
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.layers.PropertyFactory.*
 import org.maplibre.android.style.expressions.Expression.*
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import kotlinx.coroutines.Job
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
 import org.maplibre.android.style.sources.TileSet
@@ -100,21 +101,75 @@ import org.maplibre.android.camera.CameraUpdateFactory
 fun MapScreen(
     onNavigateToDev: () -> Unit,
     viewModel: MapViewModel,
-    modifier: Modifier = Modifier
+    isVisible: Boolean,
+    onMapLoaded: () -> Unit
 ) {
     val context = LocalContext.current
+    //
+    var locationPermissionGranted by remember {mutableStateOf(
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val queryText by remember { mutableStateOf("") }
     val currentJob = remember { mutableStateOf<Job?>(null) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val uiState by viewModel.uiState.collectAsState()
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
-    val mapView = getMapView(viewModel, context)
+    val mapView = getMapView(viewModel, context, onMapLoaded)
     // mapView is alerted when lifecycle changes
-    LifeCycleObserver(lifecycleOwner, mapView)
+    LifeCycleObserver(mapView)
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            mapView.onResume()
+        } else {
+            mapView.onPause()
+        }
+    }
+
+
+    //Shows the "Allow Location" popup and remembers the response
+    val locationPermissionRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+    }
+        //Actually runs the popup and makes sure it doesn't rerun
+    LaunchedEffect(Unit){
+        locationPermissionRequest.launch(arrayOf(
+             Manifest.permission.ACCESS_COARSE_LOCATION,
+             Manifest.permission.ACCESS_FINE_LOCATION
+        ))
+    }
+
+    //Sets up the GPS listner
+    DisposableEffect(locationPermissionGranted){
+        if(!locationPermissionGranted) return@DisposableEffect onDispose{}
+
+        val locationManager = context.getSystemService(
+            Context.LOCATION_SERVICE) as LocationManager
+
+        //fires every time we want to update the user position from the GPS
+        //pushes the coordinates to the viewmodel
+        val listener = LocationListener { location ->
+            viewModel.onUserLocationUpdated(location.latitude, location.longitude)
+        }
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            3000L, //for every 3 seconds
+            10f, //if moved 10 meters
+            listener
+        )
+        //disposes of the GPS listener(to avoid leaks)
+        onDispose{locationManager.removeUpdates(listener)}
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -218,9 +273,9 @@ fun MapSearchBar(
                     ) },
                     trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFEDFEED),
-                        unfocusedContainerColor = Color(0xFFEDFEED),
-                        disabledContainerColor = Color(0xFFEDFEED)
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
                     )
                 )
             },
@@ -307,19 +362,20 @@ fun MapMenu(
 @Composable
 fun getMapView(
     viewModel: MapViewModel,
-    context: Context
+    context: Context,
+    onMapLoaded: () -> Unit
 ): MapView {
     val uiState by viewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
 
 
     val mapView = remember {
-        MapView(context).apply {
-            onCreate(null)
+            MapView(context).apply {
+                onCreate(null)
 
-            getMapAsync { map ->
-                mapRef = map
-                setMapLayout(map)
+                getMapAsync { map ->
+                    mapRef = map
+                    setMapLayout(map)
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
@@ -380,7 +436,10 @@ fun getMapView(
         val styleUrl = if (uiState.isSatelliteMode)
                 "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
-                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+                if(isDarkMode(context))
+                    "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
+                else
+                    "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
 
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
@@ -388,6 +447,8 @@ fun getMapView(
             setupHistoricalFindsLayer(style)
             setupForestLayer(style, uiState.showWmsForest)
             setupPointMarker(style)
+            setupUserLocationLayer(style)
+            onMapLoaded()
         }
     }
     // WMS
@@ -414,6 +475,20 @@ fun getMapView(
             source.setGeoJson(Feature.fromGeometry(point))
         }
     }
+    //Drawing the users position dot
+    LaunchedEffect(uiState.userLocation, mapRef){
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val location = uiState.userLocation ?: return@LaunchedEffect
+        currentMap.getStyle{ style ->
+            val source = style.getSourceAs<GeoJsonSource>("user-location-source")
+                ?: return@getStyle
+            val point = Point.fromLngLat(location.longitude, location.latitude)
+            source.setGeoJson(Feature.fromGeometry(point))
+        }
+    }
+
+
+
     //Mushroom finding pins
     // Updating the pins each time they change
     LaunchedEffect(
@@ -499,16 +574,21 @@ fun getMapView(
 }
 
 @Composable
-fun LifeCycleObserver(lifecycleOwner: LifecycleOwner, mapView: MapView) {
+fun LifeCycleObserver(mapView: MapView) {
+
+    val context = LocalContext.current
+    val lifecycleOwner = context as? LifecycleOwner ?: LocalLifecycleOwner.current
+
     DisposableEffect(lifecycleOwner, mapView) {
-        // observer listens to the lifecycle and when each of the functions below
-        // are called by the observer, the same ones are called by mapView
-        val observer = object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) { mapView.onStart() }
-            override fun onResume(owner: LifecycleOwner) { mapView.onResume() }
-            override fun onPause(owner: LifecycleOwner) { mapView.onPause() }
-            override fun onStop(owner: LifecycleOwner) { mapView.onStop() }
-            override fun onDestroy(owner: LifecycleOwner) { mapView.onDestroy() }
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> mapView.onStart()
+                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
+                Lifecycle.Event.ON_STOP -> mapView.onStop()
+                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                else -> {}
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         // When mapScreen is removed, so is the observer and mapView no longer calls the above functions
@@ -572,15 +652,15 @@ private fun setupHeatmapLayer(style: Style) {
         fillColor(
             interpolate(
                 linear(), get("score"),
-                stop(0, rgba(200, 0, 0, 0.4f)),     // red
-                stop(1, rgba(255, 100, 0, 0.5f)),   // Orange
-                stop(50, rgba(255, 255, 0, 0.6f)),// Yellow
-                stop(100, rgba(0, 255, 0, 0.7f))  // Green
+                stop(0, rgba(248, 113, 113, 0.4f)),     // red
+                stop(15, rgba(251, 146, 60, 0.4f)),   // Orange
+                stop(50, rgba(250, 204, 21, 0.4f)),// Yellow
+                stop(100, rgba(74, 222, 128, 0.4f))  // Green
             )
         ),
         //Changes the border
         fillOutlineColor(rgba(0, 0, 0, 0f)),
-        fillOpacity(0.5f)
+        fillOpacity(1f)
     )
 
 
@@ -598,9 +678,9 @@ private fun setupHistoricalFindsLayer(style: Style) {
     val circleLayer = CircleLayer("historical-finds-layer", "historical-finds-source")
     circleLayer.setProperties(
         circleRadius(6f),
-        circleColor("#8B4513"),   // brown pin color
+        circleColor("#D0ECA8"),   // PrimaryFixed
         circleStrokeWidth(1.5f),
-        circleStrokeColor("#FFFFFF")
+        circleStrokeColor("#1B1C15")  //OnSurfaceDark
     )
     style.addLayer(circleLayer)
 }
@@ -639,9 +719,42 @@ private fun setupPointMarker(style: Style) {
     val circleLayer = CircleLayer("position-layer", "position-source")
     circleLayer.setProperties(
         circleRadius(6f),
-        circleColor("#2769DB"),   // blue like google maps
+        circleColor("#2769DB"),   // blue like Google Maps
         circleStrokeWidth(1.5f),
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(circleLayer)
+
+}
+
+//Sets up the userPosition on the map
+
+private fun setupUserLocationLayer(style: Style){
+    val source = GeoJsonSource("user-location-source")
+    style.addSource(source)
+
+    //Outer ring around user position (Pulsing ring)
+    val pulseLayer = CircleLayer("user-location-pulse", "user-location-source")
+    pulseLayer.setProperties(
+        circleRadius(10f),
+        circleColor("#2769DB"),
+        circleStrokeWidth(2f),
+        circleStrokeColor("#FFFFF")
+
+    )
+    style.addLayer(pulseLayer)
+
+    val dotLayer = CircleLayer("user-location-layer", "user-location-source")
+    dotLayer.setProperties(
+        circleRadius(6f),
+        circleColor("#2769DB"),
+        circleStrokeWidth(1f),
+        circleStrokeColor("#FFFFF")
+    )
+    style.addLayer(dotLayer)
+}
+
+fun isDarkMode(context: Context): Boolean {
+    val darkModeFlag = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return darkModeFlag == Configuration.UI_MODE_NIGHT_YES
 }

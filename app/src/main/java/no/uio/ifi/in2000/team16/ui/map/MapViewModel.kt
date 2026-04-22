@@ -3,6 +3,7 @@ package no.uio.ifi.in2000.team16.ui.map
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -226,6 +227,14 @@ class MapViewModel @Inject constructor(
             }
         }
     }
+
+    //Updates the users position
+    fun onUserLocationUpdated(lat: Double, lon: Double){
+        _uiState.update {it.copy(userLocation = LatLng(lat, lon))}
+    }
+
+
+
 }
 data class MapScreenState(
     val screenStatus: ScreenStatus = ScreenStatus.Idle,
@@ -243,7 +252,8 @@ data class MapScreenState(
     val showWmsForest: Boolean = false,
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
-    val addressSuggestions: List<Address> = emptyList()
+    val addressSuggestions: List<Address> = emptyList(),
+    val userLocation: LatLng? = null
 )
 
 sealed class ScreenStatus{
