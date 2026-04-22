@@ -162,7 +162,9 @@ fun MushroomListItem(
                     shape = MaterialTheme.shapes.extraSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                .clickable {navigateToMushroom()},
+                .clickable {
+                    viewModel.onMushroomViewing(mushroom)
+                    navigateToMushroom()},
             contentAlignment = Alignment.Center
         ) {
                 Icon(

@@ -19,6 +19,8 @@ class MushroomInfoViewModel @Inject constructor(
 ) : ViewModel() {
 
     val mushrooms = repository.getAllMushrooms()
+    var viewMushroom by mutableStateOf<Mushroom?>(null)
+        private set
     var selectedMushroom by mutableStateOf<Mushroom?>(
         if (mushrooms.isNotEmpty()) mushrooms[0] else null
     )
@@ -30,7 +32,9 @@ class MushroomInfoViewModel @Inject constructor(
             repository.updateSelectedMushroom(mushroom)
         }
     }
-
+    fun onMushroomViewing(mushroom: Mushroom) {
+        viewMushroom = mushroom
+    }
     fun toggleFavorite(mushroom: Mushroom) {
         viewModelScope.launch {
             repository.toggleFavorite(mushroom)

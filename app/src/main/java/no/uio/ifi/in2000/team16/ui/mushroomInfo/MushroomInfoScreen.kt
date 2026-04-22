@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -41,11 +42,9 @@ fun MushroomInfoScreen(
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     print("MUSHROM INFOSCREEN LOADED")
-    val selected = viewModel.selectedMushroom ?: return  //Return if no mushroom is selected
+    val selected = viewModel.viewMushroom?: return  //Return if no mushroom is selected
     val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
     val isFavorite = favorites.any { it.commonName == selected.commonName }
-
-    var expanded by remember { mutableStateOf(false) }
 
 
     //main Column
@@ -185,31 +184,41 @@ fun MushroomWarningBanner(onMushroomControll: () -> Unit) {
     ) {
         Row(
             modifier = Modifier.padding(16.dp)
-                .clickable { onMushroomControll() },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .clickable { onMushroomControll() }
+            ,
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier
-                    .clip( MaterialTheme.shapes.large)
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(20.dp)
             )
             Spacer(Modifier.width(12.dp))
-            Text(
-                text = "Aldri spis sopp du er usikker på.\nSe soppkontroll.no for mer informasjon.",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-                textAlign = TextAlign.Center
-            )
-            Spacer(Modifier.width(4.dp))
-            Icon(
-                imageVector = Icons.Default.Link,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(12.dp)
-            )
+            Column {
+                Text(
+                    text = "Aldri spis sopp du er usikker på.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Se Soppkontroll.no for informasjon",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        imageVector = Icons.Default.Link,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                }
+            }
         }
     }
 }
