@@ -204,12 +204,15 @@ fun MapScreen(
                     InfoPopUp(
                         msg = eval.description,
                         score = eval.score,
-                        contextData = uiState.currentContext
+                        contextData = uiState.currentContext,
+                        onDismiss = { viewModel.dismissEvaluation() }
                     )
                 }
             }
-            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0, contextData = null)
-            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0, contextData = null)
+            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0,
+                contextData = null, onDismiss = null)
+            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}",
+                score = 0, contextData = null, onDismiss = null)
             is ScreenStatus.Idle -> {}
         }
 
@@ -604,6 +607,7 @@ fun LifeCycleObserver(mapView: MapView) {
 fun BoxScope.InfoPopUp(
     msg : String,
     score : Int,
+    onDismiss: (() -> Unit)?,
     contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
@@ -611,6 +615,7 @@ fun BoxScope.InfoPopUp(
         score = score,
         description = msg,
         contextData = contextData,
+        onDismiss = onDismiss,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()
