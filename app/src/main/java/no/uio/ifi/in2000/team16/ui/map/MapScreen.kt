@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import no.uio.ifi.in2000.team16.R
 import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
@@ -15,8 +16,11 @@ import android.view.Gravity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,10 +28,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -79,6 +87,8 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
@@ -193,8 +203,7 @@ fun MapScreen(
                 color = MaterialTheme.colorScheme.primary
             )
         }
-        
-        MapSearchBar(
+        MapComponents(
             viewModel = viewModel,
             uiState = uiState,
             mapView = mapView,
@@ -226,7 +235,7 @@ fun MapScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapSearchBar(
+fun MapComponents(
     viewModel: MapViewModel,
     uiState: MapScreenState,
     mapView: MapView,
@@ -238,86 +247,172 @@ fun MapSearchBar(
     var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
-    Box(
-        modifier
-            .fillMaxWidth()
-            .wrapContentHeight(Alignment.Top)
-            .semantics { isTraversalGroup = true }
-    ) {
-        SearchBar(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .semantics { traversalIndex = 0f },
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = textFieldState.text.toString(),
-                    onQueryChange = {
-                        textFieldState.edit { replace(0, length, it) }
-                        viewModel.onSearchQueryChanged(it) // Collects suggestions while typing
-                        searchExpanded = true
-                    },
-                    onSearch = { query ->
-                        viewModel.searchAddressByText(query) { lat, lon ->
-                            mapView.getMapAsync { map ->
-                                map.animateCamera(
-                                    CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15.0)
-                                )
-                            }
-                        }
-                        onSearch(textFieldState.text.toString())
-                        searchExpanded = false // closes when search is entered/completed
-                    },
-                    expanded = searchExpanded,
-                    onExpandedChange = { searchExpanded = it },
-                    placeholder = { Text("Søk i kartet") },
-                    leadingIcon = { MapMenu(
-                        viewModel = viewModel,
-                        uiState = uiState,
-                        mapView = mapView,
-                        menuExpanded = menuExpanded,
-                        onClick = { menuExpanded = !menuExpanded },
-                        onDismissRequest = { menuExpanded = false },
-                        onNavigateToDev = onNavigateToDev
-                    ) },
-                    trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                    )
-                )
-            },
-            expanded = searchExpanded,
-            onExpandedChange = { searchExpanded = it },
+    Column() {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Top,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                //.wrapContentHeight(Alignment.Top)
+                .semantics { isTraversalGroup = true }
         ) {
-            // Displays search results in a scrollable column
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(uiState.addressSuggestions) { suggestion ->
-                    ListItem(
-                        headlineContent = { Text("${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}") },
-//                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { // each item is clickable
-                                viewModel.searchAddress(suggestion) { lat, lon ->
-                                    mapView.getMapAsync { map ->
-                                        map.animateCamera(
-                                            CameraUpdateFactory.newLatLngZoom(
-                                                LatLng(lat, lon), 15.0 // 15 is how close we want the zoom after searching
-                                            )
-                                        )
-                                    }
-                                    viewModel.onMapClicked(lat, lon)
-                                }
-                                // updates the searchbar text
-                                val text = "${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}"
-                                textFieldState.edit { replace(0, length, text) }
-                                searchExpanded = false
-                            }
-                            //.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+            MapMenu(
+                viewModel = viewModel,
+                uiState = uiState,
+                mapView = mapView,
+                menuExpanded = menuExpanded,
+                onClick = { menuExpanded = !menuExpanded },
+                onDismissRequest = { menuExpanded = false },
+                onNavigateToDev = onNavigateToDev
+            )
+            MapSearchBar(
+                viewModel = viewModel,
+                uiState = uiState,
+                searchExpanded = searchExpanded,
+                onExpandedChange = { searchExpanded = it },
+                mapView = mapView,
+                textFieldState = textFieldState,
+                onSearch = onSearch,
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Top,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp)
+                .semantics { isTraversalGroup = true }
+        ) {
+            CentralizeMap(
+                onClick = {
+                    val userLocation = uiState.userLocation
+                    if (userLocation != null) {
+                        mapView.getMapAsync { map ->
+                            map.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(userLocation.latitude, userLocation.longitude),
+                                    15.0
+                                )
+                            )
+                        }
+                    }
                 }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MapSearchBar(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    searchExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    mapView: MapView,
+    textFieldState: TextFieldState,
+    onSearch: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DockedSearchBar(
+        modifier = Modifier
+            //.align(Alignment.TopStart)
+            //.weight(1f)
+            .semantics { traversalIndex = 0f },
+        shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = textFieldState.text.toString(),
+                onQueryChange = {
+                    textFieldState.edit { replace(0, length, it) }
+                    viewModel.onSearchQueryChanged(it) // Collects suggestions while typing
+                    onExpandedChange(it.isNotEmpty())
+                },
+                onSearch = { query ->
+                    viewModel.searchAddressByText(query) { lat, lon ->
+                        mapView.getMapAsync { map ->
+                            map.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15.0)
+                            )
+                        }
+                    }
+                    onSearch(textFieldState.text.toString())
+                    onExpandedChange(false) // closes when search is entered/completed
+                },
+                expanded = searchExpanded,
+                onExpandedChange = onExpandedChange,
+                placeholder = { Text("Søk i kartet") },
+                trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                )
+            )
+        },
+        expanded = searchExpanded,
+        onExpandedChange = onExpandedChange,
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp
+    ) {
+        // Displays search results in a scrollable column
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 500.dp) // Max height of search result list
+        ) {
+            items(uiState.addressSuggestions) { suggestion ->
+                ListItem(
+                    headlineContent = { Text("${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { // each item is clickable
+                            viewModel.searchAddress(suggestion) { lat, lon ->
+                                mapView.getMapAsync { map ->
+                                    map.animateCamera(
+                                        CameraUpdateFactory.newLatLngZoom(
+                                            LatLng(lat, lon),
+                                            15.0 // 15 is how close we want the zoom after searching
+                                        )
+                                    )
+                                }
+                                viewModel.onMapClicked(lat, lon)
+                            }
+                            // updates the searchbar text
+                            val text =
+                                "${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}"
+                            textFieldState.edit { replace(0, length, text) }
+                            onExpandedChange(false)
+                        }
+                )
+                HorizontalDivider()
             }
+        }
+    }
+}
+
+@Composable
+fun CentralizeMap(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .padding(top = 16.dp)
+            .size(56.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                imageVector = Icons.Default.Navigation,
+                contentDescription = "Sentraliser kartet",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }
@@ -331,11 +426,24 @@ fun MapMenu(
     onClick: () -> Unit,
     onDismissRequest: () -> Unit,
     onNavigateToDev: () -> Unit,
-
+    modifier: Modifier = Modifier
 ) {
-    Box {
+    Box(
+        modifier = modifier
+            //.padding(top = 10.dp)
+            .size(56.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
         IconButton(onClick = onClick) {
-            Icon(Icons.Default.Menu, contentDescription = "Menu")
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Meny",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
         Dropdown(
             expanded = menuExpanded,
@@ -367,6 +475,7 @@ fun MapMenu(
     }
 }
 
+
 @Composable
 fun getMapView(
     viewModel: MapViewModel,
@@ -383,7 +492,7 @@ fun getMapView(
 
                 getMapAsync { map ->
                     mapRef = map
-                    setMapLayout(map)
+                    setMapLayout(map, context)
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
@@ -630,7 +739,7 @@ fun BoxScope.InfoPopUp(
     )
 }
 
-fun setMapLayout(map: MapLibreMap) {
+fun setMapLayout(map: MapLibreMap, context: Context) {
     map.cameraPosition = CameraPosition.Builder()
         .target(LatLng(59.91, 10.75)) // Where the map opens, now Oslo
         .zoom(11.0) // Degree of zoom when map is opened
@@ -638,10 +747,14 @@ fun setMapLayout(map: MapLibreMap) {
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
 
+    val density = context.resources.displayMetrics.density
+    val topMargin = (160 * density).toInt() // Transforms dp to pixels
+    val rightMargin = (20 * density).toInt()
     val ui = map.uiSettings
     // If we want a compass
     ui.isCompassEnabled = true
     ui.compassGravity = Gravity.TOP or Gravity.END
+    ui.setCompassMargins(0, topMargin, rightMargin, 0) // Sets the position of the compass
     // Adds zoom, scroll, rotation, tilt and double tap
     ui.isZoomGesturesEnabled = true
     ui.isScrollGesturesEnabled = true
@@ -746,6 +859,7 @@ private fun setupPinIcon(style: Style) {
         )
     style.addLayer(symbolLayer)
 }
+
 private fun setupPointMarker(style: Style) {
     val source = GeoJsonSource("position-source")
     style.addSource(source)

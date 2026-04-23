@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Check
@@ -38,6 +39,7 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 @Composable
 fun Dropdown(
     expanded: Boolean,
+    //onMenuClick: () -> Unit,
     onDismissRequest: () -> Unit,
     onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
@@ -51,14 +53,15 @@ fun Dropdown(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        offset= DpOffset(x=0.dp,y=10.dp)
+        offset = DpOffset(x = 0.dp, y = 10.dp)
     ) {
 
 
         // First section
         DropdownMenuItem(
             text = { Text(if (isHeatmapEnabled) "Skru av Heatmap" else "Skru på Heatmap") },
-            leadingIcon = { if (isHeatmapEnabled) {
+            leadingIcon = {
+                if (isHeatmapEnabled) {
                     Icon(Icons.Outlined.FlashlightOff, contentDescription = "Flashlight Off")
                 } else {
                     Icon(Icons.Outlined.FlashlightOn, contentDescription = "Flashlight On")
@@ -111,7 +114,12 @@ fun Dropdown(
                         onMushroomSelected(mushroom)
                         onDismissRequest()
                     },
-                    trailingIcon = { if (isSelected) Icon(Icons.Outlined.Check, contentDescription = "Check") }
+                    trailingIcon = {
+                        if (isSelected) Icon(
+                            Icons.Outlined.Check,
+                            contentDescription = "Check"
+                        )
+                    }
                 )
             }
         }
@@ -123,6 +131,7 @@ fun Dropdown(
 fun DropdownPreview() {
     Dropdown(
         expanded = true,
+        //onMenuClick = {},
         onDismissRequest = {},
         onNavigateToDev = {},
         isHistoricalFindsEnabled = false,

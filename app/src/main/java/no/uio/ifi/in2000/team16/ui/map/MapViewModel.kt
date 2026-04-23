@@ -3,9 +3,9 @@ package no.uio.ifi.in2000.team16.ui.map
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import org.maplibre.android.geometry.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -204,7 +204,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(searchQuery = query) }
         searchJob?.cancel() // Cancels ongoing search when search is updated
         searchJob = viewModelScope.launch { // Starts new search
-            delay(300) // Makes it wait a little bit before searching, to not spam the API
+            delay(200) // Makes it wait a little bit before searching, to not spam the API
             val suggestions = addressRepository.getSuggestions(query)
             _uiState.update { it.copy(addressSuggestions = suggestions) }
         }
