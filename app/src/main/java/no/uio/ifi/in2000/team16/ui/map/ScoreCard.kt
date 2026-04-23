@@ -236,6 +236,27 @@ fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
             )
         }
 
+        //The Score Cirlce itself:
+        Surface(
+            modifier = Modifier.size(80.dp),
+            shape = CircleShape,
+            color = getInterpolatedScoreColor(score)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                //Displays the score evaluation.
+                Text(
+                    text = score.toString(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.surface
+                )
+            }
+
+        }
+
         
     }
 
