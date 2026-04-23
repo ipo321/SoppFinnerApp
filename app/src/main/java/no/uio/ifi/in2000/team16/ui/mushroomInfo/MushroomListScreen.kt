@@ -70,18 +70,20 @@ fun MushroomListScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        WarningBanner()
-        Spacer(modifier = Modifier.height(16.dp))
-        MushroomControllBanner(onVisitSoppkontroll = onMushroomControll)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         //list column with all the mushrooms.
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            //Spacer(modifier = Modifier.height(8.dp))
+            WarningBanner()
+            //Spacer(modifier = Modifier.height(8.dp))
+            MushroomControllBanner(onVisitSoppkontroll = onMushroomControll)
+            //Spacer(modifier = Modifier.height(4.dp))
+            //favorites column
             Text(
             text = "Favoritter",
             style = MaterialTheme.typography.headlineSmall,
@@ -99,6 +101,7 @@ fun MushroomListScreen(
                     navigateToMushroom = navigateToMushroom
                 )
             }
+
             Text(
                 text = "Øvrige",
                 style = MaterialTheme.typography.headlineSmall,
