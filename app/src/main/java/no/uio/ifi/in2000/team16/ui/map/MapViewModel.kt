@@ -233,6 +233,10 @@ class MapViewModel @Inject constructor(
         _uiState.update {it.copy(userLocation = LatLng(lat, lon))}
     }
 
+    fun dismissEvaluation() {
+        _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null, currentContext = null) }
+    }
+
 
 
 }

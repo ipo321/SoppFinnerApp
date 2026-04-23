@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.ui.theme.*
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.ui.modifier.modifierLocalConsumer
 
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
@@ -42,6 +48,7 @@ fun ScoreCard(
     modifier: Modifier = Modifier,
     description: String,
     score: Int,
+    onDismiss: (() -> Unit)? = null,
     contextData: EnvironmentContext?
 ) {
     val context = LocalContext.current
@@ -53,49 +60,57 @@ fun ScoreCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
 
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            //The Score Cirlce itself:
-            Surface(
-                modifier = Modifier.size(100.dp),
-                shape = CircleShape,
-                color = getInterpolatedScoreColor(score)
+        Box(modifier = Modifier.fillMaxWidth()) {
+
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                //The Score Cirlce itself:
+                Surface(
+                    modifier = Modifier.size(100.dp),
+                    shape = CircleShape,
+                    color = getInterpolatedScoreColor(score)
                 ) {
-                    //Displays the score evaluation.
-                    Text(
-                        text = score.toString(),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.surface
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        //Displays the score evaluation.
+                        Text(
+                            text = score.toString(),
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.surface
+                        )
+                    }
+
                 }
 
-            }
 
+                Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.height(8.dp))
+                Text(
+                    text = description,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-            Text(text = description, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(16.dp))
-
-            //Rows intended for extra info like humidity exct..:
-            Row (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                //Rows intended for extra info like humidity exct..:
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     //Uppermost left
                     InfoItem(
                         label = "Skogstype",
-                        value = contextData?.forestData?.let { "${it.dominantTreeSpecies}" } ?: "Ukjent"
+                        value = contextData?.forestData?.let { "${it.dominantTreeSpecies}" }
+                            ?: "Ukjent"
                     )
 
                     //Uppermost Right
@@ -120,11 +135,19 @@ fun ScoreCard(
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Været nå", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            text = "Været nå",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             val symbolCode = contextData?.currentWeather?.symbolCode
                             if (symbolCode != null) {
-                                val imageRes = context.resources.getIdentifier(symbolCode, "drawable", context.packageName)
+                                val imageRes = context.resources.getIdentifier(
+                                    symbolCode,
+                                    "drawable",
+                                    context.packageName
+                                )
                                 if (imageRes != 0) {
                                     Image(
                                         painter = painterResource(id = imageRes),
@@ -145,7 +168,24 @@ fun ScoreCard(
                     }
                 }
             }
+            // Close button up in the corner
+            if(onDismiss != null){
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(32.dp)
+                ){
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Lukk",
+                        tint = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+            }
         }
+    }
     }
 
 @Composable
