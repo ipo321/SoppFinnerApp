@@ -15,13 +15,13 @@ class AddressDataSource @Inject constructor(
 
     // Searches while user is writing
     suspend fun suggest(query: String): List<Address> {
-        if (query.length < 3) return emptyList()
+        //if (query.length < 3) return emptyList()
         return try {
             val response: AddressSearchResponse = httpClient.get("$baseUrl/sok") {
                 url {
                     parameters.append("sok", query)
-                    parameters.append("fuzzy", "true")
-                    parameters.append("sokemodus", "OR")
+                    parameters.append("fuzzy", "true") // Allows the search text to not be 100% accurate
+                    parameters.append("sokemodus", "AND") // Everything in search must be in result. Can switch to OR if we don't want this.
                     parameters.append("utkoordsys", "4326")
                     parameters.append("treffPerSide", "8") // Only 8 suggestions at a time
                 }

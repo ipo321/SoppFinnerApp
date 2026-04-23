@@ -34,8 +34,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -270,7 +272,12 @@ fun MapComponents(
                 viewModel = viewModel,
                 uiState = uiState,
                 searchExpanded = searchExpanded,
-                onExpandedChange = { searchExpanded = it },
+                onExpandedChange = { expanded ->
+                    searchExpanded = expanded
+                   if (expanded) {
+                       viewModel.dismissEvaluation()
+                   }
+                },
                 mapView = mapView,
                 textFieldState = textFieldState,
                 onSearch = onSearch,
@@ -343,7 +350,29 @@ fun MapSearchBar(
                 expanded = searchExpanded,
                 onExpandedChange = onExpandedChange,
                 placeholder = { Text("Søk i kartet") },
-                trailingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                trailingIcon = {
+                    if (textFieldState.text.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                textFieldState.edit { replace(0, length, "") }
+                                viewModel.onSearchQueryChanged("")
+                                onExpandedChange(false)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Tøm søk",
+                                tint = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        }
+                    }
+                    else {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    }
+                },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -362,13 +391,14 @@ fun MapSearchBar(
                 .fillMaxWidth()
                 .heightIn(max = 500.dp) // Max height of search result list
         ) {
-            items(uiState.addressSuggestions) { suggestion ->
+            items(uiState.searchSuggestions) { suggestion ->
                 ListItem(
-                    headlineContent = { Text("${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}") },
+                    headlineContent = { Text(suggestion.title ?: "") },
+                    supportingContent = { Text(suggestion.subtitle) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { // each item is clickable
-                            viewModel.searchAddress(suggestion) { lat, lon ->
+                            viewModel.searchLocation(suggestion) { lat, lon ->
                                 mapView.getMapAsync { map ->
                                     map.animateCamera(
                                         CameraUpdateFactory.newLatLngZoom(
@@ -377,12 +407,10 @@ fun MapSearchBar(
                                         )
                                     )
                                 }
-                                viewModel.onMapClicked(lat, lon)
+                                //viewModel.onMapClicked(lat, lon)
                             }
                             // updates the searchbar text
-                            val text =
-                                "${suggestion.adressetekst} ${suggestion.poststed} ${suggestion.kommunenavn}"
-                            textFieldState.edit { replace(0, length, text) }
+                            textFieldState.edit { replace(0, length, suggestion.title) }
                             onExpandedChange(false)
                         }
                 )

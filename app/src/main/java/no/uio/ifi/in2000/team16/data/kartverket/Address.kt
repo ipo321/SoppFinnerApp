@@ -41,7 +41,12 @@ data class Address(
     val stedfestingverifisert: Boolean? = null,
     val representasjonspunkt: RepresentationPoint? = null,
     val oppdateringsdato: String? = null   // evt. Instant/LocalDateTime med custom serializer
-)
+) : SearchableLocation {
+    override val title: String get() = adressetekst ?: ""
+    override val subtitle: String get() = "$poststed, $kommunenavn".trim(',', ' ')
+    override val latitude: Double? get() = representasjonspunkt?.lat
+    override val longitude: Double? get() = representasjonspunkt?.lon
+}
 
 @Serializable
 data class RepresentationPoint(
