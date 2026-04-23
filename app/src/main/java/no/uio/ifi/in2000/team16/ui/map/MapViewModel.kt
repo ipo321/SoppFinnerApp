@@ -43,6 +43,8 @@ class MapViewModel @Inject constructor(
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
     private var debounceJob: Job? = null
 
+    private var hasMovedToUserLocation = false // flag to see if camera has been moved to user on startup
+
     init{
         viewModelScope.launch {
             speciesRepository.selectedMushroom.collect { mushroom ->
@@ -231,8 +233,16 @@ class MapViewModel @Inject constructor(
     //Updates the users position
     fun onUserLocationUpdated(lat: Double, lon: Double){
         _uiState.update {it.copy(userLocation = LatLng(lat, lon))}
+
+        if(!hasMovedToUserLocation){
+            hasMovedToUserLocation = true
+            _uiState.update {it.copy(moveCameraToUser = true)}
+        }
     }
 
+    fun onCameraMoved(){
+        _uiState.update{it.copy(moveCameraToUser = true)}
+    }
     fun dismissEvaluation() {
         _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null, currentContext = null) }
     }
@@ -257,7 +267,8 @@ data class MapScreenState(
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
     val addressSuggestions: List<Address> = emptyList(),
-    val userLocation: LatLng? = null
+    val userLocation: LatLng? = null,
+    val moveCameraToUser: Boolean = false
 )
 
 sealed class ScreenStatus{
