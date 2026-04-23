@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import no.uio.ifi.in2000.team16.R
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -45,7 +46,7 @@ fun MushroomInfoScreen(
     val selected = viewModel.viewMushroom?: return  //Return if no mushroom is selected
     val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
     val isFavorite = favorites.any { it.commonName == selected.commonName }
-
+    val inSeason = viewModel.isInSeason
 
     //main Column
     Column(
@@ -114,6 +115,14 @@ fun MushroomInfoScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            MushroomPropertyBadge(
+                MushroomProperty(
+                    label = if (inSeason) "I sesong" else "Ikke i sesong",
+                    iconRes = if (inSeason) R.drawable.check_icon else R.drawable.x_icon,
+                    isNegative = !inSeason
+                )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
             selected.properties.forEach { property ->
                 MushroomPropertyBadge(property)
                 Spacer(modifier = Modifier.width(16.dp))
@@ -149,7 +158,7 @@ fun MushroomInfoScreen(
 @Composable
 fun MushroomPropertyBadge(property: MushroomProperty) {
     val borderColor = if (property.isNegative) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-    val bgColor     = if (property.isNegative) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
+    val bgColor = if (property.isNegative) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(

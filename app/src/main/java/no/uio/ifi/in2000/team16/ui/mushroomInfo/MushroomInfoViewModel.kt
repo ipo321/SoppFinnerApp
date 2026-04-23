@@ -11,6 +11,8 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import javax.inject.Inject
+import java.time.LocalDate
+
 
 
 @HiltViewModel
@@ -40,6 +42,14 @@ class MushroomInfoViewModel @Inject constructor(
             repository.toggleFavorite(mushroom)
         }
     }
+
+    val isInSeason: Boolean
+        get() {
+            val currentMonth = java.util.Calendar.getInstance()
+                .get(java.util.Calendar.MONTH) + 1
+
+            return viewMushroom?.profile?.activeMonths?.contains(currentMonth) == true
+        }
 
 }
 
