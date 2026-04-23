@@ -1,6 +1,40 @@
-Harriet 
-Mikael Fossbakk
-Jostein Holen Ibsen
-Adam
-ESMA
-Heidi
+<!-- Beskriver hvordan appen kjøres og avhengigheter (f.eks. krever
+lokasjon). Bør også inneholde informasjon om biblioteker som er
+brukt og en enkel forklaring for bibliotekene som ikke er vist i
+kurset. -->
+
+# IN2000 project team 16:
+## About
+A app for finding mushroom in Norway. The app offers a simple map ui where users can pick a mushroom and spot and get
+a evaluation of its potentials. The app also offers heatmap to view the potential of a larger area.
+
+To evaluate an area the app collects information on historical weather (MET-Frost), current weather (MET-LocationForecast),
+Mushroom findings (GBIF), biological data (NIBIO SAT-SKOG) and resource type data (NIBIO AR5). The Context is then as a default
+used in a local ML-model to calculate a score. The app also offers a option for AI-evaluation and Local simplified algorithm
+___
+## Requirements 
+The app needs an internet connection to be able to offer a full user-experience. The app does not crash at the lack of a internet connection
+but the functionality will be severally limited.  
+
+To run the application locally, you must provide your own API credentials. The app should not crash without these credentials but the AI functions will not work
+
+``` Text 
+AZURE_API_KEY= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_ENDPOINT= https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+___
+## How to run
+
+___
+## Dependencies
+___
+## Libraries
+___
+## Members of the team
+* Harriet
+* Mikael
+* Jostein
+* Adam
+* Esma
+* Heidi
