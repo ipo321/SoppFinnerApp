@@ -9,17 +9,6 @@ data class AddressSearchResponse(
 )
 
 @Serializable
-data class MetaData(
-    val viserFra: Int? = null,
-    val asciiKompatibel: Boolean? = null,
-    val totaltAntallTreff: Int? = null,
-    val viserTil: Int? = null,
-    val sokeStreng: String? = null,
-    val side: Int? = null,
-    val treffPerSide: Int? = null
-)
-
-@Serializable
 data class Address(
     val adressenavn: String? = null,
     val adressetekst: String? = null,
@@ -47,10 +36,3 @@ data class Address(
     override val latitude: Double? get() = representasjonspunkt?.lat
     override val longitude: Double? get() = representasjonspunkt?.lon
 }
-
-@Serializable
-data class RepresentationPoint(
-    val epsg: String? = null,
-    val lat: Double? = null,
-    val lon: Double? = null
-)

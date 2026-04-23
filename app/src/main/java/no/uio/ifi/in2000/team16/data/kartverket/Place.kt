@@ -29,7 +29,7 @@ data class Place(
         val type = navneobjekttype?.replaceFirstChar { it.uppercase() } ?: "Sted"
         val kommune = kommunenavn ?: ""
         val fylke = fylkesnavn ?: ""
-        val parts = listOf(type, kommune, fylke).filter { it.isNotBlank() && it != "null" }
+        //val parts = listOf(type, kommune, fylke).filter { it.isNotBlank() && it != "null" }
 
         return when {
             kommune.isNotEmpty() && fylke.isNotEmpty() && kommune != fylke -> "$type $kommune $fylke"
