@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.Manifest
+import no.uio.ifi.in2000.team16.R
 import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
 import android.content.Context
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.Gravity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
@@ -78,12 +80,15 @@ import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
 import org.maplibre.android.style.sources.TileSet
 import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.style.layers.Property
+import org.maplibre.android.style.layers.SymbolLayer
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -449,7 +454,9 @@ fun getMapView(
             setupHeatmapLayer(style)
             setupHistoricalFindsLayer(style)
             setupForestLayer(style, uiState.showWmsForest)
-            setupPointMarker(style)
+            //setupPointMarker(style)
+            addPinImage(style, context)
+            setupPinIcon(style)
             setupUserLocationLayer(style)
             onMapLoaded()
         }
@@ -473,7 +480,7 @@ fun getMapView(
         val lon = uiState.lastClickedLon ?: return@LaunchedEffect
 
         currentMap.getStyle { style ->
-            val source = style.getSourceAs<GeoJsonSource>("position-source") ?: return@getStyle
+            val source = style.getSourceAs<GeoJsonSource>("clicked-source") ?: return@getStyle
             val point = Point.fromLngLat(lon, lat)
             source.setGeoJson(Feature.fromGeometry(point))
         }
@@ -717,6 +724,28 @@ private fun setupForestLayer(style: Style, isVisible: Boolean) {
     style.addLayer(wmsLayer)
 }
 
+private fun addPinImage(style: Style, context: Context) {
+    val drawable = AppCompatResources.getDrawable(context, R.drawable.location_pin)
+        ?: return
+
+    val bitmap = drawable.toBitmap()  // Makes the drawable into a bitmap for MapLibre
+    style.addImage("pin-icon", bitmap)
+}
+
+private fun setupPinIcon(style: Style) {
+    val source = GeoJsonSource("clicked-source")
+    style.addSource(source)
+
+    val symbolLayer = SymbolLayer("clicked-layer", "clicked-source")
+        .withProperties(
+            iconImage("pin-icon"),
+            iconSize(1.5f), // The size of the pin-icon
+            iconAllowOverlap(true),
+            iconIgnorePlacement(true),
+            iconAnchor(Property.ICON_ANCHOR_BOTTOM) // Makes the pin-tip point where clicked
+        )
+    style.addLayer(symbolLayer)
+}
 private fun setupPointMarker(style: Style) {
     val source = GeoJsonSource("position-source")
     style.addSource(source)
