@@ -489,7 +489,7 @@ fun getMapView(
 
                 getMapAsync { map ->
                     mapRef = map
-                    setMapLayout(map)
+                    setMapLayout(map, context)
                     map.addOnMapClickListener { coordinate ->
                         Log.d("MAP", "Map clicked at: $coordinate")
 
@@ -734,7 +734,7 @@ fun BoxScope.InfoPopUp(
     )
 }
 
-fun setMapLayout(map: MapLibreMap) {
+fun setMapLayout(map: MapLibreMap, context: Context) {
     map.cameraPosition = CameraPosition.Builder()
         .target(LatLng(59.91, 10.75)) // Where the map opens, now Oslo
         .zoom(11.0) // Degree of zoom when map is opened
@@ -742,10 +742,14 @@ fun setMapLayout(map: MapLibreMap) {
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
 
+    val density = context.resources.displayMetrics.density
+    val topMargin = (160 * density).toInt() // Transforms dp to pixels
+    val rightMargin = (20 * density).toInt()
     val ui = map.uiSettings
     // If we want a compass
     ui.isCompassEnabled = true
     ui.compassGravity = Gravity.TOP or Gravity.END
+    ui.setCompassMargins(0, topMargin, rightMargin, 0) // Sets the position of the compass
     // Adds zoom, scroll, rotation, tilt and double tap
     ui.isZoomGesturesEnabled = true
     ui.isScrollGesturesEnabled = true
