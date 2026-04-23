@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.map
 
 //Version-3.5
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +39,9 @@ import no.uio.ifi.in2000.team16.ui.theme.*
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.modifier.modifierLocalConsumer
 
 
@@ -70,25 +74,7 @@ fun ScoreCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //The Score Cirlce itself:
-                Surface(
-                    modifier = Modifier.size(100.dp),
-                    shape = CircleShape,
-                    color = getInterpolatedScoreColor(score)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        //Displays the score evaluation.
-                        Text(
-                            text = score.toString(),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.surface
-                        )
-                    }
-
-                }
+                ScoreCircle(score = score)
 
 
                 Spacer(Modifier.height(8.dp))
@@ -186,7 +172,7 @@ fun ScoreCard(
             }
         }
     }
-    }
+}
 
 @Composable
 fun InfoItem(label: String, value: String){
@@ -206,3 +192,72 @@ fun getInterpolatedScoreColor(score: Int): Color {
     }
 }
 
+
+//Makes the scoreCirlce and the ring around it:
+@Composable
+fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
+    val scoreColor = getInterpolatedScoreColor(score)
+    val trackColor = scoreColor.copy(alpha = 0.25f)
+    val sweepAngle = (score /100f) * 360f
+
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.size(100.dp)
+    ){
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = 8.dp.toPx()
+            val inset = strokeWidth / 2
+
+            drawArc(
+                color = trackColor,
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
+                size = androidx.compose.ui.geometry.Size(
+                    width = size.width - strokeWidth,
+                    height = size.height - strokeWidth
+                ),
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+
+            drawArc(
+                color = scoreColor,
+                startAngle = -90f,
+                sweepAngle = sweepAngle,
+                useCenter = false,
+                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
+                size = androidx.compose.ui.geometry.Size(
+                    width = size.width - strokeWidth,
+                    height = size.height - strokeWidth
+                ),
+                style = Stroke(width = inset + 1.dp.toPx(), cap = StrokeCap.Round)
+            )
+        }
+
+        //The Score Cirlce itself:
+        Surface(
+            modifier = Modifier.size(80.dp),
+            shape = CircleShape,
+            color = getInterpolatedScoreColor(score)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                //Displays the score evaluation.
+                Text(
+                    text = score.toString(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.surface
+                )
+            }
+
+        }
+
+        
+    }
+
+}
