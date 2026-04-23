@@ -233,6 +233,7 @@ fun Navigation(
                     val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
                     MushroomListScreen(
                         navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
+                        onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
                         viewModel = viewModel
                     )
                 }

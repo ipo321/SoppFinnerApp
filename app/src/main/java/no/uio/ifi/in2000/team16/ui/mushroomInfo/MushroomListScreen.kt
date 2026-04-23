@@ -15,13 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -29,11 +35,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
 /*
@@ -43,6 +51,7 @@ hold each mushroom in a list, and routs to the mushroom info screen when cliked.
 @Composable
 fun MushroomListScreen(
     navigateToMushroom: () -> Unit,
+    onMushroomControll: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     val mushrooms = viewModel.mushrooms
@@ -62,7 +71,10 @@ fun MushroomListScreen(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(16.dp))
-
+        WarningBanner()
+        Spacer(modifier = Modifier.height(16.dp))
+        MushroomControllBanner(onVisitSoppkontroll = onMushroomControll)
+        Spacer(modifier = Modifier.height(16.dp))
         //list column with all the mushrooms.
         Column(
             modifier = Modifier
@@ -80,7 +92,6 @@ fun MushroomListScreen(
                 MushroomListItem(
                     viewModel = viewModel,
                     mushroom = mushroom,
-                    isFavorite = favorites.any { it.commonName == mushroom.commonName },
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
@@ -98,7 +109,6 @@ fun MushroomListScreen(
                 MushroomListItem(
                     viewModel = viewModel,
                     mushroom = mushroom,
-                    isFavorite = favorites.any { it.commonName == mushroom.commonName },
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
@@ -117,7 +127,6 @@ fun MushroomListScreen(
 fun MushroomListItem(
     viewModel: MushroomInfoViewModel,
     mushroom: Mushroom,
-    isFavorite: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
     navigateToMushroom: () -> Unit,
@@ -149,7 +158,6 @@ fun MushroomListItem(
             Text(
                 text = mushroom.latinName,
                 style = MaterialTheme.typography.labelMedium,
-                fontStyle = FontStyle.Italic,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -192,6 +200,7 @@ private fun mushroomCardModifier(
                 shape = MaterialTheme.shapes.medium
             )
 
+
     } else {
         base
             .clip(MaterialTheme.shapes.medium)
@@ -201,6 +210,78 @@ private fun mushroomCardModifier(
                 shape = MaterialTheme.shapes.medium
             )
 
+    }
+}
+
+@Composable
+fun MushroomControllBanner(onVisitSoppkontroll: () -> Unit) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.large,
+        shadowElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Logo + text row
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.soppkontroll_logo),
+                    contentDescription = "Soppkontroll logo",
+                    modifier = Modifier.size(48.dp).clip(CircleShape)
+                )
+                Spacer(Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Soppkontroll.no",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "tilbyr digital soppkontroll som lar brukerne sjekke om soppen er spiselig eller ikke.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            // Orange button
+            Button(
+                onClick = { onVisitSoppkontroll() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE07B20)),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text("Besøk Soppkontroll.no", color = Color.White)
+                Spacer(Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.Default.OpenInNew,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun WarningBanner(){
+    Surface(
+        color = Color(0xFFFFF3CD),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth()
+            .border(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, width = 1.dp)
+    ) {
+        Text(
+            text = "OBS: Dette er ikke en app for identifikasjon av sopp",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        )
     }
 }
 
