@@ -23,7 +23,7 @@ class AddressDataSource @Inject constructor(
                     parameters.append("fuzzy", "true")
                     parameters.append("sokemodus", "OR")
                     parameters.append("utkoordsys", "4326")
-                    parameters.append("treffPerSide", "5") // Only 5 suggestions at a time
+                    parameters.append("treffPerSide", "8") // Only 8 suggestions at a time
                 }
             }.body()
             response.adresser
