@@ -11,7 +11,13 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import javax.inject.Inject
+import java.time.LocalDate
 
+/*
+viwemodel for both the mushroom listScreen and the MushroomInfoscreen.
+gets from speciesRepository that gets form local data that dont change.
+
+ */
 
 @HiltViewModel
 class MushroomInfoViewModel @Inject constructor(
@@ -40,6 +46,15 @@ class MushroomInfoViewModel @Inject constructor(
             repository.toggleFavorite(mushroom)
         }
     }
+
+    //cheking if the Mushroom is in season used for the badge
+    val isInSeason: Boolean
+        get() {
+            val currentMonth = java.util.Calendar.getInstance()
+                .get(java.util.Calendar.MONTH) + 1//calendar is 0 indeksed
+
+            return viewMushroom?.profile?.activeMonths?.contains(currentMonth) == true
+        }
 
 }
 
