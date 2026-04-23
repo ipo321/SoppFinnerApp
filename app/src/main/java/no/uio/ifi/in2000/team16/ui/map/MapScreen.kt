@@ -693,6 +693,19 @@ fun getMapView(
         }
     }
 
+    //For making the screen start on the user position
+    LaunchedEffect(uiState.moveCameraToUser, mapRef) {
+        if(!uiState.moveCameraToUser) return@LaunchedEffect
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val location = uiState.userLocation ?: return@LaunchedEffect
+
+        currentMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(location, 13.0)
+        )
+        //resets the flag
+        viewModel.onCameraMoved()
+    }
+
     return mapView
 }
 
