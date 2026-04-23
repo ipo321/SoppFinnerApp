@@ -167,7 +167,7 @@ fun MapScreen(
             10f, //if moved 10 meters
             listener
         )
-        //disposes of the GPS listner(to avoid leaks)
+        //disposes of the GPS listener(to avoid leaks)
         onDispose{locationManager.removeUpdates(listener)}
     }
 

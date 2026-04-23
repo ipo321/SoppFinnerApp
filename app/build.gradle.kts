@@ -17,8 +17,6 @@ val localProperties = Properties().apply {
     }
 }
 
-val arcgisApiKey: String = localProperties.getProperty("ARCGIS_API_KEY", "")
-
 android {
     namespace = "no.uio.ifi.in2000.team16"
     compileSdk = 36
@@ -31,8 +29,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField("String", "ARCGIS_API_KEY", "\"$arcgisApiKey\"")
     }
 
         packaging {
@@ -85,6 +81,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.ads.mobile.sdk)
+    implementation(libs.androidx.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -122,7 +119,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.compose.material:material-icons-extended")
-
+    implementation("com.stevdza-san:sprite:1.1.0")
     // Jsoup
     implementation("org.jsoup:jsoup:1.18.1")
 

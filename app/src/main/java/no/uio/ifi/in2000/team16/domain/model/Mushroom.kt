@@ -4,6 +4,7 @@ data class Mushroom(
     val commonName: String,
     val latinName: String,
     val imageRes: Int,
+    val bioRes: String,
     val properties: List<MushroomProperty>,
     val profile: SpeciesProfile
 )

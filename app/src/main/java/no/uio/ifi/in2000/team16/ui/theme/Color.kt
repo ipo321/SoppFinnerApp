@@ -50,3 +50,15 @@ val ScoreHigh = Color(0xFF4ADE80) //rgba(74, 222, 128, 0.6f)
 val ScoreMediumHigh = Color(0xFFFACC15)  //rgba(250, 204, 21, 0.6f)
 val ScoreMediumLow = Color(0xFFFB923C)  //rgba(251, 146, 60, 0.6f)
 val ScoreLow = Color(0xFFF87171)  //rgba(248, 113, 113, 0.6f)
+//Bottom navigation colors
+val DarkGreen = Color(0xFF1E1E1E)
+val LightGreen= Color(0xFFD4E6CC)
+
+val LightGreen2 = Color(0xFFEDFEED)
+
+
+
+//Bottom navigaiton DarkMode
+val BottomBarDark = Color(0xFF1E1E1E)
+val selectedColor = Color(0xFFD4E6CC)
+val iconColor = Color(0xFFEDFEED)

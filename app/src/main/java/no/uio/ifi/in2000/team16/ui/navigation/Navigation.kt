@@ -22,9 +22,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.painterResource
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -32,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
-import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
@@ -41,15 +44,17 @@ import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
 import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
+import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
 import androidx.core.content.edit
-import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
-import no.uio.ifi.in2000.team16.ui.popUp.StartPopUp
-
-
+import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
+import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 
 //
 const val MAP_SCREEN = "map"
@@ -70,26 +75,66 @@ fun Navigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val welcomeViewModel: WelcomeViewModel = hiltViewModel()
+    val onboardingCompleted by welcomeViewModel.onBoardingCompleted.collectAsState()
 
-    val mapViewModel: MapViewModel = hiltViewModel()
+    var isTimerFinished by remember { mutableStateOf(false) }
+
+
+    //A slights delay to show the loading screen before the app starts
+    //Not good code practice
+    LaunchedEffect(Unit) {
+        delay(2000) // 2 second delay
+        isTimerFinished = true
+
+    }
     val context = LocalContext.current
+
+    var isMapLoaded by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-    var onboardingCompleted by remember {
-        mutableStateOf(sharedPreferences.getBoolean("onboarding_completed", false))
-    }
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
-    var showStartPopup by remember { mutableStateOf(true) }
-    var isMapLoaded by remember { mutableStateOf(false) }
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val mapUiState by mapViewModel.uiState.collectAsState()
+
+    // Determine if the app is ready to transition away from the loading screen
+    val isAppReady = onboardingCompleted != null && isTimerFinished
+
+    // Specifically check if we are going to the map and if the map is ready.
+    val isMapReady = onboardingCompleted == false || mapUiState.selectedMushroom != null
+
+    // State to control the visibility of the warning dialog
+    var showMapWarning by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isAppReady) {
+        if (isAppReady) {
+            showMapWarning = true
+        }
+    }
+
+    if (!isAppReady || (onboardingCompleted == true && !isMapReady)) {
+        LoadingScreen()
+        return
+    }
+
+    // Display the dialog over the UI if showMapWarning is true
+    if (showMapWarning) {
+        DialogWithImage(
+            onDismissRequest = { showMapWarning = false },
+            onConfirmation = { showMapWarning = false },
+            painter = painterResource(id = R.drawable.dead_sprite),
+            imageDescription = "Warning image"
+        )
+
+    }
 
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
+            if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
                 BottomNavigationBar(navController = navController)
-            }
-        }
+            }}
     ) { innerPadding ->
 
         Box(
@@ -99,7 +144,7 @@ fun Navigation(
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
-            if (onboardingCompleted && currentRoute != ONBOARDING_SCREEN) {
+            if (onboardingCompleted == true && currentRoute != ONBOARDING_SCREEN) {
                 MapScreen(
                     onNavigateToDev = { navController.navigate(DEV_SCREEN) },
                     viewModel = mapViewModel,
@@ -109,25 +154,45 @@ fun Navigation(
             }
             NavHost(
                 navController = navController,
-                startDestination = if (onboardingCompleted) MAP_SCREEN else ONBOARDING_SCREEN,
+                startDestination = if (onboardingCompleted == true) MAP_SCREEN else ONBOARDING_SCREEN,
                 modifier = modifier.fillMaxSize()
             ) {
                 composable(ONBOARDING_SCREEN) {
                     OnboardingScreen(
                         onFinished = {
-                            sharedPreferences.edit {
-                                putBoolean("onboarding_completed", true)
-                            }
-                            onboardingCompleted = true
+                            welcomeViewModel.saveOnBoardingState(completed = true)
                             navController.navigate(MAP_SCREEN) {
-                                popUpTo(ONBOARDING_SCREEN) {
-                                    inclusive = true
-                                }
+                                popUpTo(ONBOARDING_SCREEN) { inclusive = true }
                             }
                         }
                     )
                 }
 
+            composable(MAP_SCREEN) {
+            }
+
+            composable(PROFILE_SCREEN) {
+                ProfileScreen(navController = navController)
+            }
+            //UNDER-ITEMS for Profile-screen
+            composable(SETTINGS_SCREEN) {
+                SettingsScreen(navController = navController)
+            }
+            composable(HISTORY_SCREEN) {
+                HistoryScreen(navController = navController)
+            }
+            composable(SHROOMSPOT_SCREEN) {
+                ShroomSpotScreen(navController = navController)
+            }
+            composable(INFO_SCREEN) {
+                InfoScreen(navController = navController)
+            }
+            composable(SHROOMCONTROL_SCREEN) {
+                ShroomControlScreen(navController = navController)
+            }
+            composable(SHROOMBANK_SCREEN) {
+                ShroomBankScreen(navController = navController)
+            }
                 composable(MAP_SCREEN) {
                 }
 
@@ -180,12 +245,13 @@ fun Navigation(
                     val viewModel: MushroomInfoViewModel = hiltViewModel(listEntry)
                     MushroomInfoScreen(
                         onNavigateBack = { navController.popBackStack() },
+                        onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
                         viewModel = viewModel
                     )
                 }
 
             }
-            if (onboardingCompleted && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
+            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

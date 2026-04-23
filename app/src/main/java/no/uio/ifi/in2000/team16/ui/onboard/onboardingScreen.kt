@@ -25,22 +25,22 @@ fun OnboardingScreen(
     modifier: Modifier = Modifier,
     onFinished: () -> Unit
 ) {
-
+//Just an example, need more sprites
     val pages = listOf(
         OnBoardModel(
             title = "Velkommennnn",
             description = "Faskjer",
-            imageRes = R.drawable.ic_onboarding_1
+            imageRes = R.drawable.sprite01
         ),
         OnBoardModel(
             title = "Huskeliste",
             description = "blablabla",
-            imageRes = R.drawable.ic_onboarding_2
+            imageRes = R.drawable.ic_onboarding_1
         ),
         OnBoardModel(
             title = "VIKTIG",
             description = "Ikke dø",
-            imageRes = R.drawable.warning
+            imageRes = R.drawable.dead_sprite
         )
     )
 
