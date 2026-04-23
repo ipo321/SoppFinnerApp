@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">Team 16</string>
+    <string name="app_name">Sopp</string>
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string name="home">Home</string>
+    <string name="sopp">Sopp</string>
+    <string name="subscription">Subscription</string>
+    <string name="library">Library</string>
+    <string name="min_side">Min side</string>
+    <string name="kart">kart</string>
+    <string name="filtrer">filtrer</string>
+    <string name="brunsopp">Sopp</string>
+    <string name="vet_ikke_helt">vet ikke helt</string>
+    <string name="informasjon">Informasjon</string>
 </resources>

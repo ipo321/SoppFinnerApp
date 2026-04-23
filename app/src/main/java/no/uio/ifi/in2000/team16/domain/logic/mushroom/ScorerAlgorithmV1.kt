@@ -10,14 +10,14 @@ First version of the algorithm, it has the most important kill switches and the 
 */
 
 class MushroomScorerV1 : MushroomScorer {
-    override fun calculateScore(                    //Overrides the Interface
+    override suspend fun calculateScore(                    //Overrides the Interface
         context: EnvironmentContext,
         species: SpeciesProfile
     ): EvaluationResult {
         val killReason =
             SeasonKillSwitch.check(context.currentMonth, species.activeMonths)
             ?: FrostKillSwitch.check(context.currentWeather?.temp, species.killTemp)
-            ?: UrbanKillSwitch.check(context.forestData?.arType)
+            ?: UrbanKillSwitch.check(context.ar5)
 
         if (killReason != null) {
             return EvaluationResult(0, killReason)

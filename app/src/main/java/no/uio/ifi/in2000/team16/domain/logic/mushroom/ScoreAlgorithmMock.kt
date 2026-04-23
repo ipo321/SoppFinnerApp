@@ -10,7 +10,7 @@ MOCK algorithm that gives just a random score to test UI functions
 
 
 class ScoreAlgorithmMock : MushroomScorer {
-    override fun calculateScore(                    //Overrides the Interface
+    override suspend fun calculateScore(                    //Overrides the Interface
         context: EnvironmentContext,
         species: SpeciesProfile
     ): EvaluationResult {

@@ -1,47 +1,52 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
 //import jakarta.inject.Inject
-import no.uio.ifi.in2000.team16.domain.model.MushroomInfo
-import no.uio.ifi.in2000.team16.domain.model.MushroomSearchResult
-import no.uio.ifi.in2000.team16.domain.model.OccurrenceResult
+import android.util.Log
 import javax.inject.Inject
 import kotlin.Int
 import kotlin.math.cos
 /*
 repository that can search for mushrooms and get information about them
-and the amount of mushrooms spottings in a certain area.
-use getSpeciesNearLocation with latidude, longitude and the enumc class MushroomSpicies.
-
+and the amount of mushrooms spotting in a certain area.
+use getSpeciesNearLocation with latitude, longitude and species profile.
+amount of mushroom results have a default limit that can be adjusted (limit)
+and a default radius that can be adjusted (radiusKm).
 
 */
 
-enum class MushroomSpecies(val taxonKey: String) {
-    CHANTERELLE("5249504"),
-    FUNNEL_CHANTERELLE("2554536"),
-    PORCINI("5954958")
-}
+
 class MushroomRepository @Inject constructor(
     private val mushroomDataSource: MushroomDataSource
 ) {
 
-    suspend fun searchMushrooms(query: String): List<MushroomInfo> =
-        mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
+    suspend fun searchMushrooms(query: String): List<MushroomInfo> {
+        Log.d("T16_Mushroom_Repository", "Searching for mushrooms with query: $query")
+        return mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
+    }
 
-    //get one spesiffic by id.
-    suspend fun getMushroomDetails(id: String): MushroomInfo =
-        mushroomDataSource.getMushroomById(id).toMushroom()
+
+    suspend fun getMushroomDetails(id: String): MushroomInfo? {
+        Log.d("T16_Mushroom_Repository", "Fetching details for mushroom ID: $id")
+        val result = mushroomDataSource.getMushroomById(id)
+        if (result == null){
+            Log.w("T16_Mushroom_Repository","Could not find mushroom details for ID: $id")
+            return null
+        }
+        return result.toMushroom()
+    }
 
     suspend fun getSpeciesCountNearLocation(
         lat: Double,
         lon: Double,
-        species: MushroomSpecies,
-        radiusKm: Double = 10.0,
-    ): Int = getMushroomCountNearLocation(
-        lat = lat,
-        lon = lon,
-        radiusKm = radiusKm,
-        mushRoomType = species.taxonKey
-    )
+        taxonKey: String,
+        radiusKm: Double = 5.0,
+    ): Int {
+        val result = getMushroomsNearLocation(lat, lon, radiusKm, taxonKey)
+        return result.count
+    }
+
+
+
 
     //returns an int with how many mushrooms are in the area
     suspend fun getMushroomCountNearLocation(
@@ -59,19 +64,17 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 10.0,
+        radiusKm: Double = 3.0,
         mushRoomType: String = "all mushrooms",
-        limit: Int = 5 //amount of results. default 5.
+        limit: Int = 50
     ): OccurrenceResult {
         val latOffset = radiusKm / 111.0
-        val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))//recalculation for the variation of latidiudes
+        val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
 
-        //making a square box around the location
         val latMin = lat - latOffset
         val latMax = lat + latOffset
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
-
 
         return mushroomDataSource.getOccurrencesNearLocation(mushRoomType, latMin, latMax, lonMin, lonMax, limit)
     }
@@ -94,4 +97,23 @@ class MushroomRepository @Inject constructor(
             genusKey = genusKey,
             species = species
         )
+
+    suspend fun getMushroomInBoundingBox(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        mushRoomType: String,
+        limit: Int = 10
+    ): OccurrenceResult {
+        return mushroomDataSource.getOccurrencesNearLocation(
+            mushRoomType = mushRoomType,
+            latMin = south,
+            latMax = north,
+            lonMin = west,
+            lonMax = east,
+            limit = limit
+        )
+    }
+
 }

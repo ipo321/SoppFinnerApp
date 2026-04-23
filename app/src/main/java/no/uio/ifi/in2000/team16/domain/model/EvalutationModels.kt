@@ -1,5 +1,7 @@
 package no.uio.ifi.in2000.team16.domain.model
 
+import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
+
 
 /*
 Dataclasses for handling the information that will be put into the evaluation module. Important to look at for all API and repositories as this is what your repository should return.
@@ -9,8 +11,11 @@ data class EnvironmentContext(
     val currentWeather: WeatherData?,
     val weatherHistory: WeatherHistory?,
     val terrainData: TerrainData?,
+    val ar5: String?,
     val forestData: ForestData?,
-    val historicalFinds: Int = 0,
+    val historicalFindCount: Int = 0,
+    val historicalFinds: List<Occurrence> = emptyList(),
+    val hist: Int = 0,
     val currentMonth: Int
 ) {
     companion object {
@@ -18,8 +23,9 @@ data class EnvironmentContext(
             currentWeather = null,
             weatherHistory = null,
             terrainData = null,
+            ar5 = null,
             forestData = null,
-            historicalFinds = 0,
+            historicalFindCount = 0,
             currentMonth = 8 //August
         )
 
@@ -42,6 +48,8 @@ data class WeatherData(
 data class WeatherHistory(
     val avgTempPast14Days: Double?,
     val totalRainPast14Days: Double?,
+    val minTempPast14Days: Double?,
+    val maxTempPast14Days: Double?
 )
 
 
@@ -52,9 +60,24 @@ data class TerrainData(
 )
 
 data class ForestData(
-    val arType: Int,    //AR5 code
-    val treeSpecies: Int //type of forest
+    // Trees
+    val dominantTreeSpecies: String?,
+    val sprucePercentage: Int?,       // 0 - 100
+    val pinePercentage: Int?,         // 0 - 100
+    val broadleafPercentage: Int?,    // 0 - 100
+
+    // Soil & Growth
+    val fertilityCategory: String?,
+    val siteIndex: Int?,              // e.g., 8, 11, 14, 17, 20
+
+    // Age
+    val standAge: Int?,               // Age of the trees in years
+
+    // Terrain (Elevation)
+    val minElevation: Int?,           // Meters above sea level
+    val maxElevation: Int?
 )
+
 
 
 // Structure of the result from the algorithm
