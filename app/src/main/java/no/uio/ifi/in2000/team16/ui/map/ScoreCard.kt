@@ -2,8 +2,11 @@ package no.uio.ifi.in2000.team16.ui.map
 
 //Version-3.5
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +15,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,13 +42,16 @@ import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.ui.theme.*
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.modifier.modifierLocalConsumer
-
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import no.uio.ifi.in2000.team16.R
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
 
@@ -74,8 +82,18 @@ fun ScoreCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //The Score Cirlce itself:
-                ScoreCircle(score = score)
+                Box(contentAlignment = Alignment.Center) {
+                    ScoreCircle(score = score)
 
+                    InfoCapsule(
+                        infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
+                                " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
+                                "skogstype.",
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 30.dp, y = (-20).dp)
+                    )
+                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -170,6 +188,7 @@ fun ScoreCard(
                     )
                 }
             }
+
         }
     }
 }
@@ -260,4 +279,55 @@ fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
         
     }
 
+}
+
+@Composable
+fun InfoCapsule(
+    infoText: String,
+    modifier: Modifier = Modifier
+){
+    var isExpanded by remember {mutableStateOf(false)}
+
+    //So you can click anywhere on the screen to exit the infopopup
+    Box(modifier = modifier) {
+
+        //The infocapsule
+        Surface(
+            onClick = { isExpanded = !isExpanded },
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_info_outline_24),
+                contentDescription = "Info",
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .size(18.dp)
+            )
+        }
+
+        if(isExpanded){
+            Popup(
+                onDismissRequest = {isExpanded = false},
+                properties = PopupProperties(focusable = true)
+            ){
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.onPrimaryContainer),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    modifier = Modifier
+                        .widthIn(max = 240.dp)
+                        .padding(8.dp)
+                ){
+                    Text(
+                        text = infoText,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+        }
+    }
 }
