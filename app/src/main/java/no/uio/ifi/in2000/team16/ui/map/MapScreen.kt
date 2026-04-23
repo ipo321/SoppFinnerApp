@@ -452,6 +452,10 @@ fun MapMenu(
             isHeatmapEnabled = uiState.isHeatmapEnabled,
             isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
             onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+            isSatelliteMode = uiState.isSatelliteMode,
+            onToggleSatellite = { viewModel.toggleSatellite() },
+            showWmsForest = uiState.showWmsForest,
+            onToggleWmsForest = { viewModel.toggleWmsForest() },
             favoriteMushrooms = uiState.favoriteMushrooms,
             selectedMushroom = uiState.selectedMushroom,
             onMushroomSelected = { mushroom ->

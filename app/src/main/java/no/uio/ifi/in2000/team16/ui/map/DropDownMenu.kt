@@ -1,8 +1,12 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +18,8 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.FlashlightOff
 import androidx.compose.material.icons.outlined.FlashlightOn
+import androidx.compose.material.icons.outlined.Forest
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -21,8 +27,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,11 +47,14 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 @Composable
 fun Dropdown(
     expanded: Boolean,
-    //onMenuClick: () -> Unit,
     onDismissRequest: () -> Unit,
     onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
+    isSatelliteMode: Boolean = false,
+    onToggleSatellite: () -> Unit = {},
+    showWmsForest: Boolean = false,
+    onToggleWmsForest: () -> Unit = {},
     favoriteMushrooms: List<Mushroom> = emptyList(),
     selectedMushroom: Mushroom? = null,
     onMushroomSelected: (Mushroom) -> Unit = {},
@@ -80,6 +91,18 @@ fun Dropdown(
                 onToggleHistoricalFinds()
                 onDismissRequest()
             }
+        )
+
+        DropdownMenuItem(
+            text = { Text(if (isSatelliteMode) "Kartmodus" else "Satellittmodus") },
+            leadingIcon = { Icon(Icons.Outlined.Layers, contentDescription = "Kartlag-ikon") },
+            onClick = { onToggleSatellite() }
+        )
+
+        DropdownMenuItem(
+            text = { Text(if (showWmsForest) "Skjul skoglag" else "Vis skoglag") },
+            leadingIcon = { Icon(Icons.Outlined.Forest, contentDescription = "Skog-ikon") },
+            onClick = { onToggleWmsForest() }
         )
 
         DropdownMenuItem(
@@ -126,15 +149,16 @@ fun Dropdown(
     }
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun DropdownPreview() {
     Dropdown(
         expanded = true,
-        //onMenuClick = {},
         onDismissRequest = {},
         onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
+        isHeatmapEnabled = false,
         onToggleHistoricalFinds = {})
 }
 
