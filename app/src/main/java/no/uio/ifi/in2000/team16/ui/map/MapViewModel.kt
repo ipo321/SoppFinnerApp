@@ -275,7 +275,6 @@ data class MapScreenState(
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
     val searchSuggestions: List<SearchableLocation> = emptyList(),
-    val userLocation: LatLng? = null
     val addressSuggestions: List<Address> = emptyList(),
     val userLocation: LatLng? = null,
     val moveCameraToUser: Boolean = false
