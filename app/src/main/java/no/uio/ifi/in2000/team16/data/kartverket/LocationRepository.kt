@@ -10,7 +10,6 @@ class LocationRepository @Inject constructor(
     private val placeDataSource: PlaceDataSource
 ) {
     suspend fun search(query: String): List<SearchableLocation>  = coroutineScope {
-
         val addressSearch = async { addressDataSource.suggest(query) }
         val placeSearch = async { placeDataSource.suggest(query) }
         val addresses = try { addressSearch.await() } catch (e: Exception) {
@@ -20,9 +19,19 @@ class LocationRepository @Inject constructor(
             Log.e("PlaceDataSource", "Error in geocode: ${e.message}")
             emptyList() }
 
-        (addresses + places) // Combines and returns results as one list
+        (places + addresses) // Combines and returns results as one list
             .filter { it.latitude != null && it.longitude != null } // Removes results without lat and lon
             .distinctBy { it.title.lowercase() }
+            .sortedWith(compareByDescending<SearchableLocation> {
+                if (it is Place) {
+                    when (it.navneobjekttype?.lowercase()) {
+                        "fylke" -> 3 // Priorities "fylke" over "kommune"
+                        "kommune" -> 2
+                        else -> 1
+                    }
+                }
+                else 0
+                }.thenBy { it.title.length }) // Shortest name comes first in suggestions
             .take(10)
     }
 

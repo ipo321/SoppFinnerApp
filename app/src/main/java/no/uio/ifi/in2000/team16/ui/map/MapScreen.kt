@@ -393,7 +393,7 @@ fun MapSearchBar(
         ) {
             items(uiState.searchSuggestions) { suggestion ->
                 ListItem(
-                    headlineContent = { Text(suggestion.title ?: "") },
+                    headlineContent = { Text(suggestion.title) },
                     supportingContent = { Text(suggestion.subtitle) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -403,11 +403,10 @@ fun MapSearchBar(
                                     map.animateCamera(
                                         CameraUpdateFactory.newLatLngZoom(
                                             LatLng(lat, lon),
-                                            15.0 // 15 is how close we want the zoom after searching
+                                            13.0 // 13 is how close we want the zoom after searching
                                         )
                                     )
                                 }
-                                //viewModel.onMapClicked(lat, lon)
                             }
                             // updates the searchbar text
                             textFieldState.edit { replace(0, length, suggestion.title) }

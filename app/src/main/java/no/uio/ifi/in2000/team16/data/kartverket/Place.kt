@@ -27,18 +27,24 @@ data class Place(
     
     override val subtitle: String get() {
         val type = navneobjekttype?.replaceFirstChar { it.uppercase() } ?: "Sted"
-        val kommune = kommunenavn ?: ""
-        val fylke = fylkesnavn ?: ""
-        //val parts = listOf(type, kommune, fylke).filter { it.isNotBlank() && it != "null" }
+        val kommune = kommunenavn.takeIf { it != "null" && it != navn && !it.isNullOrBlank() } ?: ""
+        val fylke = fylkesnavn.takeIf { it != "null" && it != navn && it != kommune && !it.isNullOrBlank() } ?: ""
 
-        return when {
-            kommune.isNotEmpty() && fylke.isNotEmpty() && kommune != fylke -> "$type $kommune $fylke"
-            kommune.isNotEmpty() -> "$type $kommune"
-            fylke.isNotEmpty() -> "$type $fylke"
-            else -> type
+        val locationParts = listOf(kommune, fylke).filter { it.isNotEmpty() }
+        return if (locationParts.isNotEmpty()) {
+            "$type i ${locationParts.joinToString(", ")}"
+        } else {
+            type
         }
+
+//        return when {
+//            kommune.isNotEmpty() && fylke.isNotEmpty() && kommune != fylke -> "$type i $kommune i $fylke"
+//            kommune.isNotEmpty() -> "$type i $kommune"
+//            fylke.isNotEmpty() -> "$type i $fylke"
+//            else -> type
+//        }
     }
     
-    override val latitude: Double? get() = representasjonspunkt?.lat
-    override val longitude: Double? get() = representasjonspunkt?.lon
+    override val latitude: Double? get() = representasjonspunkt?.nord ?: representasjonspunkt?.lat
+    override val longitude: Double? get() = representasjonspunkt?.øst ?: representasjonspunkt?.lon
 }

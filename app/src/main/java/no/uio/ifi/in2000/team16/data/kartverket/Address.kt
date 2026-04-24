@@ -32,7 +32,11 @@ data class Address(
     val oppdateringsdato: String? = null   // evt. Instant/LocalDateTime med custom serializer
 ) : SearchableLocation {
     override val title: String get() = adressetekst ?: ""
-    override val subtitle: String get() = "$poststed, $kommunenavn".trim(',', ' ')
+    override val subtitle: String get() {
+        val post = poststed ?: ""
+        val kom = kommunenavn ?: ""
+        return if (post == kom || kom.isBlank()) post else "$poststed, $kommunenavn".trim(',', ' ')
+    }
     override val latitude: Double? get() = representasjonspunkt?.lat
     override val longitude: Double? get() = representasjonspunkt?.lon
 }

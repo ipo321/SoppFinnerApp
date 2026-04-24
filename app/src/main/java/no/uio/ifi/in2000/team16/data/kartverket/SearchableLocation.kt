@@ -26,6 +26,8 @@ data class MetaData(
 @Serializable
 data class RepresentationPoint(
     val epsg: String? = null,
-    val lat: Double? = null,
-    val lon: Double? = null
+    val lat: Double? = null, // Address-API
+    val lon: Double? = null, // Address-API
+    val nord: Double? = null, // Place-API
+    val øst: Double? = null  // Place-API
 )
