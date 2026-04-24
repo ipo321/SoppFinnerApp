@@ -21,7 +21,7 @@ class LocationForecastRepository @Inject constructor(
     // In-memory cache, should be made into a room database in the future for better persistence
 
     private val cache = ConcurrentHashMap<String, Deferred<CacheEntry?>>()
-    private val cacheMaxAgeMs = 8*60*60*1000L //8 hours
+    private val cacheMaxAgeMs = 8 * 60 * 60 * 1000L //8 hours
 
     private data class CacheEntry(
         val data: WeatherData,
@@ -34,7 +34,7 @@ class LocationForecastRepository @Inject constructor(
     }
 
 
-    suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? = coroutineScope{
+    suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? = coroutineScope {
 
         //Rounding to two decimals since that is the precision of the weather model (about 1x1 km)
         val roundedLat = roundToTwoDecimals(lat)
@@ -51,7 +51,7 @@ class LocationForecastRepository @Inject constructor(
                 return@coroutineScope cached.data
             } else {
                 Log.d("T16_Weather_Repo", "Cache expired for $cacheKey")
-                cache.remove(cacheKey)
+                cache.remove(cacheKey, existingDeferred)
             }
         }
 
@@ -63,7 +63,7 @@ class LocationForecastRepository @Inject constructor(
             async {
                 val response = dataSource.fetchWeather(roundedLat, roundedLon)
 
-                val timeseries = response?.properties?.timeseries ?: run{
+                val timeseries = response?.properties?.timeseries ?: run {
                     Log.w("T16_Weather_Repo", "No timeseries found in response for $cacheKey")
                     return@async null
                 }
@@ -74,25 +74,30 @@ class LocationForecastRepository @Inject constructor(
                 }
 
                 val totalRain = next8Hours.sumOf {
-                    it.data.next_1_hours?.details?.precipitation_amount ?: 0.0
+                    it.data.next1Hours?.details?.precipitationAmount ?: 0.0
                 }
 
                 val maxWind = next8Hours.mapNotNull {
-                    it.data.instant.details.wind_speed
+                    it.data.instant.details.windSpeed
                 }.maxOrNull()
 
-                val avgTemp = next8Hours.mapNotNull { it.data.instant.details.air_temperature }.average()
-                    .takeIf { !it.isNaN() }
-                val avgHumidity = next8Hours.mapNotNull { it.data.instant.details.relative_humidity }.average()
-                    .takeIf { !it.isNaN() }
-                val avgDewPoint = next8Hours.mapNotNull { it.data.instant.details.dew_point_temperature }.average()
-                    .takeIf { !it.isNaN() }
-                val avgFog = next8Hours.mapNotNull { it.data.instant.details.fog_area_fraction }.average()
-                    .takeIf { !it.isNaN() }
+                val avgTemp =
+                    next8Hours.mapNotNull { it.data.instant.details.airTemperature }.average()
+                        .takeIf { !it.isNaN() }
+                val avgHumidity =
+                    next8Hours.mapNotNull { it.data.instant.details.relativeHumidity }.average()
+                        .takeIf { !it.isNaN() }
+                val avgDewPoint =
+                    next8Hours.mapNotNull { it.data.instant.details.dewPointTemperature }
+                        .average()
+                        .takeIf { !it.isNaN() }
+                val avgFog =
+                    next8Hours.mapNotNull { it.data.instant.details.fogAreaFraction }.average()
+                        .takeIf { !it.isNaN() }
 
-                val generalForecast = next8Hours.firstOrNull()?.data?.next_12_hours
-                val symbol = generalForecast?.summary?.symbol_code
-                val rainProb = generalForecast?.details?.probability_of_precipitation
+                val generalForecast = next8Hours.firstOrNull()?.data?.next12Hours
+                val symbol = generalForecast?.summary?.symbolCode
+                val rainProb = generalForecast?.details?.probabilityOfPrecipitation
 
                 val weatherData = WeatherData(
                     temp = avgTemp,
@@ -109,14 +114,15 @@ class LocationForecastRepository @Inject constructor(
 
                 CacheEntry(
                     data = weatherData,
-                    timestamp = System.currentTimeMillis())
+                    timestamp = System.currentTimeMillis()
+                )
             }
         }
 
         return@coroutineScope try {
             deferredResult.await()?.data
         } catch (e: Exception) {
-            cache.remove(cacheKey)
+            cache.remove(cacheKey, deferredResult)
             if (e is CancellationException) throw e
             null
         }

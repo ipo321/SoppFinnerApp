@@ -62,7 +62,7 @@ class SatSkogRepository @Inject constructor(
         return@coroutineScope try {
             deferredResult.await()
         } catch (e: Exception) {
-            preciseCache.remove(cacheKey)
+            preciseCache.remove(cacheKey, deferredResult)
             if (e is CancellationException) throw e
             null
         }
@@ -87,7 +87,7 @@ class SatSkogRepository @Inject constructor(
         return@coroutineScope try {
             deferredResult.await()
         } catch (e: Exception) {
-            heatmapCache.remove(cacheKey)
+            heatmapCache.remove(cacheKey, deferredResult)
             if (e is CancellationException) throw e
             null
         }

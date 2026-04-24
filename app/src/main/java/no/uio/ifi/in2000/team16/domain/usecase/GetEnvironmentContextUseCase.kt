@@ -16,7 +16,7 @@ import kotlin.system.measureTimeMillis
 
 
 /*
-Handles a single UseCase, takes in lon and lat and then calls all of the different
+Handles a single UseCase, takes in lon and lat and then calls all the different
 data repositories to fetch the data. Simplifies the Viewmodel. Returns the environment context object
 */
 
@@ -39,7 +39,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                     val weather = async { locationForecastRepository.weatherNext8Hours(lat, lon) }
                     val forest = async { forestRepository.getForestData(lat, lon) }
                     val history = async { frostRepository.weatherHistory(lat, lon) }
-                    val AR5 = async { ar5Repository.getArealType(lat, lon) }
+                    val arealresourcetype = async { ar5Repository.getArealType(lat, lon) }
                     //Add other repositories here
 
                     //Only send if we get species or else null, makes it possible to use the function for all species
@@ -63,7 +63,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                     val historicalFindCount = occurrenceResult?.count ?: 0
                     val historicalFinds = occurrenceResult?.results ?: emptyList()
 
-                    val forestAR5 = AR5.await()
+                    val forestAR5 = arealresourcetype.await()
                     val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
 
                     EnvironmentContext(

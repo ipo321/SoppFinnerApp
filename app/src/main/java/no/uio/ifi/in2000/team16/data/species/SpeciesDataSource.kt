@@ -287,7 +287,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-           profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+           profile = allSpeciesProfiles.find { it.name == "Traktkantarell" }!!
         ),
         Mushroom(
             commonName = "Blek piggsopp",
@@ -298,7 +298,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Blek piggsopp" }!!
         ),
         Mushroom(
             commonName = "Fåresopp",
@@ -309,7 +309,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Fåresopp" }!!
         ),
         Mushroom(
             commonName = "Granmatriske",
@@ -320,7 +320,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Granmatriske" }!!
         ),
         Mushroom(
             commonName = "Rødskrubb",
@@ -331,7 +331,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Rødskrubb" }!!
         ),
         Mushroom(
             commonName = "Brunskrubb",
@@ -342,7 +342,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Brunskrubb" }!!
         ),
         Mushroom(
             commonName = "Matblekksopp",
@@ -353,7 +353,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Matblekksopp" }!!
         ),
         Mushroom(
             commonName = "Svart trompetsopp",
@@ -364,7 +364,7 @@ class SpeciesDataSource @Inject constructor(){
                 MushroomProperty("Ikke giftig", R.drawable.skull, isNegative = false),
                 MushroomProperty("God matsopp", R.drawable.pan, isNegative = false)
             ),
-            profile = allSpeciesProfiles.find { it.name == "Kantarell" }!!
+            profile = allSpeciesProfiles.find { it.name == "Svart trompetsopp" }!!
         )
 
     )

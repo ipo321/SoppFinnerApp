@@ -4,7 +4,8 @@ import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 
 
 /*
-Dataclasses for handling the information that will be put into the evaluation module. Important to look at for all API and repositories as this is what your repository should return.
+Dataclasses for handling the information that will be put into the evaluation module.
+Important to look at for all API and repositories as this is what your repository should return.
 */
 
 data class EnvironmentContext(
@@ -69,6 +70,6 @@ data class ForestData(
 
 // Structure of the result from the algorithm
 data class EvaluationResult(
-    val score: Int,  // Score from 0 -100
+    val score: Int,  // Score from 0 to 100
     val description: String   // Description and reason of the score
 )

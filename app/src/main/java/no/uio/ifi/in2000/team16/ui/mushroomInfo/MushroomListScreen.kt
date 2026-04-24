@@ -40,7 +40,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 
@@ -101,7 +101,6 @@ fun MushroomListScreen(
                     navigateToMushroom = navigateToMushroom
                 )
             }
-
             Text(
                 text = "Øvrige",
                 style = MaterialTheme.typography.headlineSmall,

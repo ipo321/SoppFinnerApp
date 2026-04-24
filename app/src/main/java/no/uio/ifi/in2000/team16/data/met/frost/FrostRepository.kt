@@ -120,7 +120,7 @@ class FrostRepository @Inject constructor(
                         maxTempPast14Days = maxTemp
                     )
 
-                    if (avgTemp != null || totalRain != null) {
+                    if (avgTemp != null || allRainObs.isNotEmpty()) {
                         Log.i(
                             "T16_Frost_Repository",
                             "Successfully processed and cached historical weather for $cacheKey"
@@ -145,13 +145,13 @@ class FrostRepository @Inject constructor(
         val cached = try {
             deferredResult.await()
         } catch (e: Exception) {
-            cache.remove(cacheKey)
+            cache.remove(cacheKey, deferredResult)
             if (e is CancellationException) throw e
             return@coroutineScope null
         }
 
         if (cached != null && (currentTime - cached.timestamp) > cacheMaxAgeMs) {
-            cache.remove(cacheKey)
+            cache.remove(cacheKey, deferredResult)
             return@coroutineScope null
         } else if (cached != null) {
             Log.d("T16_Frost_Repository", "Returning historical weather for $cacheKey")

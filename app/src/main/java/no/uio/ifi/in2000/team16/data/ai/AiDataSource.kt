@@ -15,16 +15,20 @@ import javax.inject.Inject
 class AiDataSource @Inject constructor(
     private val client: HttpClient
 ){
-    private val AZURE_ENDPOINT = BuildConfig.AZURE_ENDPOINT
-    private val AZURE_KEY = BuildConfig.AZURE_API_KEY
-    private val MODEL_NAME = "gpt-5.4-nano"
+    private val azureEndpoint = BuildConfig.AZURE_ENDPOINT.ifBlank {
+        "https://missing-key-localy.no"   //
+    }
+    private val azureKey = BuildConfig.AZURE_API_KEY.ifBlank {
+        "MISSING KEY"
+    }
+    private val modelName = "gpt-5.4-nano"
 
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
     suspend fun fetchEvaluation(prompt: String): AiEvaluationResponse {
         Log.d("T16_Ai_DataSource", "Fetching evaluation from AI: $prompt")
         val request = ChatRequest(
-            model = MODEL_NAME,
+            model = modelName,
             input = listOf(
                 ChatMessage(
                     role = "user",
@@ -34,10 +38,10 @@ class AiDataSource @Inject constructor(
             temperature = 0.2
         )
         return try{
-            val response: ChatResponse = client.post(AZURE_ENDPOINT) {
+            val response: ChatResponse = client.post(azureEndpoint) {
                 contentType(ContentType.Application.Json)
-                header("api-key", AZURE_KEY)
-                header("Authorization", "Bearer $AZURE_KEY")
+                header("api-key", azureKey)
+                header("Authorization", "Bearer $azureKey")
                 setBody(request)
             }.body()
 
