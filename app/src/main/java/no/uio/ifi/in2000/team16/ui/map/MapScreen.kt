@@ -922,19 +922,19 @@ private fun setupUserLocationLayer(style: Style){
     //Outer ring around user position (Pulsing ring)
     val pulseLayer = CircleLayer("user-location-pulse", "user-location-source")
     pulseLayer.setProperties(
-        circleRadius(10f),
+        circleRadius(13f),
         circleColor("#2769DB"),
-        circleStrokeWidth(2f),
-        circleStrokeColor("#FFFFFF")
+        circleStrokeWidth(0f),
+        circleStrokeColor("#000000")
 
     )
     style.addLayer(pulseLayer)
 
     val dotLayer = CircleLayer("user-location-layer", "user-location-source")
     dotLayer.setProperties(
-        circleRadius(6f),
+        circleRadius(7f),
         circleColor("#2769DB"),
-        circleStrokeWidth(1f),
+        circleStrokeWidth(3f),
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(dotLayer)
