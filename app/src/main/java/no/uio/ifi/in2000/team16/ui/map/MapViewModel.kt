@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.kartverket.Address
 import no.uio.ifi.in2000.team16.data.kartverket.LocationRepository
-import no.uio.ifi.in2000.team16.data.kartverket.Place
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
@@ -28,6 +26,12 @@ import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
 import org.maplibre.android.geometry.LatLng
 import javax.inject.Inject
+
+
+/*
+Viewmodel for the Map screen
+
+ */
 
 
 @HiltViewModel
