@@ -93,6 +93,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
 import org.maplibre.android.style.sources.TileSet
@@ -249,12 +250,15 @@ fun MapComponents(
 
     Column() {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.outer),
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                //.wrapContentHeight(Alignment.Top)
+                .padding(
+                    top = Team16Theme.padding.outer,
+                    start = Team16Theme.padding.outer,
+                    end = Team16Theme.padding.outer
+                )
                 .semantics { isTraversalGroup = true }
         ) {
             MapMenu(
@@ -399,8 +403,8 @@ fun CentralizeMap(
 ) {
     Box(
         modifier = modifier
-            .padding(top = 16.dp)
-            .size(56.dp)
+            .padding(top = Team16Theme.padding.outer)
+            .size(Team16Theme.padding.mapButtonsSize)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHighest,
                 shape = CircleShape
@@ -430,7 +434,6 @@ fun MapMenu(
 ) {
     Box(
         modifier = modifier
-            //.padding(top = 10.dp)
             .size(56.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceContainerHighest,
