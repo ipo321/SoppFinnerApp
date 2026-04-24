@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -25,6 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+
+/*
+Dropdown Menu for the map
+
+ */
 
 @Composable
 fun Dropdown(

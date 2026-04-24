@@ -33,7 +33,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +57,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
@@ -133,15 +131,7 @@ fun MapScreen(
     // The map is made with MapView and remember to save state
     val mapView = getMapView(viewModel, context, onMapLoaded)
     // mapView is alerted when lifecycle changes
-    LifeCycleObserver(mapView)
-
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            mapView.onResume()
-        } else {
-            mapView.onPause()
-        }
-    }
+    MapLifecycle(mapView, isVisible)
 
 
     //Shows the "Allow Location" popup and remembers the response
@@ -731,26 +721,45 @@ fun getMapView(
 }
 
 @Composable
-fun LifeCycleObserver(mapView: MapView) {
-
+fun MapLifecycle(mapView: MapView, isVisible: Boolean) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
-    val lifecycleOwner = context as? LifecycleOwner ?: LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner, mapView) {
+    DisposableEffect(lifecycleOwner, mapView, isVisible) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_START -> mapView.onStart()
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
                 Lifecycle.Event.ON_STOP -> mapView.onStop()
                 Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
+                Lifecycle.Event.ON_RESUME -> if (isVisible) mapView.onResume()
+                Lifecycle.Event.ON_PAUSE -> if (isVisible) mapView.onPause()
                 else -> {}
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        // When mapScreen is removed, so is the observer and mapView no longer calls the above functions
+
+        // Ensure correct state if visibility changes while Activity is already RESUMED
+        if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            if (isVisible) mapView.onResume() else mapView.onPause()
+        }
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    // Handle Low Memory events to prevent native crashes
+    DisposableEffect(context, mapView) {
+        val callback = object : android.content.ComponentCallbacks2 {
+            override fun onConfigurationChanged(newConfig: Configuration) {}
+            override fun onLowMemory() {
+                mapView.onLowMemory()
+            }
+            override fun onTrimMemory(level: Int) {}
+        }
+        context.registerComponentCallbacks(callback)
+        onDispose {
+            context.unregisterComponentCallbacks(callback)
         }
     }
 }
