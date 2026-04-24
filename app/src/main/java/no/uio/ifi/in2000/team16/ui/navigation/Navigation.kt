@@ -14,7 +14,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
@@ -45,9 +44,7 @@ import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
-import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import androidx.core.content.edit
 import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen

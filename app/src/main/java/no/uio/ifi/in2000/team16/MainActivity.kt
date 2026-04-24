@@ -1,18 +1,14 @@
 package no.uio.ifi.in2000.team16
 
-import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Modifier
-
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import no.uio.ifi.in2000.team16.ui.navigation.Navigation
-import no.uio.ifi.in2000.team16.ui.navigation.Screen
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.MapLibre
 

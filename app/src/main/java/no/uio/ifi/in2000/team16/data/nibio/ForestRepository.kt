@@ -11,7 +11,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
 /*
-    Repository for the AR5 API, than handles the data output and puts it into a ForestData module from the evaluation module.
+    Repository for the AR5 API, then handles the data output and puts it into a ForestData module from the evaluation module.
     Uses the same method as SAT-SKOG
  */
 @Singleton
@@ -37,7 +37,7 @@ class ForestRepository @Inject constructor(
         return@coroutineScope try {
             deferredResult.await()
         } catch (e: Exception) {
-            cache.remove(cacheKey)
+            cache.remove(cacheKey, deferredResult)
             if (e is CancellationException) throw e
             null
         }

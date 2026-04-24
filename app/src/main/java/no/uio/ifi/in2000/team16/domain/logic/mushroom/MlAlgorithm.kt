@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OnnxTensor
-import ai.onnxruntime.OrtEnvironment.getEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.util.Log
@@ -10,13 +9,14 @@ import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.nio.FloatBuffer
+import java.util.concurrent.ConcurrentHashMap
 
 class MlAlgorithm(private val contextApp: Context) : MushroomScorer {
 
 // Caching
 companion object {
     private val env by lazy { OrtEnvironment.getEnvironment() }
-    private val sessionCache = java.util.concurrent.ConcurrentHashMap<String, OrtSession>()
+    private val sessionCache = ConcurrentHashMap<String, OrtSession>()
 
     private fun getSession(context: Context, speciesName: String): OrtSession {
         val name = speciesName.replace("ø", "o").replace("æ", "ae").replace("å", "a").replace(" ", "_")
@@ -73,11 +73,8 @@ companion object {
         features[7] = (context.weatherHistory?.totalRainPast14Days ?: 0.0).toFloat()
         features[8] = (context.forestData?.siteIndex ?: 0).toFloat()
 
-        var mlHabitatScore = 0.0
-
         // Machine Model
-        try {
-            val env = getEnvironment()
+        val mlHabitatScore: Double = try {
             val session = getSession(contextApp, species.name)
 
             val shape = longArrayOf(1, 9)
@@ -86,16 +83,17 @@ companion object {
             val inputName = session.inputNames.iterator().next()
             val result = session.run(mapOf(inputName to tensor))
 
+            @Suppress("UNCHECKED_CAST")
             val outputScores = result[1].value as Array<FloatArray>
             val rawScore = outputScores[0][0]
 
             //Score between 0 and 100
             val percentage = (rawScore - minRaw) / (maxRaw - minRaw)
-            mlHabitatScore = (percentage * 100).toDouble().coerceIn(0.0, 100.0)
 
             tensor.close()
             result.close()
 
+            (percentage * 100).toDouble().coerceIn(0.0, 100.0)
         } catch (e: Exception) {
             Log.e("T16_MlAlgorithm", "Failed to run ONNX for ${species.name}",e)
             return EvaluationResult(0, "Mangler model for soppen.")

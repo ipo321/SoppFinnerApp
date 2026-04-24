@@ -6,8 +6,10 @@ import kotlin.math.exp
 import kotlin.math.pow
 
 /*
-Scorers are used to build up the algorithm. They can be combined in different ways to create different types. They will all return a value between 0.0 and 1.0 wheres the weighting and
-score is set in the algorithm. If you wanna design new ones: USE .coerceIn(0.0, 1.0) to make sure that no value is greater or larger than 1.0 or smaller than 0.0
+Scorers are used to build up the algorithm. They can be combined in different ways to create
+different types. They will all return a value between 0.0 and 1.0 where's the weighting and
+score is set in the algorithm. If you wanna design new ones: USE .coerceIn(0.0, 1.0) to make sure
+that no value is greater or larger than 1.0 or smaller than 0.0
 */
 
 // Helper function

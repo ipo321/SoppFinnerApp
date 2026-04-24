@@ -17,7 +17,7 @@ import java.io.IOException
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "on_boarding_pref")
 
 class DataStoreRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) {
 
     private object PreferencesKey {

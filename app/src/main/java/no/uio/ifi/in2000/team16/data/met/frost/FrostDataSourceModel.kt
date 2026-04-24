@@ -75,7 +75,7 @@ data class Body(
     val value: String? = null
 )
 
-//Class used by the datasource to find closest station
+//Class used by the datasource to find the closest station
 data class LocalStation(
     val id: String,
     val name: String,

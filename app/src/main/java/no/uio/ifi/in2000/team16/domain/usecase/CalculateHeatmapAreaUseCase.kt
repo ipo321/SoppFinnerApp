@@ -246,8 +246,6 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
     private fun generateGridPoints(bounds: BoundingBox, step: Double): List<GridPoint> {
         val points = mutableListOf<GridPoint>()
 
-        val mapHeight = bounds.north - bounds.south
-
         val startLat = kotlin.math.floor(bounds.south / step) * step
         val endLat = kotlin.math.ceil(bounds.north / step) * step
         val startLon = kotlin.math.floor(bounds.west / step) * step

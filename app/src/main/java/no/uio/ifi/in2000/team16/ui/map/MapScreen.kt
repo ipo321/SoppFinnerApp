@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.Manifest
-import android.annotation.SuppressLint
 import no.uio.ifi.in2000.team16.R
 import org.maplibre.android.style.layers.Property.NONE
 import org.maplibre.android.style.layers.Property.VISIBLE
@@ -20,15 +19,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
@@ -38,12 +34,10 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -62,7 +56,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraPosition
@@ -87,8 +80,6 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
@@ -904,7 +895,7 @@ private fun setupUserLocationLayer(style: Style){
         circleRadius(10f),
         circleColor("#2769DB"),
         circleStrokeWidth(2f),
-        circleStrokeColor("#FFFFF")
+        circleStrokeColor("#FFFFFF")
 
     )
     style.addLayer(pulseLayer)
@@ -914,7 +905,7 @@ private fun setupUserLocationLayer(style: Style){
         circleRadius(6f),
         circleColor("#2769DB"),
         circleStrokeWidth(1f),
-        circleStrokeColor("#FFFFF")
+        circleStrokeColor("#FFFFFF")
     )
     style.addLayer(dotLayer)
 }

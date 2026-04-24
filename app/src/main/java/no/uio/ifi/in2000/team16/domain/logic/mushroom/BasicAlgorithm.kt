@@ -7,7 +7,7 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 
 /*
 Basic version of the algorithm, is based on our own research and personal op
-Will be the most simple one to run but also the weakest.
+Will be the simplest one to run but also the weakest.
 The Species profiles has been made using ML algorithm
 */
 

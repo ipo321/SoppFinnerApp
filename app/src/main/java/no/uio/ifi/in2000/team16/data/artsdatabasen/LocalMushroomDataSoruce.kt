@@ -22,12 +22,12 @@ import javax.inject.Singleton
  */
 @Singleton
 class LocalMushroomDataSource @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     private val json: Json
 ) {
 
     companion object {
-        private const val TAG = "T_16_LocalMushroomDataSource"
+        private const val TAG = "T16_LocalMushroomDataSource"
     }
     private val mutex = Mutex()
 
@@ -39,13 +39,21 @@ class LocalMushroomDataSource @Inject constructor(
             cachedOccurrences ?: loadFromDisk().also { cachedOccurrences = it }
         }
     }
-    private suspend fun loadFromDisk(): OccurrenceResult = withContext(Dispatchers.IO) {
-        try {
-            val text = context.resources
-                .openRawResource(R.raw.mushroom_map_data)
-                .bufferedReader()
-                .use { it.readText() } //read text form file and automatically closes afterwords.
-            parseGeoJson(text) //sends raw jason string to parse function.
+
+
+
+
+    private suspend fun loadFromDisk(): OccurrenceResult  {
+        return try {
+            val text = withContext(Dispatchers.IO) {
+                context.resources
+                    .openRawResource(R.raw.mushroom_map_data)
+                    .bufferedReader()
+                    .use { it.readText() } //read text form file and automatically closes afterwords.
+            }
+            withContext(Dispatchers.Default){
+                parseGeoJson(text) //sends raw jason string to parse function.
+            }
         }catch (e: Exception) {
             Log.e(TAG, "Failed to load mushroom data: ${e.message}", e)
             OccurrenceResult()
@@ -84,15 +92,10 @@ class LocalMushroomDataSource @Inject constructor(
         lonMin: Double,
         lonMax: Double,
         localSpeciesId: Int? // null = unrecognized species
-    ): OccurrenceResult {
-        if (localSpeciesId == null) return OccurrenceResult()
+    ): OccurrenceResult = withContext(Dispatchers.Default) {
+        if (localSpeciesId == null) return@withContext OccurrenceResult()
         val all = getAllOccurrences()
-        Log.d(
-            TAG,
-            "Filtering ${all.count} occurrences " +
-                    "bbox=[lat:$latMin..$latMax, lon:$lonMin..$lonMax], " +
-                    "localSpeciesId=${localSpeciesId ?: "ALL"}"
-        )
+        Log.d(TAG, "Filtering ${all.count} occurrences...")
         val bySpecies = all.results.filter { it.localSpeciesId == localSpeciesId }
 
 
@@ -109,7 +112,7 @@ class LocalMushroomDataSource @Inject constructor(
 
         Log.d(TAG, "Filter result: ${filtered.size} occurrences")
 
-        return OccurrenceResult(
+        OccurrenceResult(
             count = filtered.size,
             results = filtered
         )
