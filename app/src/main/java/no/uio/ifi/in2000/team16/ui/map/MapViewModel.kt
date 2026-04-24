@@ -12,15 +12,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.kartverket.Address
 import no.uio.ifi.in2000.team16.data.kartverket.LocationRepository
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
-import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
-import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
 import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
@@ -49,7 +45,6 @@ class MapViewModel @Inject constructor(
     private var searchJob: Job? = null // cancel old searches
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
     private var debounceJob: Job? = null
-
     private var hasMovedToUserLocation = false // flag to see if camera has been moved to user on startup
 
     init{
@@ -173,9 +168,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun toggleHistoricalFinds() {
-        _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
-    }
+
 
 
     fun onMushroomSelected(mushroom: Mushroom) {
@@ -191,22 +184,6 @@ class MapViewModel @Inject constructor(
                 onMapClicked(lat, lon)
             }
         }
-    }
-
-    fun updateSearchQuery(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
-    }
-
-    fun performSearch() {
-        println("Søker etter: ${_uiState.value.searchQuery}")
-    }
-
-    fun toggleSatellite() {
-        _uiState.update { it.copy(isSatelliteMode = !it.isSatelliteMode) }
-    }
-
-    fun toggleWmsForest() {
-        _uiState.update { it.copy(showWmsForest = !it.showWmsForest) }
     }
     
     fun onSearchQueryChanged(query: String) {
@@ -253,40 +230,22 @@ class MapViewModel @Inject constructor(
     }
 
     fun onCameraMoved(){
-        _uiState.update{it.copy(moveCameraToUser = true)}
+        _uiState.update{it.copy(moveCameraToUser = false)}
     }
+
+    fun toggleSatellite() {
+        _uiState.update { it.copy(isSatelliteMode = !it.isSatelliteMode) }
+    }
+
+    fun toggleWmsForest() {
+        _uiState.update { it.copy(showWmsForest = !it.showWmsForest) }
+    }
+
+    fun toggleHistoricalFinds() {
+        _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
+    }
+
     fun dismissEvaluation() {
         _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null, currentContext = null) }
     }
-
-
-
-}
-data class MapScreenState(
-    val screenStatus: ScreenStatus = ScreenStatus.Idle,
-    val selectedMushroom: Mushroom? = null,
-    val currentContext: EnvironmentContext? = null,
-    val evaluation: EvaluationResult? = null,
-    val favoriteMushrooms: List<Mushroom> = emptyList(),
-    val isHeatmapEnabled: Boolean = false,
-    val heatmapTiles: List<HeatmapTile> = emptyList(),
-    val isFetchingHeatmap: Boolean = false,
-    val searchQuery: String = "",
-    val isHistoricalFindsEnabled: Boolean = false,
-    val currentTileSize: Double = 0.2,
-    val isSatelliteMode: Boolean = false,
-    val showWmsForest: Boolean = false,
-    val lastClickedLat: Double? = null,
-    val lastClickedLon: Double? = null,
-    val searchSuggestions: List<SearchableLocation> = emptyList(),
-    val addressSuggestions: List<Address> = emptyList(),
-    val userLocation: LatLng? = null,
-    val moveCameraToUser: Boolean = false
-)
-
-sealed class ScreenStatus{
-    object Idle : ScreenStatus()
-    object Loading : ScreenStatus()
-    object Success : ScreenStatus()
-    data class Error(val message: String) : ScreenStatus()
 }
