@@ -9,17 +9,6 @@ data class AddressSearchResponse(
 )
 
 @Serializable
-data class MetaData(
-    val viserFra: Int? = null,
-    val asciiKompatibel: Boolean? = null,
-    val totaltAntallTreff: Int? = null,
-    val viserTil: Int? = null,
-    val sokeStreng: String? = null,
-    val side: Int? = null,
-    val treffPerSide: Int? = null
-)
-
-@Serializable
 data class Address(
     val adressenavn: String? = null,
     val adressetekst: String? = null,
@@ -41,11 +30,13 @@ data class Address(
     val stedfestingverifisert: Boolean? = null,
     val representasjonspunkt: RepresentationPoint? = null,
     val oppdateringsdato: String? = null   // evt. Instant/LocalDateTime med custom serializer
-)
-
-@Serializable
-data class RepresentationPoint(
-    val epsg: String? = null,
-    val lat: Double? = null,
-    val lon: Double? = null
-)
+) : SearchableLocation {
+    override val title: String get() = adressetekst ?: ""
+    override val subtitle: String get() {
+        val post = poststed ?: ""
+        val kom = kommunenavn ?: ""
+        return if (post == kom || kom.isBlank()) post else "$poststed, $kommunenavn".trim(',', ' ')
+    }
+    override val latitude: Double? get() = representasjonspunkt?.lat
+    override val longitude: Double? get() = representasjonspunkt?.lon
+}

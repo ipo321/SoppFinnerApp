@@ -4,33 +4,36 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import org.maplibre.android.geometry.LatLng
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
-import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
-import javax.inject.Inject
+import no.uio.ifi.in2000.team16.data.kartverket.Address
+import no.uio.ifi.in2000.team16.data.kartverket.LocationRepository
+import no.uio.ifi.in2000.team16.data.kartverket.Place
+import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.usecase.CalculateHeatmapAreaUseCase
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
-import no.uio.ifi.in2000.team16.data.kartverket.Address
-import no.uio.ifi.in2000.team16.data.kartverket.AddressRepository
+import no.uio.ifi.in2000.team16.domain.usecase.GetEnvironmentContextUseCase
+import org.maplibre.android.geometry.LatLng
+import javax.inject.Inject
 
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepository,
-    private val addressRepository: AddressRepository,
+    private val locationRepository: LocationRepository,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
     private val scorerProvider: ScorerProvider
@@ -205,28 +208,33 @@ class MapViewModel @Inject constructor(
     fun onSearchQueryChanged(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
         searchJob?.cancel() // Cancels ongoing search when search is updated
+        if (query.length < 3) {
+            _uiState.update { it.copy(searchSuggestions = emptyList()) }
+            return
+        }
         searchJob = viewModelScope.launch { // Starts new search
             delay(200) // Makes it wait a little bit before searching, to not spam the API
-            val suggestions = addressRepository.getSuggestions(query)
-            _uiState.update { it.copy(addressSuggestions = suggestions) }
-        }
-    }
-
-    // Method for getting location for address chosen from search, used when search completes
-    fun searchAddress(address: Address, onLocationFound: (lat: Double, lon: Double) -> Unit) {
-        val location = address.representasjonspunkt
-        if (location?.lat != null && location.lon != null) {
-            onLocationFound(location.lat, location.lon)
+            val results = locationRepository.search(query)
+            _uiState.update { it.copy(searchSuggestions = results) }
         }
     }
     
     // Method for finding address from the query, used when user is still searching
     fun searchAddressByText(query: String, onLocationFound: (Double, Double) -> Unit) {
         viewModelScope.launch {
-            val location = addressRepository.getLocationCoordinates(query)
-            if (location != null && location.lat != null && location.lon != null) {
-                onLocationFound(location.lat, location.lon)
+            val location = locationRepository.getLocationCoordinates(query)
+            if (location != null && location.latitude != null && location.longitude != null) {
+                onLocationFound(location.latitude!!, location.longitude!!)
             }
+        }
+    }
+
+    // Method for getting location for address chosen from search, used when search completes
+    fun searchLocation(location: SearchableLocation, onLocationFound: (lat: Double, lon: Double) -> Unit) {
+        val lat = location.latitude
+        val lon = location.longitude
+        if (lat != null && lon != null) {
+            onLocationFound(lat, lon)
         }
     }
 
@@ -261,11 +269,13 @@ data class MapScreenState(
     val isFetchingHeatmap: Boolean = false,
     val searchQuery: String = "",
     val isHistoricalFindsEnabled: Boolean = false,
-    val currentTileSize: Double = 0.2,           
-    val isSatelliteMode: Boolean = false,        
+    val currentTileSize: Double = 0.2,
+    val isSatelliteMode: Boolean = false,
     val showWmsForest: Boolean = false,
     val lastClickedLat: Double? = null,
     val lastClickedLon: Double? = null,
+    val searchSuggestions: List<SearchableLocation> = emptyList(),
+    val userLocation: LatLng? = null
     val addressSuggestions: List<Address> = emptyList(),
     val userLocation: LatLng? = null,
     val moveCameraToUser: Boolean = false
