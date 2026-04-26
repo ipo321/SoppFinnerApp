@@ -27,7 +27,6 @@ private val DarkColorScheme = darkColorScheme(
 
     // The base layer of the app
     background = DarkBackground,
-    surface = DarkSurface,
     onSurface = DarkOnSurface,
 
     // Tonal Hierarchy: Use these to create depth and stacked layers without using lines

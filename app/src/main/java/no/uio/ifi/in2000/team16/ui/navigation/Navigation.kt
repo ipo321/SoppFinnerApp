@@ -1,17 +1,9 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
 import android.content.Context
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -20,7 +12,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,9 +20,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+<<<<<<< Updated upstream
 import androidx.compose.ui.unit.dp
+=======
+>>>>>>> Stashed changes
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
@@ -40,18 +33,19 @@ import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
-import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
 import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.Security
 
 //
 const val MAP_SCREEN = "map"
@@ -63,9 +57,15 @@ const val PROFILE_SCREEN = "profileScreen"
 const val SETTINGS_SCREEN = "profileScreen/settings"
 const val HISTORY_SCREEN = "profileScreen/history"
 const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
-const val INFO_SCREEN = "profileScreen/info"
+const val INFO_SCREEN = "InfoScreen"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControl"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
+
+const val SECURITY_SCREEN = "Security"
+
+const val SCORE_INFO_SCREEN = "ScoreInfo"
+
+
 
 @Composable
 fun Navigation(
@@ -169,11 +169,17 @@ fun Navigation(
             }
 
             composable(PROFILE_SCREEN) {
-                ProfileScreen(navController = navController)
+                ProfileScreen(navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
             }
             //UNDER-ITEMS for Profile-screen
             composable(SETTINGS_SCREEN) {
-                SettingsScreen(navController = navController)
+                SettingsScreen(navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
             }
             composable(HISTORY_SCREEN) {
                 HistoryScreen(navController = navController)
@@ -182,10 +188,16 @@ fun Navigation(
                 ShroomSpotScreen(navController = navController)
             }
             composable(INFO_SCREEN) {
-                InfoScreen(navController = navController)
+                InfoScreen(navController = navController,
+                        onNavigateBack = {
+                    navController.popBackStack()
+                })
             }
             composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController)
+                ShroomControlScreen(navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
             }
             composable(SHROOMBANK_SCREEN) {
                 ShroomBankScreen(navController = navController)
@@ -194,11 +206,17 @@ fun Navigation(
                 }
 
                 composable(PROFILE_SCREEN) {
-                    ProfileScreen(navController = navController)
+                    ProfileScreen(navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
                 //UNDER-ITEMS for Profile-screen
                 composable(SETTINGS_SCREEN) {
-                    SettingsScreen(navController = navController)
+                    SettingsScreen(navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
                 composable(HISTORY_SCREEN) {
                     HistoryScreen(navController = navController)
@@ -207,13 +225,31 @@ fun Navigation(
                     ShroomSpotScreen(navController = navController)
                 }
                 composable(INFO_SCREEN) {
-                    InfoScreen(navController = navController)
+                    InfoScreen(navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
                 composable(SHROOMCONTROL_SCREEN) {
-                    ShroomControlScreen(navController = navController)
+                    ShroomControlScreen(navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
                 composable(SHROOMBANK_SCREEN) {
                     ShroomBankScreen(navController = navController)
+                }
+                composable (SCORE_INFO_SCREEN ){
+                    InfoScreen(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
+                }
+                composable(SECURITY_SCREEN){
+                    Security(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
 
                 composable(DEV_SCREEN) {
@@ -249,29 +285,30 @@ fun Navigation(
                 }
 
             }
-            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.cute_mushroom),
-                            contentDescription = "Laster kart",
-                            modifier = Modifier.size(120.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Laster inn kartdata...",
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                }
-            }
+
+//            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .background(MaterialTheme.colorScheme.background),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.cute_mushroom),
+//                            contentDescription = "Laster kart",
+//                            modifier = Modifier.size(120.dp)
+//                        )
+//                        Spacer(modifier = Modifier.height(16.dp))
+//                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        Text(
+//                            "Laster inn kartdata...",
+//                            color = MaterialTheme.colorScheme.onBackground
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 }

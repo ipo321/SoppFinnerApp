@@ -4,12 +4,16 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +32,7 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 @Composable
 fun SettingsScreen(
     navController: NavController,
+    onNavigateBack: () -> Unit,
     viewModel: ProfileScreenViewModel = hiltViewModel()
 
 ){
@@ -40,19 +45,21 @@ fun SettingsScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box{
-            Text("This is the settingsScreen")
-        }
+        OutlinedButton(
+        onClick = onNavigateBack,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Text("Tilbake")
+    }
+        Text(
+            text = "Innstillinger",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier=Modifier.height(24.dp))
 
-        Box {
-            Button(
-                onClick = {
-                    navController.popBackStack()
-                }
-            ) {
-                Text("Go Back")
-            }
-        }
+
     }
 }
 

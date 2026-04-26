@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -9,17 +9,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+<<<<<<< Updated upstream
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+=======
+import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreenViewModel
+
+>>>>>>> Stashed changes
 
 //Overlays the screen with a networkScreen of SoppPortal
 @Composable
 fun ShroomControlScreen(
     navController: NavController,
+    onNavigateBack: () -> Unit,
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     Box {
