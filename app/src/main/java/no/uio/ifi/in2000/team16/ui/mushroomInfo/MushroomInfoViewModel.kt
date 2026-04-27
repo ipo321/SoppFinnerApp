@@ -23,8 +23,8 @@ gets from speciesRepository that gets form local data that dont change.
 
  */
 data class MushroomInfoUiState(
-    val mushrooms: List<Mushroom> = emptyList(),
     val favorites: List<Mushroom> = emptyList(),
+    val otherMushrooms: List<Mushroom> = emptyList(),
     val viewMushroom: Mushroom? = null,
     val selectedMushroom: Mushroom? = null,
     val isInSeason: Boolean = false
@@ -40,29 +40,39 @@ class MushroomInfoViewModel @Inject constructor(
         MushroomInfoUiState()
     )
     val uiState: StateFlow<MushroomInfoUiState> = _uiState.asStateFlow()
+    init {
+        // Load static mushroom list once
+        val allMushrooms = repository.getAllMushrooms()
+        _uiState.update {
+            it.copy(
+               // mushrooms = allMushrooms,
+                otherMushrooms = allMushrooms,
+                selectedMushroom = allMushrooms.firstOrNull()
+            )
+        }
+        viewModelScope.launch {
+            repository.favoriteMushrooms.collect { favs ->
+                val favNames = favs.map { it.commonName }.toSet()
+                val favoriteList = allMushrooms.filter { it.commonName in favNames }
+                val otherList = allMushrooms.filterNot { it.commonName in favNames }
+                _uiState.update {
+                    it.copy(
+                        favorites = favoriteList,
+                        otherMushrooms = otherList
+                    )
+                }
+            }
+        }
+    }
+
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             _uiState.update { it.copy(selectedMushroom = mushroom) }
             repository.updateSelectedMushroom(mushroom)
         }
     }
-    init {
-        // Load static mushroom list once
-        val allMushrooms = repository.getAllMushrooms()
-        _uiState.update {
-            it.copy(
-                mushrooms = allMushrooms,
-                selectedMushroom = allMushrooms.firstOrNull()
-            )
-        }
 
         // Collect favorites into uiState
-        viewModelScope.launch {
-            repository.favoriteMushrooms.collect { favs ->
-                _uiState.update { it.copy(favorites = favs) }
-            }
-        }
-    }
 
     fun onMushroomViewing(mushroom: Mushroom) {
         val currentMonth = java.util.Calendar.getInstance()

@@ -52,8 +52,6 @@ fun MushroomListScreen(
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
-    val mushrooms = uiState.mushrooms
-    val favorites = uiState.favorites
     val selectedMushroom = uiState.selectedMushroom
     //main Column
     Column(
@@ -88,7 +86,7 @@ fun MushroomListScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            mushrooms.filter { favorites.any { fav -> fav.commonName == it.commonName } }.forEach{ mushroom ->
+            uiState.favorites.forEach { mushroom ->
                 MushroomListItem(
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
@@ -107,7 +105,7 @@ fun MushroomListScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            mushrooms.filterNot { favorites.any { fav -> fav.commonName == it.commonName } }.forEach { mushroom ->
+            uiState.otherMushrooms.forEach { mushroom ->
                 MushroomListItem(
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
