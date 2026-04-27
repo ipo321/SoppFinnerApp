@@ -82,6 +82,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -278,6 +279,7 @@ fun MapComponents(
                 mapView = mapView,
                 textFieldState = textFieldState,
                 onSearch = onSearch,
+                modifier = Modifier.weight(1f)
             )
         }
         Row(
@@ -334,11 +336,16 @@ fun MapSearchBar(
     modifier: Modifier = Modifier
 ) {
     DockedSearchBar(
-        modifier = Modifier
+        modifier = modifier
+            .fillMaxWidth()
             .semantics { traversalIndex = 0f },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        ),
         shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
         inputField = {
             SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth(),
                 query = textFieldState.text.toString(),
                 onQueryChange = {
                     textFieldState.edit { replace(0, length, it) }
@@ -365,7 +372,7 @@ fun MapSearchBar(
                             onClick = {
                                 textFieldState.edit { replace(0, length, "") }
                                 viewModel.onSearchQueryChanged("")
-                                onExpandedChange(false)
+                                //onExpandedChange(false)
                             }
                         ) {
                             Icon(
@@ -383,9 +390,9 @@ fun MapSearchBar(
                     }
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                 )
             )
         },
