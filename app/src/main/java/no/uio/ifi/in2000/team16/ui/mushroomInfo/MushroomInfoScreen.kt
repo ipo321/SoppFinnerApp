@@ -42,11 +42,12 @@ fun MushroomInfoScreen(
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     print("MUSHROM INFOSCREEN LOADED")
-    val selected = viewModel.viewMushroom?: return  //Return if no mushroom is selected
-    val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
+   // val selected = viewModel.viewMushroom?: return  //Return if no mushroom is selected
+    val uiState by viewModel.uiState.collectAsState()
+    val selected = uiState.viewMushroom ?: return
+    val favorites = uiState.favorites
+    val inSeason = uiState.isInSeason
     val isFavorite = favorites.any { it.commonName == selected.commonName }
-    val inSeason = viewModel.isInSeason
-
     //main Column
     Column(
         modifier = Modifier

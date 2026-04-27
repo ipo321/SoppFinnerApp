@@ -51,9 +51,8 @@ fun MushroomListScreen(
     onMushroomControll: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
-    val mushrooms = viewModel.mushrooms
-    val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
-    val selectedMushroom = viewModel.selectedMushroom
+    val uiState by viewModel.uiState.collectAsState()
+    val selectedMushroom = uiState.selectedMushroom
     //main Column
     Column(
         modifier = Modifier
@@ -87,15 +86,17 @@ fun MushroomListScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            mushrooms.filter { favorites.any { fav -> fav.commonName == it.commonName } }.forEach{ mushroom ->
+            uiState.favorites.forEach { mushroom ->
                 MushroomListItem(
-                    viewModel = viewModel,
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
                     },
-                    navigateToMushroom = navigateToMushroom
+                    navigateToMushroom = {
+                        viewModel.onMushroomViewing(mushroom)  // set which mushroom to display
+                        navigateToMushroom()
+                    }
                 )
             }
             Text(
@@ -104,15 +105,17 @@ fun MushroomListScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            mushrooms.filterNot { favorites.any { fav -> fav.commonName == it.commonName } }.forEach { mushroom ->
+            uiState.otherMushrooms.forEach { mushroom ->
                 MushroomListItem(
-                    viewModel = viewModel,
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
                     },
-                    navigateToMushroom = navigateToMushroom
+                    navigateToMushroom = {
+                        viewModel.onMushroomViewing(mushroom)  // set which mushroom to display
+                        navigateToMushroom()
+                    }
                 )
             }
 
@@ -125,7 +128,7 @@ fun MushroomListScreen(
 //Click on the item itself will take you to that mushroom
 @Composable
 fun MushroomListItem(
-    viewModel: MushroomInfoViewModel,
+
     mushroom: Mushroom,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -137,7 +140,6 @@ fun MushroomListItem(
     Row(
         modifier = cardModifier
             .clickable {
-                viewModel.onMushroomViewing(mushroom)
                 navigateToMushroom() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
