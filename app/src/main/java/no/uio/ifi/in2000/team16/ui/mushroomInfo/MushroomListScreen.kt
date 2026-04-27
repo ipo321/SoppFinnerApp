@@ -51,9 +51,10 @@ fun MushroomListScreen(
     onMushroomControll: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
-    val mushrooms = viewModel.mushrooms
-    val favorites by viewModel.favoriteMushrooms.collectAsState(initial = emptyList())
-    val selectedMushroom = viewModel.selectedMushroom
+    val uiState by viewModel.uiState.collectAsState()
+    val mushrooms = uiState.mushrooms
+    val favorites = uiState.favorites
+    val selectedMushroom = uiState.selectedMushroom
     //main Column
     Column(
         modifier = Modifier
