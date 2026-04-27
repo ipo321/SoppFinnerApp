@@ -10,9 +10,11 @@ data class PlaceSearchResponse(
 
 @Serializable
 data class Place(
+    val stedsnavnnummer: Long? = null,
     val stedsnummer: Long? = null,
-    val navn: String? = null,
+    val stedstatus: String? = null,
     val navnestatus: String? = null,
+    val skrivemåte: String? = null,
     val skrivemåtestatus: String? = null,
     val språk: String? = null,
     val navneobjekttype: String? = null,
@@ -23,26 +25,19 @@ data class Place(
     val representasjonspunkt: RepresentationPoint? = null,
     val oppdateringsdato: String? = null
 ) : SearchableLocation {
-    override val title: String get() = navn ?: ""
+    override val title: String get() = skrivemåte ?: ""
     
     override val subtitle: String get() {
         val type = navneobjekttype?.replaceFirstChar { it.uppercase() } ?: "Sted"
-        val kommune = kommunenavn.takeIf { it != "null" && it != navn && !it.isNullOrBlank() } ?: ""
-        val fylke = fylkesnavn.takeIf { it != "null" && it != navn && it != kommune && !it.isNullOrBlank() } ?: ""
+        val kommune = kommunenavn.takeIf { it != "null" && it != skrivemåte && !it.isNullOrBlank() } ?: ""
+        val fylke = fylkesnavn.takeIf { it != "null" && it != skrivemåte && it != kommune && !it.isNullOrBlank() } ?: ""
 
         val locationParts = listOf(kommune, fylke).filter { it.isNotEmpty() }
-        return if (locationParts.isNotEmpty()) {
-            "$type i ${locationParts.joinToString(", ")}"
-        } else {
-            type
+        return when {
+            locationParts.isNotEmpty() -> "$type i ${locationParts.joinToString(", ")}"
+            (type != "Annen administrativ inndeling") -> type // We don't want this text, it doesn't tell the user much
+            else -> ""
         }
-
-//        return when {
-//            kommune.isNotEmpty() && fylke.isNotEmpty() && kommune != fylke -> "$type i $kommune i $fylke"
-//            kommune.isNotEmpty() -> "$type i $kommune"
-//            fylke.isNotEmpty() -> "$type i $fylke"
-//            else -> type
-//        }
     }
     
     override val latitude: Double? get() = representasjonspunkt?.nord ?: representasjonspunkt?.lat
