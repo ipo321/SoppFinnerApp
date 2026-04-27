@@ -365,7 +365,7 @@ fun MapSearchBar(
                             onClick = {
                                 textFieldState.edit { replace(0, length, "") }
                                 viewModel.onSearchQueryChanged("")
-                                onExpandedChange(false)
+                                //onExpandedChange(false)
                             }
                         ) {
                             Icon(
