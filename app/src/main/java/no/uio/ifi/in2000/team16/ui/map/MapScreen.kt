@@ -580,10 +580,10 @@ fun getMapView(
 
     val mapView = remember {
         // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
-        val options = MapLibreMapOptions.createFromAttributes(context, null)
-            .textureMode(true)
+//        val mode = MapLibreMapOptions.createFromAttributes(context, null)
+//            .textureMode(true)
 
-        MapView(context, options).apply { // options are sent as argument here to fix the bug
+        MapView(context, /*mode*/).apply { // mode are sent as argument here to fix the bug
             onCreate(null)
 
             getMapAsync { map ->

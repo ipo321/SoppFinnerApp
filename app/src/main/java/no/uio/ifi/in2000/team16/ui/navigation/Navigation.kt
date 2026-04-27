@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -138,7 +139,7 @@ fun Navigation(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                //.padding(innerPadding)
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
@@ -153,7 +154,9 @@ fun Navigation(
             NavHost(
                 navController = navController,
                 startDestination = if (onboardingCompleted == true) MAP_SCREEN else ONBOARDING_SCREEN,
-                modifier = modifier.fillMaxSize()
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(if (isMapVisible) PaddingValues(0.dp) else innerPadding)
             ) {
                 composable(ONBOARDING_SCREEN) {
                     OnboardingScreen(
