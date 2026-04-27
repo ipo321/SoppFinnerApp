@@ -197,7 +197,7 @@ fun setMapLayout(map: MapLibreMap, context: Context) {
     map.setMaxZoomPreference(25.0) // Maximum zoom
 
     val density = context.resources.displayMetrics.density
-    val topMargin = (160 * density).toInt() // Transforms dp to pixels
+    val topMargin = (244 * density).toInt() // Transforms dp to pixels
     val rightMargin = (20 * density).toInt()
     val ui = map.uiSettings
     // If we want a compass
