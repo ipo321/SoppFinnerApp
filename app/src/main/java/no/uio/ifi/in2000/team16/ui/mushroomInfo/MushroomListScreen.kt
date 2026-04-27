@@ -89,13 +89,15 @@ fun MushroomListScreen(
             )
             mushrooms.filter { favorites.any { fav -> fav.commonName == it.commonName } }.forEach{ mushroom ->
                 MushroomListItem(
-                    viewModel = viewModel,
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
                     },
-                    navigateToMushroom = navigateToMushroom
+                    navigateToMushroom = {
+                        viewModel.onMushroomViewing(mushroom)  // set which mushroom to display
+                        navigateToMushroom()
+                    }
                 )
             }
             Text(
@@ -106,13 +108,15 @@ fun MushroomListScreen(
             )
             mushrooms.filterNot { favorites.any { fav -> fav.commonName == it.commonName } }.forEach { mushroom ->
                 MushroomListItem(
-                    viewModel = viewModel,
                     mushroom = mushroom,
                     isSelected = selectedMushroom?.commonName == mushroom.commonName,
                     onClick = {
                         viewModel.onMushroomSelected(mushroom)
                     },
-                    navigateToMushroom = navigateToMushroom
+                    navigateToMushroom = {
+                        viewModel.onMushroomViewing(mushroom)  // set which mushroom to display
+                        navigateToMushroom()
+                    }
                 )
             }
 
@@ -125,7 +129,7 @@ fun MushroomListScreen(
 //Click on the item itself will take you to that mushroom
 @Composable
 fun MushroomListItem(
-    viewModel: MushroomInfoViewModel,
+
     mushroom: Mushroom,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -137,7 +141,6 @@ fun MushroomListItem(
     Row(
         modifier = cardModifier
             .clickable {
-                viewModel.onMushroomViewing(mushroom)
                 navigateToMushroom() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
