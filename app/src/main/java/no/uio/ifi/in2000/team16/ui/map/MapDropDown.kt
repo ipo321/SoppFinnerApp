@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /*
 Dropdown Menu for the map
@@ -67,8 +68,25 @@ fun Dropdown(
             onClick = {
                 onToggleHeatMap()
                 onDismissRequest()
-            }
+            },
+//            trailingIcon = {
+//                if (isHeatmapEnabled) Icon(
+//                    Icons.Outlined.Check,
+//                    contentDescription = "Check"
+//                )
+//            }
         )
+        if (isHeatmapEnabled) {
+            ColorRow(
+                numberOfRows = 3,
+                colors = listOf( // Colors taken from heatmap
+                    Color(0xFFF4BFBE),
+                    Color(0xFFF5E399),
+                    Color(0xFFADDB94)
+                ),
+                text = listOf("Lavere score", "Middels score", "Høyere score"),
+            )
+        }
 
         DropdownMenuItem(
             text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
@@ -88,8 +106,28 @@ fun Dropdown(
         DropdownMenuItem(
             text = { Text(if (showWmsForest) "Skjul skoglag" else "Vis skoglag") },
             leadingIcon = { Icon(Icons.Outlined.Forest, contentDescription = "Skog-ikon") },
-            onClick = { onToggleWmsForest() }
+            onClick = { onToggleWmsForest() },
+//            trailingIcon = {
+//                if (showWmsForest) Icon(
+//                    Icons.Outlined.Check,
+//                    contentDescription = "Check"
+//                )
+//            }
         )
+
+        if (showWmsForest) {
+            ColorRow(
+                numberOfRows = 5,
+                colors = listOf( // Colors taken from Sat-Skog WMS
+                    Color(0xFF71AC4C),
+                    Color(0xFFC2AA6F),
+                    Color(0xFFB1CA73),
+                    Color(0xFFECB84C),
+                    Color(0xFFF4DC8E)
+                ),
+                text = listOf("Grandominert", "Furudominert", "Barblanding", "Blanding", "Lauvdominert")
+            )
+        }
 
         DropdownMenuItem(
             text = { Text("Dev") },
