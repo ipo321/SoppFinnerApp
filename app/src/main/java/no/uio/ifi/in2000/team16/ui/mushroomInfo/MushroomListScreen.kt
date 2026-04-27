@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,16 +14,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,7 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
@@ -76,7 +73,7 @@ fun MushroomListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             //Spacer(modifier = Modifier.height(8.dp))
             WarningBanner()
@@ -85,11 +82,11 @@ fun MushroomListScreen(
             //Spacer(modifier = Modifier.height(4.dp))
             //favorites column
             Text(
-            text = "Favoritter",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
+                text = "Favoritter",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
             mushrooms.filter { favorites.any { fav -> fav.commonName == it.commonName } }.forEach{ mushroom ->
                 MushroomListItem(
                     viewModel = viewModel,
@@ -125,6 +122,7 @@ fun MushroomListScreen(
 }
 
 //the itemst that will be put in the list
+//Click on the item itself will take you to that mushroom
 @Composable
 fun MushroomListItem(
     viewModel: MushroomInfoViewModel,
@@ -138,7 +136,9 @@ fun MushroomListItem(
 
     Row(
         modifier = cardModifier
-            .clickable { onClick() }
+            .clickable {
+                viewModel.onMushroomViewing(mushroom)
+                navigateToMushroom() }
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -163,29 +163,14 @@ fun MushroomListItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        Box(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .size(28.dp)
-                .border(
-                    width = 2.dp,
-                    shape = MaterialTheme.shapes.extraSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                .clickable {
-                    viewModel.onMushroomViewing(mushroom)
-                    navigateToMushroom()},
-            contentAlignment = Alignment.Center
-        ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "go to mushroom",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
+        //box for chooing to select this mushroom for the search
+        Checkbox(
+            checked = isSelected,
+            onCheckedChange = { onClick() },
+            modifier = Modifier.padding(end = 4.dp)
+        )
     }
+}
 
 @Composable
 private fun mushroomCardModifier(
@@ -261,7 +246,7 @@ fun MushroomControllBanner(onVisitSoppkontroll: () -> Unit) {
                 Text("Besøk Soppkontroll.no", color = Color.White)
                 Spacer(Modifier.width(8.dp))
                 Icon(
-                    imageVector = Icons.Default.OpenInNew,
+                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
