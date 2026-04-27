@@ -47,11 +47,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import no.uio.ifi.in2000.team16.R
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import no.uio.ifi.in2000.team16.ui.dev.GridRow
+import no.uio.ifi.in2000.team16.ui.dev.SectionHeader
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
 
@@ -64,114 +77,318 @@ fun ScoreCard(
     contextData: EnvironmentContext?
 ) {
     val context = LocalContext.current
+    //controls weather the card is extended or not
+    var isExpanded by remember {mutableStateOf(false)}
+
+    val w = contextData?.currentWeather
+    val h = contextData?.weatherHistory
+    val f = contextData?.forestData
+    val t = contextData?.terrainData
+
 
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxWidth()){
 
+            AnimatedContent(
+                targetState = isExpanded,
+                transitionSpec = {
+                    (fadeIn() + slideInVertically{it}) togetherWith
+                    (fadeOut() + slideOutVertically {it})
+                },
+                label = "scorecard_expand"
+            ){
+                expanded ->
+                if(expanded){
+                    //Expanded view:
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                //The Score Cirlce itself:
-                Box(contentAlignment = Alignment.Center) {
-                    ScoreCircle(score = score)
-
-                    InfoCapsule(
-                        infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
-                                " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
-                                "skogstype.",
+                    Column(
                         modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .offset(x = 30.dp, y = (-20).dp)
-                    )
-                }
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                            .padding(top = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(Modifier.height(24.dp))
 
-                Spacer(Modifier.height(8.dp))
+                        //The Score Cirlce itself:
+                        Box(contentAlignment = Alignment.Center) {
+                            ScoreCircle(score = score)
+                            InfoCapsule(
+                                infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
+                                        " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
+                                        "skogstype.",
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 30.dp, y = (-20).dp)
+                            )
+                        }
 
-                Text(
-                    text = description,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                        Spacer(Modifier.height(10.dp))
 
-                Spacer(Modifier.height(16.dp))
-
-                //Rows intended for extra info like humidity exct..:
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    //Uppermost left
-                    InfoItem(
-                        label = "Skogstype",
-                        value = contextData?.forestData?.let { "${it.dominantTreeSpecies}" }
-                            ?: "Ukjent"
-                    )
-
-                    //Uppermost Right
-                    val avgTemp = contextData?.weatherHistory?.avgTempPast14Days
-                    InfoItem(
-                        label = "Snitt-temp",
-                        value = if (avgTemp != null) "%.1f°C".format(avgTemp) else "--"
-                    )
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val rain = contextData?.weatherHistory?.totalRainPast14Days
-                    InfoItem(
-                        label = "Nedbør (14 dgr)",
-                        value = if (rain != null) "%.1f mm".format(rain) else "--"
-                    )
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Været nå",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = description,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            val symbolCode = contextData?.currentWeather?.symbolCode
-                            if (symbolCode != null) {
-                                val imageRes = context.resources.getIdentifier(
-                                    symbolCode,
-                                    "drawable",
-                                    context.packageName
+
+                        Spacer(Modifier.height(16.dp))
+
+                        //Rows intended for extra info like humidity exct :
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Snitt-temp",
+                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Nedbør (14d)",
+                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val rain = contextData?.weatherHistory?.totalRainPast14Days
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+
+                                InfoItem(
+                                    label = "Nedbør (14 dgr)",
+                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
                                 )
-                                if (imageRes != 0) {
-                                    Image(
-                                        painter = painterResource(id = imageRes),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(Modifier.width(4.dp))
-                                }
                             }
 
-                            val currentTemp = contextData?.currentWeather?.temp
-                            Text(
-                                text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                                    Text(
+                                        text = "Været nå",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center) {
+                                        val symbolCode = contextData?.currentWeather?.symbolCode
+                                        if (symbolCode != null) {
+                                            val imageRes = context.resources.getIdentifier(
+                                                symbolCode,
+                                                "drawable",
+                                                context.packageName
+                                            )
+                                            if (imageRes != 0) {
+                                                Image(
+                                                    painter = painterResource(id = imageRes),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(Modifier.width(4.dp))
+                                            }
+                                        }
+
+
+                                        val currentTemp = contextData?.currentWeather?.temp
+                                        Text(
+                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Temp", "${w?.temp?.toInt() ?: "--"}°C")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Regn", "${w?.rain ?: "--"} mm")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Fukt",
+                                    w?.humidity?.let {"%.2f%%".format(it)} ?: "--")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Vind", "${w?.windSpeed ?: "--"} m/s")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Minste temp",
+                                    h?.minTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
+
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Max temp",
+                                    h?.maxTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
+
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Gran", "${f?.sprucePercentage ?: "--"}%")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Lauv", "${f?.broadleafPercentage ?: "--"}%")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Bonitet", f?.fertilityCategory ?: "--")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Helning", "${t?.slope ?: "--"}°")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Retning", "${t?.direction ?: "--"}°")
+                            }
+                        }
+                    }
+
+                }else{
+                    //Collapsed view:
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                            .padding(top = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(Modifier.height(24.dp))
+
+                        //The Score Cirlce itself:
+                        Box(contentAlignment = Alignment.Center) {
+                            ScoreCircle(score = score)
+                            InfoCapsule(
+                                infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
+                                        " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
+                                        "skogstype.",
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = 30.dp, y = (-20).dp)
                             )
+                        }
+
+                        Spacer(Modifier.height(10.dp))
+
+                        Text(
+                            text = description,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Row(modifier = Modifier.fillMaxWidth()){
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Snitt-temp",
+                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
+                            }
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
+                                InfoItem("Nedbør (14d)",
+                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
+                            }
+                        }
+
+                        Spacer(Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val rain = contextData?.weatherHistory?.totalRainPast14Days
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+
+                                InfoItem(
+                                    label = "Nedbør (14 dgr)",
+                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
+                                )
+                            }
+
+                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                                    Text(
+                                        text = "Været nå",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        val symbolCode = contextData?.currentWeather?.symbolCode
+                                        if (symbolCode != null) {
+                                            val imageRes = context.resources.getIdentifier(
+                                                symbolCode,
+                                                "drawable",
+                                                context.packageName
+                                            )
+                                            if (imageRes != 0) {
+                                                Image(
+                                                    painter = painterResource(id = imageRes),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(Modifier.width(4.dp))
+                                            }
+                                        }
+
+
+                                        val currentTemp = contextData?.currentWeather?.temp
+                                        Text(
+                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+
+            //Always visibles in same spaces:
+
             // Close button up in the corner
             if(onDismiss != null){
                 IconButton(
@@ -188,6 +405,24 @@ fun ScoreCard(
                     )
                 }
             }
+
+            IconButton(
+                onClick = {isExpanded = !isExpanded},
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(4.dp)
+                    .size(32.dp)
+            ){
+                Icon(
+                    painter = painterResource(
+                        id = if(isExpanded)R.drawable.close_fullscreen_24px
+                        else R.drawable.open_in_full_24px
+                    ),
+                    contentDescription = if(isExpanded) "Krymp" else "Utvid",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
 
         }
     }
@@ -233,8 +468,8 @@ fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
-                size = androidx.compose.ui.geometry.Size(
+                topLeft = Offset(inset, inset),
+                size = Size(
                     width = size.width - strokeWidth,
                     height = size.height - strokeWidth
                 ),
@@ -246,8 +481,8 @@ fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
                 startAngle = -90f,
                 sweepAngle = sweepAngle,
                 useCenter = false,
-                topLeft = androidx.compose.ui.geometry.Offset(inset, inset),
-                size = androidx.compose.ui.geometry.Size(
+                topLeft = Offset(inset, inset),
+                size = Size(
                     width = size.width - strokeWidth,
                     height = size.height - strokeWidth
                 ),
@@ -331,3 +566,4 @@ fun InfoCapsule(
         }
     }
 }
+
