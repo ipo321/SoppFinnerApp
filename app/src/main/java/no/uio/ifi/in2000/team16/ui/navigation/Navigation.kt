@@ -93,6 +93,7 @@ fun Navigation(
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
     val mapViewModel: MapViewModel = hiltViewModel()
+    val mushroomInfoViewModel: MushroomInfoViewModel = hiltViewModel()
     val mapUiState by mapViewModel.uiState.collectAsState()
 
     // Determine if the app is ready to transition away from the loading screen
@@ -144,7 +145,7 @@ fun Navigation(
             if (onboardingCompleted == true && currentRoute != ONBOARDING_SCREEN) {
                 MapScreen(
                     onNavigateToDev = { navController.navigate(DEV_SCREEN) },
-                    viewModel = mapViewModel,
+                    mapViewModel = mapViewModel,
                     isVisible = isMapVisible,
                     onMapLoaded = { isMapLoaded = true }
                 )
@@ -227,11 +228,11 @@ fun Navigation(
                 }
 
                 composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
-                    val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
+                    //val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
                     MushroomListScreen(
                         navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
                         onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
-                        viewModel = viewModel
+                        viewModel = mushroomInfoViewModel
                     )
                 }
 

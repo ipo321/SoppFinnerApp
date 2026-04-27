@@ -15,6 +15,7 @@ import android.view.Gravity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -51,7 +52,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -80,10 +80,18 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
@@ -91,6 +99,8 @@ import org.maplibre.android.style.sources.TileSet
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.style.layers.Property
 import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.geojson.Polygon
+import kotlin.math.abs
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -107,7 +117,7 @@ import org.maplibre.android.style.layers.SymbolLayer
 @Composable
 fun MapScreen(
     onNavigateToDev: () -> Unit,
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     isVisible: Boolean,
     onMapLoaded: () -> Unit
 ) {
@@ -125,11 +135,11 @@ fun MapScreen(
     val queryText by remember { mutableStateOf("") }
     val currentJob = remember { mutableStateOf<Job?>(null) }
 
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val uiState by mapViewModel.uiState.collectAsState()
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
-    val mapView = getMapView(viewModel, context, onMapLoaded)
+    val mapView = getMapView(mapViewModel, context, onMapLoaded)
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
 
@@ -158,7 +168,7 @@ fun MapScreen(
         //fires every time we want to update the user position from the GPS
         //pushes the coordinates to the viewmodel
         val listener = LocationListener { location ->
-            viewModel.onUserLocationUpdated(location.latitude, location.longitude)
+            mapViewModel.onUserLocationUpdated(location.latitude, location.longitude)
         }
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
@@ -188,7 +198,7 @@ fun MapScreen(
             )
         }
         MapComponents(
-            viewModel = viewModel,
+            mapViewModel = mapViewModel,
             uiState = uiState,
             mapView = mapView,
             onNavigateToDev = onNavigateToDev,
@@ -203,7 +213,7 @@ fun MapScreen(
                         msg = eval.description,
                         score = eval.score,
                         contextData = uiState.currentContext,
-                        onDismiss = { viewModel.dismissEvaluation() }
+                        onDismiss = { mapViewModel.dismissEvaluation() }
                     )
                 }
             }
@@ -220,7 +230,7 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapComponents(
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     uiState: MapScreenState,
     mapView: MapView,
     onNavigateToDev: () -> Unit,
@@ -244,7 +254,7 @@ fun MapComponents(
                 .semantics { isTraversalGroup = true }
         ) {
             MapMenu(
-                viewModel = viewModel,
+                viewModel = mapViewModel,
                 uiState = uiState,
                 mapView = mapView,
                 menuExpanded = menuExpanded,
@@ -256,13 +266,13 @@ fun MapComponents(
                 onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
-                viewModel = viewModel,
+                viewModel = mapViewModel,
                 uiState = uiState,
                 searchExpanded = uiState.isSearchBarExpanded,
                 onExpandedChange = { expanded ->
                     viewModel.setSearchBarExpanded(expanded)
                    if (expanded) {
-                       viewModel.dismissEvaluation()
+                       mapViewModel.dismissEvaluation()
                    }
                 },
                 mapView = mapView,
@@ -275,8 +285,21 @@ fun MapComponents(
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(end = 16.dp)
-                .semantics { isTraversalGroup = true }
+                .padding(
+                    top = Team16Theme.padding.outer,
+                    end = Team16Theme.padding.outer
+                )
+        ) {
+            MushroomIcon(
+                mushroom = uiState.selectedMushroom
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = Team16Theme.padding.outer)
         ) {
             CentralizeMap(
                 onClick = {
@@ -400,6 +423,58 @@ fun MapSearchBar(
                         }
                 )
                 HorizontalDivider()
+            }
+        }
+    }
+}
+
+
+@Composable
+fun MushroomIcon(
+    mushroom: Mushroom?,
+    modifier: Modifier = Modifier
+) {
+    val selected = mushroom ?: return
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
+            .padding(Team16Theme.padding.inner)
+    ) {
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(Team16Theme.padding.inner)
+        ) {
+            Text(
+                text = "Viser resultater for:",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = selected.commonName,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+
+        Column() {
+            Box(
+                modifier = Modifier
+                    .size(Team16Theme.padding.mapButtonsSize)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Image(
+                    painter = painterResource(id = selected.imageRes),
+                    contentDescription = selected.commonName,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
@@ -531,7 +606,7 @@ fun getMapView(
 
                         if (currentTarget != null && lastTarget != null) {
                             val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                            val zoomDiff = kotlin.math.abs(currentZoom - lastZoom)
+                            val zoomDiff = abs(currentZoom - lastZoom)
 
                             if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
                                 return@addOnCameraIdleListener
@@ -687,7 +762,7 @@ fun getMapView(
                         Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize)
                     )
 
-                    val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
+                    val polygon = Polygon.fromLngLats(listOf(polygonPoints))
                     val feature = Feature.fromGeometry(polygon)
 
                     feature.addNumberProperty("score", tile.score)
