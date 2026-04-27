@@ -72,7 +72,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun onMapClicked(lat: Double, lon: Double) {
-        _uiState.update { it.copy(lastClickedLat = lat, lastClickedLon = lon) }
+        _uiState.update { it.copy(lastClickedLat = lat, lastClickedLon = lon, isSearchBarExpanded = false) }
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
         viewModelScope.launch {
@@ -243,6 +243,10 @@ class MapViewModel @Inject constructor(
 
     fun toggleHistoricalFinds() {
         _uiState.update { it.copy(isHistoricalFindsEnabled = !it.isHistoricalFindsEnabled) }
+    }
+
+    fun setSearchBarExpanded(expanded: Boolean) {
+        _uiState.update { it.copy(isSearchBarExpanded = expanded) }
     }
 
     fun dismissEvaluation() {

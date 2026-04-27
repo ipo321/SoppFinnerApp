@@ -228,7 +228,6 @@ fun MapComponents(
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
     Column() {
@@ -249,16 +248,19 @@ fun MapComponents(
                 uiState = uiState,
                 mapView = mapView,
                 menuExpanded = menuExpanded,
-                onClick = { menuExpanded = !menuExpanded },
+                onClick = {
+                    menuExpanded = !menuExpanded
+                    viewModel.setSearchBarExpanded(false)
+                },
                 onDismissRequest = { menuExpanded = false },
                 onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
                 viewModel = viewModel,
                 uiState = uiState,
-                searchExpanded = searchExpanded,
+                searchExpanded = uiState.isSearchBarExpanded,
                 onExpandedChange = { expanded ->
-                    searchExpanded = expanded
+                    viewModel.setSearchBarExpanded(expanded)
                    if (expanded) {
                        viewModel.dismissEvaluation()
                    }
@@ -289,6 +291,7 @@ fun MapComponents(
                             )
                         }
                     }
+                    viewModel.setSearchBarExpanded(false)
                 }
             )
         }
@@ -309,8 +312,6 @@ fun MapSearchBar(
 ) {
     DockedSearchBar(
         modifier = Modifier
-            //.align(Alignment.TopStart)
-            //.weight(1f)
             .semantics { traversalIndex = 0f },
         shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
         inputField = {
