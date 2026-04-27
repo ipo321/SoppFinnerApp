@@ -148,7 +148,7 @@ companion object {
 
         val weatherText = if (current > 0.7) {
             "I tillegg er det strålende sankevær i dag."
-        } else if (current < 0.4) {
+        } else if (current < 0.2) { // This was earlier 0.4. Changed it to 0.2 to not get the messages with quite low wind.
             "Vær obs på at dagens vær gjør sankingen litt røff."
         } else {
             ""
