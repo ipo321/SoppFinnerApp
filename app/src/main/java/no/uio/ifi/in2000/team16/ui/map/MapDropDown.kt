@@ -68,7 +68,13 @@ fun Dropdown(
             onClick = {
                 onToggleHeatMap()
                 onDismissRequest()
-            }
+            },
+//            trailingIcon = {
+//                if (isHeatmapEnabled) Icon(
+//                    Icons.Outlined.Check,
+//                    contentDescription = "Check"
+//                )
+//            }
         )
         if (isHeatmapEnabled) {
             ColorRow(
@@ -100,8 +106,28 @@ fun Dropdown(
         DropdownMenuItem(
             text = { Text(if (showWmsForest) "Skjul skoglag" else "Vis skoglag") },
             leadingIcon = { Icon(Icons.Outlined.Forest, contentDescription = "Skog-ikon") },
-            onClick = { onToggleWmsForest() }
+            onClick = { onToggleWmsForest() },
+//            trailingIcon = {
+//                if (showWmsForest) Icon(
+//                    Icons.Outlined.Check,
+//                    contentDescription = "Check"
+//                )
+//            }
         )
+
+        if (showWmsForest) {
+            ColorRow(
+                numberOfRows = 5,
+                colors = listOf( // Colors taken from Sat-Skog WMS
+                    Color(0xFF71AC4C),
+                    Color(0xFFC2AA6F),
+                    Color(0xFFB1CA73),
+                    Color(0xFFECB84C),
+                    Color(0xFFF4DC8E)
+                ),
+                text = listOf("Grandominert", "Furudominert", "Barblanding", "Blanding", "Lauvdominert")
+            )
+        }
 
         DropdownMenuItem(
             text = { Text("Dev") },
