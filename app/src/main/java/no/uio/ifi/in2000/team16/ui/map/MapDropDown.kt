@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /*
 Dropdown Menu for the map
@@ -69,6 +70,17 @@ fun Dropdown(
                 onDismissRequest()
             }
         )
+        if (isHeatmapEnabled) {
+            ColorRow(
+                numberOfRows = 3,
+                colors = listOf( // Colors taken from heatmap
+                    Color(0xFFF4BFBE),
+                    Color(0xFFF5E399),
+                    Color(0xFFADDB94)
+                ),
+                text = listOf("Lavere score", "Middels score", "Høyere score"),
+            )
+        }
 
         DropdownMenuItem(
             text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
