@@ -44,15 +44,17 @@ fun InfoScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box {
+            Column(modifier = Modifier,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Trykk for å ringe Gift Informasjonen")
 
-            Text("Trykk for å ringe Gift Informasjonen")
-
-            Button(
-                onClick = {
-                    context.startActivity(intentPIN)
+                Button(
+                    onClick = {
+                        context.startActivity(intentPIN)
+                    }
+                ) {
+                    Text("Ring")
                 }
-            ) {
-                Text("Ring")
             }
         }
 
