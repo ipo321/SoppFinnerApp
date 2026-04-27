@@ -198,7 +198,7 @@ fun MapScreen(
             )
         }
         MapComponents(
-            mapViewModel = mapViewModel,
+            viewModel = mapViewModel,
             uiState = uiState,
             mapView = mapView,
             onNavigateToDev = onNavigateToDev,
@@ -230,7 +230,7 @@ fun MapScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapComponents(
-    mapViewModel: MapViewModel,
+    viewModel: MapViewModel,
     uiState: MapScreenState,
     mapView: MapView,
     onNavigateToDev: () -> Unit,
@@ -254,7 +254,7 @@ fun MapComponents(
                 .semantics { isTraversalGroup = true }
         ) {
             MapMenu(
-                viewModel = mapViewModel,
+                viewModel = viewModel,
                 uiState = uiState,
                 mapView = mapView,
                 menuExpanded = menuExpanded,
@@ -266,13 +266,13 @@ fun MapComponents(
                 onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
-                viewModel = mapViewModel,
+                viewModel = viewModel,
                 uiState = uiState,
                 searchExpanded = uiState.isSearchBarExpanded,
                 onExpandedChange = { expanded ->
                     viewModel.setSearchBarExpanded(expanded)
                    if (expanded) {
-                       mapViewModel.dismissEvaluation()
+                       viewModel.dismissEvaluation()
                    }
                 },
                 mapView = mapView,
