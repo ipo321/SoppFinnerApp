@@ -12,6 +12,7 @@ import android.location.LocationManager
 import androidx.compose.foundation.lazy.items
 import android.util.Log
 import android.view.Gravity
+import org.maplibre.android.maps.MapLibreMapOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
@@ -123,27 +124,19 @@ fun MapScreen(
     onMapLoaded: () -> Unit
 ) {
     val context = LocalContext.current
-    //
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     var locationPermissionGranted by remember {mutableStateOf(
         ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         )
     }
-
-    val coroutineScope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
-    val queryText by remember { mutableStateOf("") }
-    val currentJob = remember { mutableStateOf<Job?>(null) }
-
-    val lifecycleOwner = LocalLifecycleOwner.current
     val uiState by mapViewModel.uiState.collectAsState()
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
-    val mapView = getMapView(mapViewModel, context, onMapLoaded)
+    val mapView = getMapView(mapViewModel, context, lifecycle, onMapLoaded)
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
-
 
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
@@ -578,6 +571,7 @@ fun MapMenu(
 fun getMapView(
     viewModel: MapViewModel,
     context: Context,
+    lifeCycle: Lifecycle,
     onMapLoaded: () -> Unit
 ): MapView {
     val uiState by viewModel.uiState.collectAsState()
@@ -585,66 +579,70 @@ fun getMapView(
 
 
     val mapView = remember {
-            MapView(context).apply {
-                onCreate(null)
+        // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
+        val options = MapLibreMapOptions.createFromAttributes(context, null)
+            .textureMode(true)
 
-                getMapAsync { map ->
-                    mapRef = map
-                    setMapLayout(map, context)
-                    map.addOnMapClickListener { coordinate ->
-                        Log.d("MAP", "Map clicked at: $coordinate")
+        MapView(context, options).apply { // options are sent as argument here to fix the bug
+            onCreate(null)
 
-                        viewModel.onMapClicked(
-                            lat = coordinate.latitude,
-                            lon = coordinate.longitude
-                        )
-                        true
-                    }
-                    var lastTarget: LatLng? = null
-                    var lastZoom: Double = 0.0
+            getMapAsync { map ->
+                mapRef = map
+                setMapLayout(map, context)
+                map.addOnMapClickListener { coordinate ->
+                    Log.d("MAP", "Map clicked at: $coordinate")
 
-                    // Checks if map is still
-                    map.addOnCameraIdleListener() {
-                        val currentZoom = map.cameraPosition.zoom
+                    viewModel.onMapClicked(
+                        lat = coordinate.latitude,
+                        lon = coordinate.longitude
+                    )
+                    true
+                }
+                var lastTarget: LatLng? = null
+                var lastZoom: Double = 0.0
 
-                        if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
+                // Checks if map is still
+                map.addOnCameraIdleListener() {
+                    val currentZoom = map.cameraPosition.zoom
 
-                        val currentTarget = map.cameraPosition.target
+                    if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
 
-                        if (currentTarget != null && lastTarget != null) {
-                            val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                            val zoomDiff = abs(currentZoom - lastZoom)
+                    val currentTarget = map.cameraPosition.target
 
-                            if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
-                                return@addOnCameraIdleListener
-                            }
+                    if (currentTarget != null && lastTarget != null) {
+                        val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
+                        val zoomDiff = abs(currentZoom - lastZoom)
+
+                        if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
+                            return@addOnCameraIdleListener
                         }
-
-                        lastTarget = currentTarget
-                        lastZoom = currentZoom
-
-                        val visibleBounds = map.projection.visibleRegion.latLngBounds
-
-                        val north = visibleBounds.northEast.latitude
-                        val south = visibleBounds.southWest.latitude
-                        val east = visibleBounds.northEast.longitude
-                        val west = visibleBounds.southWest.longitude
-
-                        val latDiff = north - south
-                        val lonDiff = east - west
-
-                        val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.2),
-                            south = south - (latDiff * 0.2),
-                            east = east + (lonDiff * 0.4),
-                            west = west - (lonDiff * 0.4)
-                        )
-
-                        viewModel.fetchHeatmapData(expandedBounds)
                     }
+
+                    lastTarget = currentTarget
+                    lastZoom = currentZoom
+
+                    val visibleBounds = map.projection.visibleRegion.latLngBounds
+
+                    val north = visibleBounds.northEast.latitude
+                    val south = visibleBounds.southWest.latitude
+                    val east = visibleBounds.northEast.longitude
+                    val west = visibleBounds.southWest.longitude
+
+                    val latDiff = north - south
+                    val lonDiff = east - west
+
+                    val expandedBounds = BoundingBox(
+                        north = north + (latDiff * 0.2),
+                        south = south - (latDiff * 0.2),
+                        east = east + (lonDiff * 0.4),
+                        west = west - (lonDiff * 0.4)
+                    )
+
+                    viewModel.fetchHeatmapData(expandedBounds)
                 }
             }
         }
+    }
     LaunchedEffect(uiState.isSatelliteMode, mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
