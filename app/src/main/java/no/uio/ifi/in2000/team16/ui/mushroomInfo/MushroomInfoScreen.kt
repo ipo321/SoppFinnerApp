@@ -1,11 +1,23 @@
 package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
-
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -14,21 +26,31 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.unit.dp
-import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
+
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
 this screen only uses resorses that are in the app and no api calls are made.
@@ -38,60 +60,47 @@ see the MushroomInfoViewModel for the dropdown meny and the Mushroom data class.
 @Composable
 fun MushroomInfoScreen(
     onNavigateBack: () -> Unit,
-    onMushroomControll: () -> Unit,
+    onMushroomControl: () -> Unit,
+    onNavigateToMap: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
-){
-    print("MUSHROM INFOSCREEN LOADED")
-   // val selected = viewModel.viewMushroom?: return  //Return if no mushroom is selected
+) {
     val uiState by viewModel.uiState.collectAsState()
     val selected = uiState.viewMushroom ?: return
-    val favorites = uiState.favorites
     val inSeason = uiState.isInSeason
-    val isFavorite = favorites.any { it.commonName == selected.commonName }
+    val isFavorite = uiState.favorites.any { it.commonName == selected.commonName }
     //main Column
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp)
+            .padding(padding.outer)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         //back button
-            Text(
-                text = "< Utforsk",
-                modifier = Modifier.fillMaxWidth().clickable { onNavigateBack() },
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.headlineSmall
+        Text(
+            text = "< Utforsk",
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onNavigateBack() },
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.headlineSmall
 
-            )
+        )
 
 
         Spacer(modifier = Modifier.height(16.dp))
         //warning with link to soppkontroll.no
-        MushroomWarningBanner(onMushroomControll = onMushroomControll)
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Mushroom image in a green circle
-        Box(
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.errorContainer),
-            contentAlignment = Alignment.Center
-        ) {
-
-            Image(
-                painter = painterResource(id = selected.imageRes),
-                contentDescription = selected.commonName,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        MushroomWarningBanner(onMushroomControl = onMushroomControl)
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Mushroom image
+        MushroomImage(selected)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         //name text
         Text(
             text = selected.commonName,
@@ -107,14 +116,13 @@ fun MushroomInfoScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-        Spacer(modifier = Modifier.height(16.dp))
         //info badges
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            //In Season badge
             MushroomPropertyBadge(
                 MushroomProperty(
                     label = if (inSeason) "I sesong" else "Ikke i sesong",
@@ -122,43 +130,59 @@ fun MushroomInfoScreen(
                     isNegative = !inSeason
                 )
             )
-            Spacer(modifier = Modifier.width(16.dp))
+            //rest of the badges
             selected.properties.forEach { property ->
                 MushroomPropertyBadge(property)
-                Spacer(modifier = Modifier.width(16.dp))
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
         //favorite button
-        OutlinedButton(
+        MushroomActionButton(
             onClick = { viewModel.toggleFavorite(selected) },
-            modifier = Modifier.wrapContentSize()
+            contentColor = MaterialTheme.colorScheme.error
         ) {
-            Icon(imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                contentDescription = if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+            Icon(
+                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                contentDescription = if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter"
+            )
             Spacer(Modifier.width(8.dp))
-            Text(if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter")
+            Text(
+                if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter",
+                color = MaterialTheme.colorScheme.primary
+            )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+        //GO to map Button
+        MushroomActionButton(onClick = {
+            viewModel.onMushroomSelected(selected)
+            onNavigateToMap()
+        }) {
+            Text("Velg i kart")
+        }
         Spacer(modifier = Modifier.height(16.dp))
 
+        //about the mushroom header
         Text(
             text = "Om soppen",
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(8.dp))
+        //the about the mushroom text
         Text(
             text = stringResource(id = selected.bioRes.toInt()),
             style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
+
 @Composable
 fun MushroomPropertyBadge(property: MushroomProperty) {
-    val borderColor = if (property.isNegative) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
-    val bgColor = if (property.isNegative) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
+    val borderColor =
+        if (property.isNegative) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.secondary
+    val bgColor =
+        if (property.isNegative) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
@@ -185,16 +209,16 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
 }
 
 @Composable
-fun MushroomWarningBanner(onMushroomControll: () -> Unit) {
+fun MushroomWarningBanner(onMushroomControl: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.large
     ) {
         Row(
-            modifier = Modifier.padding(16.dp)
-                .clickable { onMushroomControll() }
-            ,
+            modifier = Modifier
+                .padding(16.dp)
+                .clickable { onMushroomControl() },
             verticalAlignment = Alignment.Top,
         ) {
             Icon(
@@ -230,4 +254,39 @@ fun MushroomWarningBanner(onMushroomControll: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun MushroomImage(selected: Mushroom) {
+    Box(
+        modifier = Modifier
+            .size(200.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.onBackground),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Image(
+            painter = painterResource(id = selected.imageRes),
+            contentDescription = selected.commonName,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+
+@Composable
+fun MushroomActionButton(
+    onClick: () -> Unit,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    content: @Composable RowScope.() -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier.wrapContentSize(),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+        content = content
+    )
 }
