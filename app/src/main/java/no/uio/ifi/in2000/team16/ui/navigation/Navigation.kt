@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen
@@ -35,7 +34,7 @@ import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
 import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
@@ -67,7 +66,9 @@ const val SCORE_INFO_SCREEN = "ScoreInfo"
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    darkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
     val welcomeViewModel: WelcomeViewModel = hiltViewModel()
     val onboardingCompleted by welcomeViewModel.onBoardingCompleted.collectAsState()
@@ -166,17 +167,25 @@ fun Navigation(
             }
 
             composable(PROFILE_SCREEN) {
-                ProfileScreen(navController = navController,
+                ProfileScreen(
+                    navController = navController,
                     onNavigateBack = {
                         navController.popBackStack()
-                    })
+                    },
+                    darkTheme = darkTheme,
+                    onToggleTheme = onToggleTheme
+                )
             }
             //UNDER-ITEMS for Profile-screen
             composable(SETTINGS_SCREEN) {
-                SettingsScreen(navController = navController,
+                SettingsScreen(
+                    navController = navController,
                     onNavigateBack = {
                         navController.popBackStack()
-                    })
+                    },
+                    darkTheme = darkTheme,
+                    onToggleTheme = onToggleTheme,
+                )
             }
             composable(HISTORY_SCREEN) {
                 HistoryScreen(navController = navController)
@@ -202,19 +211,9 @@ fun Navigation(
                 composable(MAP_SCREEN) {
                 }
 
-                composable(PROFILE_SCREEN) {
-                    ProfileScreen(navController = navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
+
                 //UNDER-ITEMS for Profile-screen
-                composable(SETTINGS_SCREEN) {
-                    SettingsScreen(navController = navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
+
                 composable(HISTORY_SCREEN) {
                     HistoryScreen(navController = navController)
                 }

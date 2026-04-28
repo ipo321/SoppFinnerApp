@@ -47,6 +47,8 @@ data class MenuItemData(
 fun ProfileScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
+    darkTheme: Boolean,
+    onToggleTheme: () -> Unit,
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     val menuItems = listOf(
@@ -77,6 +79,7 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        Spacer(modifier = Modifier.height(12.dp))
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,6 +97,7 @@ fun ProfileScreen(
             }
         }
     }
+
 }
 
 @Composable
@@ -116,9 +120,9 @@ fun MenuListItem(
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp)
         )
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         Text(
             text = item.text,
             style = MaterialTheme.typography.titleMedium,
