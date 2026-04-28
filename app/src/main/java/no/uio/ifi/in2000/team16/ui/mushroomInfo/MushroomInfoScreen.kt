@@ -105,12 +105,11 @@ fun MushroomInfoScreen(
         Text(
             text = selected.commonName,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             text = selected.latinName,
-            style = MaterialTheme.typography.labelMedium,
-            fontStyle = FontStyle.Italic,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
@@ -199,7 +198,7 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
                 modifier = Modifier.size(32.dp)
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = property.label,
             style = MaterialTheme.typography.labelSmall,
