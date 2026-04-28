@@ -63,6 +63,11 @@ class MushroomInfoViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            repository.selectedMushroom.collect { mushroom ->
+                _uiState.update { it.copy(selectedMushroom = mushroom) }
+            }
+        }
     }
 
     fun onMushroomSelected(mushroom: Mushroom) {
