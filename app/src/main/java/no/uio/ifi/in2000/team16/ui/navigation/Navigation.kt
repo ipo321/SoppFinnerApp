@@ -21,10 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalContext
-<<<<<<< Updated upstream
 import androidx.compose.ui.unit.dp
-=======
->>>>>>> Stashed changes
 import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.dev.DevScreen

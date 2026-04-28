@@ -53,7 +53,6 @@ fun ProfileScreen(
         MenuItemData("Innstillinger", Icons.Default.Settings, SETTINGS_SCREEN),
         MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
-        MenuItemData("Sopp kontroll", Icons.Default.Cloud, SHROOMCONTROL_SCREEN),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
     )
 

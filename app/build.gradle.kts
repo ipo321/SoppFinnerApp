@@ -81,11 +81,8 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.ads.mobile.sdk)
     implementation(libs.androidx.foundation.layout)
-<<<<<<< Updated upstream
     implementation(libs.androidx.foundation)
-=======
     implementation(libs.androidx.games.activity)
->>>>>>> Stashed changes
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

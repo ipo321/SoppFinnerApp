@@ -196,6 +196,7 @@ private fun mushroomCardModifier(
     return if (isSelected) {
         base
             .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 width = 4.dp,
                 color = MaterialTheme.colorScheme.primaryContainer,
@@ -206,6 +207,7 @@ private fun mushroomCardModifier(
     } else {
         base
             .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.outlineVariant,
