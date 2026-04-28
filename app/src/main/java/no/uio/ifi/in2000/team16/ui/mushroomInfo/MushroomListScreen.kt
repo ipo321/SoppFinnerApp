@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.OpenInNew
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -48,7 +49,7 @@ hold each mushroom in a list, and routs to the mushroom info screen when cliked.
 @Composable
 fun MushroomListScreen(
     navigateToMushroom: () -> Unit,
-    onMushroomControll: () -> Unit,
+    onMushroomControl: () -> Unit,
     viewModel: MushroomInfoViewModel = hiltViewModel()
 ){
     val uiState by viewModel.uiState.collectAsState()
@@ -77,7 +78,7 @@ fun MushroomListScreen(
             //Spacer(modifier = Modifier.height(8.dp))
             WarningBanner()
             //Spacer(modifier = Modifier.height(8.dp))
-            MushroomControllBanner(onVisitSoppkontroll = onMushroomControll)
+            MushroomControlBanner(onVisitSoppkontroll = onMushroomControl)
             //Spacer(modifier = Modifier.height(4.dp))
             //favorites column
             Text(
@@ -128,17 +129,18 @@ fun MushroomListScreen(
 //Click on the item itself will take you to that mushroom
 @Composable
 fun MushroomListItem(
-
     mushroom: Mushroom,
     isSelected: Boolean,
     onClick: () -> Unit,
     navigateToMushroom: () -> Unit,
 ) {
-    val cardModifier = mushroomCardModifier(isSelected)
+    //val cardModifier = mushroomCardModifier(isSelected)
 
 
     Row(
-        modifier = cardModifier
+        modifier = Modifier
+            .fillMaxWidth()
+            .mushroomCard(isSelected)
             .clickable {
                 navigateToMushroom() }
             .padding(12.dp),
@@ -165,7 +167,7 @@ fun MushroomListItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        //box for chooing to select this mushroom for the search
+        //box for choosing to select this mushroom for the search
         Checkbox(
             checked = isSelected,
             onCheckedChange = { onClick() },
@@ -173,39 +175,32 @@ fun MushroomListItem(
         )
     }
 }
-
+//extention Function for the mushroom card. makes it highlighted if it is chosen.
 @Composable
-private fun mushroomCardModifier(
-    isSelected: Boolean
-): Modifier {
-    val base = Modifier.fillMaxWidth()
+private fun Modifier.mushroomCard(isSelected: Boolean): Modifier {
+    val borderWidth = if (isSelected) 4.dp else 2.dp
+    val borderColor = if (isSelected)
+        MaterialTheme.colorScheme.primaryContainer
+    else
+        MaterialTheme.colorScheme.outlineVariant
 
-    return if (isSelected) {
-        base
-            .clip(MaterialTheme.shapes.medium)
-            .border(
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.primaryContainer,
-                shape = MaterialTheme.shapes.medium
-            )
-
-
-    } else {
-        base
-            .clip(MaterialTheme.shapes.medium)
-            .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.outlineVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-
-    }
+    return this
+        .clip(MaterialTheme.shapes.medium)
+        .border(
+            width = borderWidth,
+            color = borderColor,
+            shape = MaterialTheme.shapes.medium
+        )
 }
 
+
 @Composable
-fun MushroomControllBanner(onVisitSoppkontroll: () -> Unit) {
+fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .border(width = 4.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = MaterialTheme.shapes.medium),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.large,
         shadowElevation = 2.dp
@@ -240,7 +235,7 @@ fun MushroomControllBanner(onVisitSoppkontroll: () -> Unit) {
 
             // Orange button
             Button(
-                onClick = { onVisitSoppkontroll() },
+                onClick = onVisitSoppkontroll,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE07B20)),
                 shape = MaterialTheme.shapes.medium
@@ -261,16 +256,30 @@ fun MushroomControllBanner(onVisitSoppkontroll: () -> Unit) {
 @Composable
 fun WarningBanner(){
     Surface(
-        color = Color(0xFFFFF3CD),
+        color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.fillMaxWidth()
-            .border(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, width = 1.dp)
+            .border(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, width = 1.dp),
+
     ) {
-        Text(
-            text = "OBS: Dette er ikke en app for identifikasjon av sopp",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-        )
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(20.dp)
+            )
+
+
+            Text(
+                text = "OBS: Dette er ikke en app for identifikasjon av sopp",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            )
+        }
     }
 }
 

@@ -235,7 +235,7 @@ fun Navigation(
                     //val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
                     MushroomListScreen(
                         navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
-                        onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
                         viewModel = mushroomInfoViewModel
                     )
                 }
@@ -248,7 +248,8 @@ fun Navigation(
                     //val viewModel: MushroomInfoViewModel = hiltViewModel(listEntry)
                     MushroomInfoScreen(
                         onNavigateBack = { navController.popBackStack() },
-                        onMushroomControll = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                        onNavigateToMap = { navController.navigate(MAP_SCREEN) },
                         viewModel = mushroomInfoViewModel
                     )
                 }
