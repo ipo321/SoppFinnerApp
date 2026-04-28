@@ -580,10 +580,10 @@ fun getMapView(
 
     val mapView = remember {
         // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
-//        val mode = MapLibreMapOptions.createFromAttributes(context, null)
-//            .textureMode(true)
+        val mode = MapLibreMapOptions.createFromAttributes(context, null)
+            .textureMode(true)
 
-        MapView(context, /*mode*/).apply { // mode are sent as argument here to fix the bug
+        MapView(context, mode).apply { // mode are sent as argument here to fix the bug
             onCreate(null)
 
             getMapAsync { map ->
@@ -819,7 +819,12 @@ fun BoxScope.InfoPopUp(
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(
+                top = Team16Theme.padding.outer,
+                end = Team16Theme.padding.outer,
+                start = Team16Theme.padding.outer,
+                bottom = 120.dp
+            )
     )
 }
 

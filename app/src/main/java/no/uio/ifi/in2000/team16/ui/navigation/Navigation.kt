@@ -133,13 +133,14 @@ fun Navigation(
         bottomBar = {
             if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
                 BottomNavigationBar(navController = navController)
-            }}
+            }
+        }
     ) { innerPadding ->
 
         Box(
             modifier = modifier
                 .fillMaxSize()
-                //.padding(innerPadding)
+                .padding(top = innerPadding.calculateTopPadding())
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
@@ -156,7 +157,7 @@ fun Navigation(
                 startDestination = if (onboardingCompleted == true) MAP_SCREEN else ONBOARDING_SCREEN,
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(if (isMapVisible) PaddingValues(0.dp) else innerPadding)
+                    //.padding(if (isMapVisible) PaddingValues(0.dp) else innerPadding)
             ) {
                 composable(ONBOARDING_SCREEN) {
                     OnboardingScreen(
