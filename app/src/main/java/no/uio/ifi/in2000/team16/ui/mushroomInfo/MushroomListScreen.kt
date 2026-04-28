@@ -197,7 +197,10 @@ private fun Modifier.mushroomCard(isSelected: Boolean): Modifier {
 @Composable
 fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .border(width = 4.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = MaterialTheme.shapes.medium),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.large,
         shadowElevation = 2.dp
@@ -253,7 +256,7 @@ fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
 @Composable
 fun WarningBanner(){
     Surface(
-        color = Color(0xFFFFF3CD),
+        color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.fillMaxWidth()
             .border(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, width = 1.dp),
