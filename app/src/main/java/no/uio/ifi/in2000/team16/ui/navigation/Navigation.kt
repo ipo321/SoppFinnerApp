@@ -69,7 +69,6 @@ const val HISTORY_SCREEN = "profileScreen/history"
 const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
 const val INFO_SCREEN = "InfoScreen"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControl"
-const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
 
 const val SECURITY_SCREEN = "Security"
 
@@ -217,9 +216,7 @@ fun Navigation(
                         navController.popBackStack()
                     })
             }
-            composable(SHROOMBANK_SCREEN) {
-                ShroomBankScreen(navController = navController)
-            }
+
                 composable(INFO_SCREEN) {
                     InfoScreen(navController=navController,
                         onNavigateBack = {

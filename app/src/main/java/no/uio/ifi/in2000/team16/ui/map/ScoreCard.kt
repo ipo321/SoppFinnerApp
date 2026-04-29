@@ -269,15 +269,6 @@ fun ScoreCard(
                         }
 
                         Spacer(Modifier.height(20.dp))
-
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Helning", "${t?.slope ?: "--"}°")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Retning", "${t?.direction ?: "--"}°")
-                            }
-                        }
                     }
 
                 }else{
