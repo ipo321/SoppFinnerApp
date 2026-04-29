@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
+import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROLL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
@@ -55,6 +57,7 @@ fun ProfileScreen(
         MenuItemData("Innstillinger", Icons.Default.Settings, SETTINGS_SCREEN),
         MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
+        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROLL),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
     )
 

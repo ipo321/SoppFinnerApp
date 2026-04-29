@@ -38,7 +38,8 @@ fun ScoreInfo(
             .background(Color(0xFFD4E6CC))
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {    OutlinedButton(
+    )
+    {    OutlinedButton(
         onClick = onNavigateBack,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge

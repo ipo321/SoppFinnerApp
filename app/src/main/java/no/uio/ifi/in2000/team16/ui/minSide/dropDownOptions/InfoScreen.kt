@@ -1,5 +1,7 @@
-package no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions
+package no.uio.ifi.in2000.team16.ui.minSide
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,27 +18,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreenViewModel
 
 
 @Composable
 fun InfoScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: ProfileScreenViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 
-){ Column(
+){
+    //Test to so if its loading in the terminal:
+    println("InfoScreen loaded")
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFD4E6CC))
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-    OutlinedButton(
+    ) {    OutlinedButton(
         onClick = onNavigateBack,
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge
@@ -47,9 +51,10 @@ fun InfoScreen(
             text = "Om appen",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
-            )
-    Spacer(modifier=Modifier.height(24.dp))
+        )
+        Spacer(modifier=Modifier.height(24.dp))
 
-}
+
+    }
 }
 

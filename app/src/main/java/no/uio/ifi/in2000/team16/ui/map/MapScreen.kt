@@ -12,9 +12,11 @@ import android.location.LocationManager
 import androidx.compose.foundation.lazy.items
 import android.util.Log
 import android.view.Gravity
+import org.maplibre.android.maps.MapLibreMapOptions
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -51,7 +53,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -80,10 +81,19 @@ import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.style.layers.RasterLayer
 import org.maplibre.android.style.sources.RasterSource
@@ -91,6 +101,8 @@ import org.maplibre.android.style.sources.TileSet
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.style.layers.Property
 import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.geojson.Polygon
+import kotlin.math.abs
 
 /*
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
@@ -107,32 +119,24 @@ import org.maplibre.android.style.layers.SymbolLayer
 @Composable
 fun MapScreen(
     onNavigateToDev: () -> Unit,
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     isVisible: Boolean,
     onMapLoaded: () -> Unit
 ) {
     val context = LocalContext.current
-    //
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
     var locationPermissionGranted by remember {mutableStateOf(
         ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         )
     }
-
-    val coroutineScope = rememberCoroutineScope()
-    val focusManager = LocalFocusManager.current
-    val queryText by remember { mutableStateOf("") }
-    val currentJob = remember { mutableStateOf<Job?>(null) }
-
-    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by mapViewModel.uiState.collectAsState()
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
-    val mapView = getMapView(viewModel, context, onMapLoaded)
+    val mapView = getMapView(mapViewModel, context, lifecycle, onMapLoaded)
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
-
 
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
@@ -158,7 +162,7 @@ fun MapScreen(
         //fires every time we want to update the user position from the GPS
         //pushes the coordinates to the viewmodel
         val listener = LocationListener { location ->
-            viewModel.onUserLocationUpdated(location.latitude, location.longitude)
+            mapViewModel.onUserLocationUpdated(location.latitude, location.longitude)
         }
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
@@ -188,7 +192,7 @@ fun MapScreen(
             )
         }
         MapComponents(
-            viewModel = viewModel,
+            viewModel = mapViewModel,
             uiState = uiState,
             mapView = mapView,
             onNavigateToDev = onNavigateToDev,
@@ -203,7 +207,7 @@ fun MapScreen(
                         msg = eval.description,
                         score = eval.score,
                         contextData = uiState.currentContext,
-                        onDismiss = { viewModel.dismissEvaluation() }
+                        onDismiss = { mapViewModel.dismissEvaluation() }
                     )
                 }
             }
@@ -228,7 +232,6 @@ fun MapComponents(
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var searchExpanded by rememberSaveable { mutableStateOf(false) }
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
     Column() {
@@ -249,16 +252,19 @@ fun MapComponents(
                 uiState = uiState,
                 mapView = mapView,
                 menuExpanded = menuExpanded,
-                onClick = { menuExpanded = !menuExpanded },
+                onClick = {
+                    menuExpanded = !menuExpanded
+                    viewModel.setSearchBarExpanded(false)
+                },
                 onDismissRequest = { menuExpanded = false },
                 onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
                 viewModel = viewModel,
                 uiState = uiState,
-                searchExpanded = searchExpanded,
+                searchExpanded = uiState.isSearchBarExpanded,
                 onExpandedChange = { expanded ->
-                    searchExpanded = expanded
+                    viewModel.setSearchBarExpanded(expanded)
                    if (expanded) {
                        viewModel.dismissEvaluation()
                    }
@@ -266,6 +272,7 @@ fun MapComponents(
                 mapView = mapView,
                 textFieldState = textFieldState,
                 onSearch = onSearch,
+                modifier = Modifier.weight(1f)
             )
         }
         Row(
@@ -273,8 +280,21 @@ fun MapComponents(
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(end = 16.dp)
-                .semantics { isTraversalGroup = true }
+                .padding(
+                    top = Team16Theme.padding.outer,
+                    end = Team16Theme.padding.outer
+                )
+        ) {
+            MushroomIcon(
+                mushroom = uiState.selectedMushroom
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(end = Team16Theme.padding.outer)
         ) {
             CentralizeMap(
                 onClick = {
@@ -289,6 +309,7 @@ fun MapComponents(
                             )
                         }
                     }
+                    viewModel.setSearchBarExpanded(false)
                 }
             )
         }
@@ -308,13 +329,16 @@ fun MapSearchBar(
     modifier: Modifier = Modifier
 ) {
     DockedSearchBar(
-        modifier = Modifier
-            //.align(Alignment.TopStart)
-            //.weight(1f)
+        modifier = modifier
+            .fillMaxWidth()
             .semantics { traversalIndex = 0f },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        ),
         shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
         inputField = {
             SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth(),
                 query = textFieldState.text.toString(),
                 onQueryChange = {
                     textFieldState.edit { replace(0, length, it) }
@@ -341,7 +365,7 @@ fun MapSearchBar(
                             onClick = {
                                 textFieldState.edit { replace(0, length, "") }
                                 viewModel.onSearchQueryChanged("")
-                                onExpandedChange(false)
+                                //onExpandedChange(false)
                             }
                         ) {
                             Icon(
@@ -359,9 +383,9 @@ fun MapSearchBar(
                     }
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                 )
             )
         },
@@ -399,6 +423,58 @@ fun MapSearchBar(
                         }
                 )
                 HorizontalDivider()
+            }
+        }
+    }
+}
+
+
+@Composable
+fun MushroomIcon(
+    mushroom: Mushroom?,
+    modifier: Modifier = Modifier
+) {
+    val selected = mushroom ?: return
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
+            .padding(Team16Theme.padding.inner)
+    ) {
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(Team16Theme.padding.inner)
+        ) {
+            Text(
+                text = "Viser resultater for:",
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = selected.commonName,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+
+        Column() {
+            Box(
+                modifier = Modifier
+                    .size(Team16Theme.padding.mapButtonsSize)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Image(
+                    painter = painterResource(id = selected.imageRes),
+                    contentDescription = selected.commonName,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
@@ -495,6 +571,7 @@ fun MapMenu(
 fun getMapView(
     viewModel: MapViewModel,
     context: Context,
+    lifeCycle: Lifecycle,
     onMapLoaded: () -> Unit
 ): MapView {
     val uiState by viewModel.uiState.collectAsState()
@@ -502,66 +579,70 @@ fun getMapView(
 
 
     val mapView = remember {
-            MapView(context).apply {
-                onCreate(null)
+        // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
+        val mode = MapLibreMapOptions.createFromAttributes(context, null)
+            .textureMode(true)
 
-                getMapAsync { map ->
-                    mapRef = map
-                    setMapLayout(map, context)
-                    map.addOnMapClickListener { coordinate ->
-                        Log.d("MAP", "Map clicked at: $coordinate")
+        MapView(context, mode).apply { // mode are sent as argument here to fix the bug
+            onCreate(null)
 
-                        viewModel.onMapClicked(
-                            lat = coordinate.latitude,
-                            lon = coordinate.longitude
-                        )
-                        true
-                    }
-                    var lastTarget: LatLng? = null
-                    var lastZoom: Double = 0.0
+            getMapAsync { map ->
+                mapRef = map
+                setMapLayout(map, context)
+                map.addOnMapClickListener { coordinate ->
+                    Log.d("MAP", "Map clicked at: $coordinate")
 
-                    // Checks if map is still
-                    map.addOnCameraIdleListener() {
-                        val currentZoom = map.cameraPosition.zoom
+                    viewModel.onMapClicked(
+                        lat = coordinate.latitude,
+                        lon = coordinate.longitude
+                    )
+                    true
+                }
+                var lastTarget: LatLng? = null
+                var lastZoom: Double = 0.0
 
-                        if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
+                // Checks if map is still
+                map.addOnCameraIdleListener() {
+                    val currentZoom = map.cameraPosition.zoom
 
-                        val currentTarget = map.cameraPosition.target
+                    if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
 
-                        if (currentTarget != null && lastTarget != null) {
-                            val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                            val zoomDiff = kotlin.math.abs(currentZoom - lastZoom)
+                    val currentTarget = map.cameraPosition.target
 
-                            if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
-                                return@addOnCameraIdleListener
-                            }
+                    if (currentTarget != null && lastTarget != null) {
+                        val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
+                        val zoomDiff = abs(currentZoom - lastZoom)
+
+                        if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
+                            return@addOnCameraIdleListener
                         }
-
-                        lastTarget = currentTarget
-                        lastZoom = currentZoom
-
-                        val visibleBounds = map.projection.visibleRegion.latLngBounds
-
-                        val north = visibleBounds.northEast.latitude
-                        val south = visibleBounds.southWest.latitude
-                        val east = visibleBounds.northEast.longitude
-                        val west = visibleBounds.southWest.longitude
-
-                        val latDiff = north - south
-                        val lonDiff = east - west
-
-                        val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.2),
-                            south = south - (latDiff * 0.2),
-                            east = east + (lonDiff * 0.4),
-                            west = west - (lonDiff * 0.4)
-                        )
-
-                        viewModel.fetchHeatmapData(expandedBounds)
                     }
+
+                    lastTarget = currentTarget
+                    lastZoom = currentZoom
+
+                    val visibleBounds = map.projection.visibleRegion.latLngBounds
+
+                    val north = visibleBounds.northEast.latitude
+                    val south = visibleBounds.southWest.latitude
+                    val east = visibleBounds.northEast.longitude
+                    val west = visibleBounds.southWest.longitude
+
+                    val latDiff = north - south
+                    val lonDiff = east - west
+
+                    val expandedBounds = BoundingBox(
+                        north = north + (latDiff * 0.2),
+                        south = south - (latDiff * 0.2),
+                        east = east + (lonDiff * 0.4),
+                        west = west - (lonDiff * 0.4)
+                    )
+
+                    viewModel.fetchHeatmapData(expandedBounds)
                 }
             }
         }
+    }
     LaunchedEffect(uiState.isSatelliteMode, mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
@@ -686,7 +767,7 @@ fun getMapView(
                         Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize)
                     )
 
-                    val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
+                    val polygon = Polygon.fromLngLats(listOf(polygonPoints))
                     val feature = Feature.fromGeometry(polygon)
 
                     feature.addNumberProperty("score", tile.score)
@@ -738,7 +819,12 @@ fun BoxScope.InfoPopUp(
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(
+                top = Team16Theme.padding.outer,
+                end = Team16Theme.padding.outer,
+                start = Team16Theme.padding.outer,
+                bottom = 120.dp
+            )
     )
 }
 
