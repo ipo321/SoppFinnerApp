@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
+import no.uio.ifi.in2000.team16.ui.common.MushroomActionButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -274,17 +275,3 @@ fun BackToExploreButton(onClick: () -> Unit) {
 }
 
 
-@Composable
-fun MushroomActionButton(
-    onClick: () -> Unit,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
-    content: @Composable RowScope.() -> Unit
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.wrapContentSize(),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
-        content = content
-    )
-}
