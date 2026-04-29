@@ -140,7 +140,7 @@ fun Navigation(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(innerPadding/*top = innerPadding.calculateTopPadding()*/)
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
