@@ -41,18 +41,21 @@ import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.minSide.HistoryScreen
-import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.minSide.SettingsScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.SettingsScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomBankScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ShroomControlScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
+import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.PoisonControl
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.Security
+import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ScoreInfo
 
 //
 const val MAP_SCREEN = "map"
@@ -64,14 +67,23 @@ const val PROFILE_SCREEN = "profileScreen"
 const val SETTINGS_SCREEN = "profileScreen/settings"
 const val HISTORY_SCREEN = "profileScreen/history"
 const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
-const val INFO_SCREEN = "profileScreen/info"
+const val INFO_SCREEN = "InfoScreen"
 const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControl"
 const val SHROOMBANK_SCREEN = "profileScreen/shroomBank"
+
+const val SECURITY_SCREEN = "Security"
+
+const val SCORE_INFO_SCREEN = "ScoreInfo"
+
+const val POISON_CONTROLL = "PoisonControll"
+
 
 @Composable
 fun Navigation(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    darkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
     val welcomeViewModel: WelcomeViewModel = hiltViewModel()
     val onboardingCompleted by welcomeViewModel.onBoardingCompleted.collectAsState()
@@ -174,11 +186,25 @@ fun Navigation(
             }
 
             composable(PROFILE_SCREEN) {
-                ProfileScreen(navController = navController)
+                ProfileScreen(
+                    navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    darkTheme = darkTheme,
+                    onToggleTheme = onToggleTheme
+                )
             }
             //UNDER-ITEMS for Profile-screen
             composable(SETTINGS_SCREEN) {
-                SettingsScreen(navController = navController)
+                SettingsScreen(
+                    navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    darkTheme = darkTheme,
+                    onToggleTheme = onToggleTheme,
+                )
             }
             composable(HISTORY_SCREEN) {
                 HistoryScreen(navController = navController)
@@ -186,41 +212,41 @@ fun Navigation(
             composable(SHROOMSPOT_SCREEN) {
                 ShroomSpotScreen(navController = navController)
             }
-            composable(INFO_SCREEN) {
-                InfoScreen(navController = navController)
-            }
+
             composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController)
+                ShroomControlScreen(navController = navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
             }
             composable(SHROOMBANK_SCREEN) {
                 ShroomBankScreen(navController = navController)
             }
-                composable(MAP_SCREEN) {
-                }
-
-                composable(PROFILE_SCREEN) {
-                    ProfileScreen(navController = navController)
-                }
-                //UNDER-ITEMS for Profile-screen
-                composable(SETTINGS_SCREEN) {
-                    SettingsScreen(navController = navController)
-                }
-                composable(HISTORY_SCREEN) {
-                    HistoryScreen(navController = navController)
-                }
-                composable(SHROOMSPOT_SCREEN) {
-                    ShroomSpotScreen(navController = navController)
-                }
                 composable(INFO_SCREEN) {
-                    InfoScreen(navController = navController)
-                }
-                composable(SHROOMCONTROL_SCREEN) {
-                    ShroomControlScreen(navController = navController)
-                }
-                composable(SHROOMBANK_SCREEN) {
-                    ShroomBankScreen(navController = navController)
+                    InfoScreen(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
                 }
 
+                composable (SCORE_INFO_SCREEN ){
+                    ScoreInfo(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
+                }
+                composable(SECURITY_SCREEN){
+                    Security(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
+                }
+                composable (POISON_CONTROLL){
+                    PoisonControl(navController=navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        })
+                }
                 composable(DEV_SCREEN) {
                     val devViewModel: DevViewModel = hiltViewModel()
                     DevScreen(
@@ -255,29 +281,30 @@ fun Navigation(
                 }
 
             }
-            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.cute_mushroom),
-                            contentDescription = "Laster kart",
-                            modifier = Modifier.size(120.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "Laster inn kartdata...",
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                }
-            }
+
+//            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .background(MaterialTheme.colorScheme.background),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.cute_mushroom),
+//                            contentDescription = "Laster kart",
+//                            modifier = Modifier.size(120.dp)
+//                        )
+//                        Spacer(modifier = Modifier.height(16.dp))
+//                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        Text(
+//                            "Laster inn kartdata...",
+//                            color = MaterialTheme.colorScheme.onBackground
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 }

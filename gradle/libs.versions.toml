@@ -45,6 +45,7 @@ adsMobileSdk = "1.0.0"
 foundationLayoutVersion = "1.11.0"
 foundationVersion = "1.11.0"
 sprite = "1.1.0"
+gamesActivity = "4.4.1"
 
 [libraries]
 android-sdk = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
@@ -102,6 +103,7 @@ onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android"
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 sprite = { module = "com.stevdza-san:sprite", version.ref = "sprite" }
+androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

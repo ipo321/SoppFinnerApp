@@ -5,9 +5,14 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,50 +28,33 @@ import androidx.navigation.NavController
 @Composable
 fun InfoScreen(
     navController: NavController,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
-){
-    val context = LocalContext.current
+    onNavigateBack: () -> Unit,
+    viewModel: ProfileScreenViewModel = androidx.hilt.navigation.compose.hiltViewModel()
 
+){
     //Test to so if its loading in the terminal:
     println("InfoScreen loaded")
-
-
-    val poisonInformationNmbr = "22591300"
-    val intentPIN = Intent(Intent.ACTION_DIAL).apply{
-        data = Uri.parse("tel:$poisonInformationNmbr")
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFD4E6CC))
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
+    ) {    OutlinedButton(
+        onClick = onNavigateBack,
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.extraLarge
     ) {
-        Box {
-            Column(modifier = Modifier,
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Trykk for å ringe Gift Informasjonen")
+        Text("Tilbake")
+    }
+        Text(
+            text = "Om appen",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier=Modifier.height(24.dp))
 
-                Button(
-                    onClick = {
-                        context.startActivity(intentPIN)
-                    }
-                ) {
-                    Text("Ring")
-                }
-            }
-        }
 
-        Box {
-            Button(
-                onClick = {
-                    navController.popBackStack()
-                }
-            ) {
-                Text("Go Back")
-            }
-        }
     }
 }
 

@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreenViewModel
+
 
 //Overlays the screen with a networkScreen of SoppPortal
 @Composable
 fun ShroomControlScreen(
     navController: NavController,
+    onNavigateBack: () -> Unit,
     viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     Box {

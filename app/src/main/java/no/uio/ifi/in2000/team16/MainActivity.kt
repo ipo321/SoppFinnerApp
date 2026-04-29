@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,74 +46,91 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            Team16Theme {
-                val navController= rememberNavController()
-                val context = LocalContext.current
+            var darkTheme by remember { mutableStateOf(false) }
+            Team16Theme(
+                darkTheme = darkTheme
 
-                //Starts the internet connection check as if it has an internet connection
-                val isNetConnected by observeConnectivity(context)
-                    .collectAsState(initial = true)
+            ) {
+                val navController = rememberNavController()
 
-                //Starts the location connection check as if it has the location connection
-                val isPosConnected by observeLocationAvailability(context)
-                    .collectAsState(initial = true)
+                Team16Theme {
+                    val navController = rememberNavController()
+                    val context = LocalContext.current
 
-                val internetSnackbarState = remember {SnackbarHostState()}
-                val locationSnackbarState = remember {SnackbarHostState()}
+                    //Starts the internet connection check as if it has an internet connection
+                    val isNetConnected by observeConnectivity(context)
+                        .collectAsState(initial = true)
 
-                //LaunchEffect for snackBar that shows No internet
-                LaunchedEffect(isNetConnected) {
-                    if(!isNetConnected){
-                        internetSnackbarState.showSnackbar(
-                            message = "Ingen internettforbindelse..",
-                            duration = SnackbarDuration.Indefinite
-                        )
-                    }else{internetSnackbarState.currentSnackbarData?.dismiss()}
-                }
+                    //Starts the location connection check as if it has the location connection
+                    val isPosConnected by observeLocationAvailability(context)
+                        .collectAsState(initial = true)
 
-                //LaunchEffect for snackBar that shows No internet
-                LaunchedEffect(isPosConnected){
-                    if(!isPosConnected){
-                        locationSnackbarState.showSnackbar(
-                            message = "Finner ikke posisjonen din..",
-                            duration = SnackbarDuration.Indefinite
-                        )
-                    }else{locationSnackbarState.currentSnackbarData?.dismiss()}
-                }
+                    val internetSnackbarState = remember { SnackbarHostState() }
+                    val locationSnackbarState = remember { SnackbarHostState() }
 
-                Box{
-
-
-                    Navigation(
-                        modifier = Modifier,
-                        navController = navController,
-                    )
-
-                    //Internet
-                    SnackbarHost(hostState = internetSnackbarState,
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 95.dp),
-                    ){
-                            data->
-                        Snackbar(
-                            snackbarData = data,
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        )
+                    //LaunchEffect for snackBar that shows No internet
+                    LaunchedEffect(isNetConnected) {
+                        if (!isNetConnected) {
+                            internetSnackbarState.showSnackbar(
+                                message = "Ingen internettforbindelse..",
+                                duration = SnackbarDuration.Indefinite
+                            )
+                        } else {
+                            internetSnackbarState.currentSnackbarData?.dismiss()
+                        }
                     }
 
-                    //Location
-                    SnackbarHost(hostState = locationSnackbarState,
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 150.dp),
-                    ){
-                            data->
-                        Snackbar(
-                            snackbarData = data,
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    //LaunchEffect for snackBar that shows No internet
+                    LaunchedEffect(isPosConnected) {
+                        if (!isPosConnected) {
+                            locationSnackbarState.showSnackbar(
+                                message = "Finner ikke posisjonen din..",
+                                duration = SnackbarDuration.Indefinite
+                            )
+                        } else {
+                            locationSnackbarState.currentSnackbarData?.dismiss()
+                        }
+                    }
+
+                    Box {
+
+
+                        Navigation(
+                            modifier = Modifier,
+                            navController = navController,
+                            darkTheme = darkTheme,
+                            onToggleTheme = { darkTheme = !darkTheme }
                         )
+
+                        //Internet
+                        SnackbarHost(
+                            hostState = internetSnackbarState,
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                                .padding(bottom = 95.dp),
+                        ) { data ->
+                            Snackbar(
+                                snackbarData = data,
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+
+                        //Location
+                        SnackbarHost(
+                            hostState = locationSnackbarState,
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                                .padding(bottom = 150.dp),
+                        ) { data ->
+                            Snackbar(
+                                snackbarData = data,
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
