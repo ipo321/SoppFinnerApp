@@ -73,7 +73,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                 south = bounds.south,
                                 east = bounds.east,
                                 west = bounds.west,
-                                mushRoomType = profile.name
+                                mushroomType = profile.name
                             )
                         }
                     }

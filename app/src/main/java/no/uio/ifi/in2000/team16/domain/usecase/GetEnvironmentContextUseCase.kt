@@ -48,7 +48,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                             mushroomRepository.getMushroomsNearLocation(
                                 lat,
                                 lon,
-                                mushRoomType = profile.name
+                                mushroomType = profile.name
                             )
                         }
                     } else {
