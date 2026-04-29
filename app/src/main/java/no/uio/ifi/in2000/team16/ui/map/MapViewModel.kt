@@ -250,6 +250,6 @@ class MapViewModel @Inject constructor(
     }
 
     fun dismissEvaluation() {
-        _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null, currentContext = null) }
+        _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null) }
     }
 }
