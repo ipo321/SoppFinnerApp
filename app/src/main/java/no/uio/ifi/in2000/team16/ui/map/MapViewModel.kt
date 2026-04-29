@@ -87,7 +87,7 @@ class MapViewModel @Inject constructor(
                     "T16_MapViewModel_MushroomLocation",
                     "Clicked ($lat, $lon) -> ${context.historicalFindCount} occurrences: " +
                             context.historicalFinds.take(2).joinToString { occ ->
-                                "${occ.species ?: occ.scientificName}@${occ.decimalLatitude},${occ.decimalLongitude}"
+                                "${occ.localSpeciesId ?: occ.localSpeciesId}@${occ.decimalLatitude},${occ.decimalLongitude}"
                             }
                 )
                 _uiState.update {
