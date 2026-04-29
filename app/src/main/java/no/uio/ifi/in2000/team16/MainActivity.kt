@@ -47,13 +47,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             var darkTheme by remember { mutableStateOf(false) }
-            Team16Theme(
-                darkTheme = darkTheme
+                Team16Theme (
+                    darkTheme = darkTheme
 
-            ) {
-                val navController = rememberNavController()
-
-                Team16Theme {
+                ){
                     val navController = rememberNavController()
                     val context = LocalContext.current
 
@@ -132,5 +129,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
+
 
