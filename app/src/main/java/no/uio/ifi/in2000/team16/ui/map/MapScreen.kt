@@ -29,6 +29,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -189,7 +190,7 @@ fun getMapView(
                 mapRef = map
                 setMapLayout(map, context)
                 map.addOnMapClickListener { coordinate ->
-                    Log.d("MAP", "Map clicked at: $coordinate")
+                    Log.d(context.getString(R.string.t16_map), "Map clicked at: $coordinate")
 
                     viewModel.onMapClicked(
                         lat = coordinate.latitude,
@@ -375,7 +376,7 @@ fun getMapView(
 
                 val featureCollection = FeatureCollection.fromFeatures(features)
                 source.setGeoJson(featureCollection)
-                Log.d("T16_Map_Heat", "Drew ${features.size} grid polygons natively.")
+                Log.d(context.getString(R.string.t16_map_heat), "Drew ${features.size} grid polygons natively.")
 
             } else {
                 // Clear the map safely

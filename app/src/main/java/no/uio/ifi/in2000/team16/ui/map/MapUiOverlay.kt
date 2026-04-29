@@ -43,14 +43,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.common.MushroomImage
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -144,7 +147,7 @@ fun MapComponents(
                             map.animateCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(userLocation.latitude, userLocation.longitude),
-                                    15.0
+                                    13.0
                                 )
                             )
                         }
@@ -153,6 +156,67 @@ fun MapComponents(
                 }
             )
         }
+    }
+}
+
+@Composable
+fun MapMenu(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    mapView: MapView,
+    menuExpanded: Boolean,
+    onClick: () -> Unit,
+    onDismissRequest: () -> Unit,
+    onNavigateToDev: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(Team16Theme.padding.mapButtonsSize)
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        IconButton(onClick = onClick) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = stringResource(R.string.meny),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Dropdown(
+            expanded = menuExpanded,
+            onDismissRequest = onDismissRequest,
+            onNavigateToDev = onNavigateToDev,
+            isHeatmapEnabled = uiState.isHeatmapEnabled,
+            isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
+            onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
+            isSatelliteMode = uiState.isSatelliteMode,
+            onToggleSatellite = { viewModel.toggleSatellite() },
+            showWmsForest = uiState.showWmsForest,
+            onToggleWmsForest = { viewModel.toggleWmsForest() },
+            favoriteMushrooms = uiState.favoriteMushrooms,
+            selectedMushroom = uiState.selectedMushroom,
+            onMushroomSelected = { mushroom ->
+                viewModel.onMushroomSelected(
+                    mushroom
+                )
+            },
+            onToggleHeatMap = {
+                mapView.getMapAsync { map ->
+                    val bounds = map.projection.visibleRegion.latLngBounds
+                    val currentBox = BoundingBox(
+                        north = bounds.northEast.latitude,
+                        south = bounds.southWest.latitude,
+                        east = bounds.northEast.longitude,
+                        west = bounds.southWest.longitude
+                    )
+                    viewModel.toggleHeatmap(currentBox)
+                }
+            }
+        )
     }
 }
 
@@ -198,7 +262,7 @@ fun MapSearchBar(
                 },
                 expanded = searchExpanded,
                 onExpandedChange = onExpandedChange,
-                placeholder = { Text("Søk i kartet") },
+                placeholder = { Text(stringResource(R.string.sok_i_kartet)) },
                 trailingIcon = {
                     if (textFieldState.text.isNotEmpty()) {
                         IconButton(
@@ -210,7 +274,7 @@ fun MapSearchBar(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
-                                contentDescription = "Tøm søk",
+                                contentDescription = stringResource(R.string.tom_sok),
                                 tint = MaterialTheme.colorScheme.primaryContainer
                             )
                         }
@@ -218,7 +282,7 @@ fun MapSearchBar(
                     else {
                         Icon(
                             Icons.Default.Search,
-                            contentDescription = "Search"
+                            contentDescription = stringResource(R.string.sok)
                         )
                     }
                 },
@@ -231,14 +295,14 @@ fun MapSearchBar(
         },
         expanded = searchExpanded,
         onExpandedChange = onExpandedChange,
-        shadowElevation = 0.dp,
-        tonalElevation = 0.dp
+        shadowElevation = Team16Theme.padding.noPadding,
+        tonalElevation = Team16Theme.padding.noPadding
     ) {
         // Displays search results in a scrollable column
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 500.dp) // Max height of search result list
+                .heightIn(max = Team16Theme.padding.searchResultHeight) // Max height of search result list
         ) {
             items(uiState.searchSuggestions) { suggestion ->
                 ListItem(
@@ -268,13 +332,13 @@ fun MapSearchBar(
     }
 }
 
-
 @Composable
 fun MushroomIcon(
     mushroom: Mushroom?,
     modifier: Modifier = Modifier
 ) {
     val selected = mushroom ?: return
+    var expanded by rememberSaveable { mutableStateOf(true) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -283,39 +347,35 @@ fun MushroomIcon(
                 color = MaterialTheme.colorScheme.surfaceContainerHighest
             )
             .padding(Team16Theme.padding.inner)
+            .clickable {
+                expanded = !expanded
+            }
     ) {
-        Column (
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(Team16Theme.padding.inner)
-        ) {
-            Text(
-                text = "Viser resultater for:",
-                style = MaterialTheme.typography.labelSmall
-            )
-            Text(
-                text = selected.commonName,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelSmall
-            )
+        if (expanded) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(Team16Theme.padding.inner)
+            ) {
+                Text(
+                    text = stringResource(R.string.viser_resultater_for),
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Text(
+                    text = selected.commonName,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
         }
 
         Column() {
-            Box(
-                modifier = Modifier
-                    .size(Team16Theme.padding.mapButtonsSize)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Image(
-                    painter = painterResource(id = selected.imageRes),
-                    contentDescription = selected.commonName,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
+            MushroomImage(
+                selected = selected,
+                size = Team16Theme.padding.mapButtonsSize,
+                background = MaterialTheme.colorScheme.surfaceContainerHighest
+            )
         }
     }
 }
@@ -338,73 +398,14 @@ fun CentralizeMap(
         IconButton(onClick = onClick) {
             Icon(
                 imageVector = Icons.Default.Navigation,
-                contentDescription = "Sentraliser kartet",
+                contentDescription = stringResource(R.string.sentraliser_kartet),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
 }
 
-@Composable
-fun MapMenu(
-    viewModel: MapViewModel,
-    uiState: MapScreenState,
-    mapView: MapView,
-    menuExpanded: Boolean,
-    onClick: () -> Unit,
-    onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .size(56.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                shape = CircleShape
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        IconButton(onClick = onClick) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Meny",
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        Dropdown(
-            expanded = menuExpanded,
-            onDismissRequest = onDismissRequest,
-            onNavigateToDev = onNavigateToDev,
-            isHeatmapEnabled = uiState.isHeatmapEnabled,
-            isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-            onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-            isSatelliteMode = uiState.isSatelliteMode,
-            onToggleSatellite = { viewModel.toggleSatellite() },
-            showWmsForest = uiState.showWmsForest,
-            onToggleWmsForest = { viewModel.toggleWmsForest() },
-            favoriteMushrooms = uiState.favoriteMushrooms,
-            selectedMushroom = uiState.selectedMushroom,
-            onMushroomSelected = { mushroom ->
-                viewModel.onMushroomSelected(
-                    mushroom
-                )
-            },
-            onToggleHeatMap = {
-                mapView.getMapAsync { map ->
-                    val bounds = map.projection.visibleRegion.latLngBounds
-                    val currentBox = BoundingBox(
-                        north = bounds.northEast.latitude,
-                        south = bounds.southWest.latitude,
-                        east = bounds.northEast.longitude,
-                        west = bounds.southWest.longitude
-                    )
-                    viewModel.toggleHeatmap(currentBox)
-                }
-            }
-        )
-    }
-}
+
 
 @Composable
 fun ColorRow(
@@ -426,7 +427,7 @@ fun ColorRow(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(10.dp)
+                        .size(Team16Theme.padding.colorExplanationSize)
                         .background(colors[index])
                 )
                 Text(
