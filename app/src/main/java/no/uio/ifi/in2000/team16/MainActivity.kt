@@ -26,6 +26,8 @@ import org.maplibre.android.MapLibre
 import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 
 
 @AndroidEntryPoint
@@ -44,29 +46,62 @@ class MainActivity : ComponentActivity() {
                 val navController= rememberNavController()
                 val context = LocalContext.current
 
-                val isConnected by observeConnectivity(context)
+                //Starts the internet connection check as if it has an internet connection
+                val isNetConnected by observeConnectivity(context)
                     .collectAsState(initial = true)
-                val snackbarHostState = remember {SnackbarHostState()}
 
-                LaunchedEffect(isConnected) {
-                    if(!isConnected){
-                        snackbarHostState.showSnackbar(
+                //Starts the location connection check as if it has the location connection
+                val isPosConnected by observeLocationAvailability(context)
+                    .collectAsState(initial = true)
+
+                val internetSnackbarState = remember {SnackbarHostState()}
+                val locationSnackbarState = remember {SnackbarHostState()}
+
+                //LaunchEffect for snackBar that shows No internet
+                LaunchedEffect(isNetConnected) {
+                    if(!isNetConnected){
+                        internetSnackbarState.showSnackbar(
                             message = "Ingen internettforbindelse..",
                             duration = SnackbarDuration.Indefinite
                         )
-                    }else{snackbarHostState.currentSnackbarData?.dismiss()}
+                    }else{internetSnackbarState.currentSnackbarData?.dismiss()}
+                }
+
+                //LaunchEffect for snackBar that shows No internet
+                LaunchedEffect(isPosConnected){
+                    if(!isPosConnected){
+                        locationSnackbarState.showSnackbar(
+                            message = "Finner ikke posisjonen din..",
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }else{locationSnackbarState.currentSnackbarData?.dismiss()}
                 }
 
                 Box{
+
+
                     Navigation(
                         modifier = Modifier,
                         navController = navController,
                     )
 
-                    SnackbarHost(hostState = snackbarHostState,
-                            modifier = Modifier.align(Alignment.BottomCenter),
+                    //Internet
+                    SnackbarHost(hostState = internetSnackbarState,
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 95.dp),
                     ){
-                        data->
+                            data->
+                        Snackbar(
+                            snackbarData = data,
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+
+                    //Location
+                    SnackbarHost(hostState = locationSnackbarState,
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 150.dp),
+                    ){
+                            data->
                         Snackbar(
                             snackbarData = data,
                             containerColor = MaterialTheme.colorScheme.errorContainer,

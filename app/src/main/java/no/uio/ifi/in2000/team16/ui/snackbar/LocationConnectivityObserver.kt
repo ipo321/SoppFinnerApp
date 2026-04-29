@@ -19,8 +19,8 @@ fun observeLocationAvailability(context: Context): Flow<Boolean> = callbackFlow 
 
     val job = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch{
         while(true){
-            trySend(isEnabled)
-            kotlinx.coroutinex.delay(2000)
+            trySend(isEnabled())
+            kotlinx.coroutines.delay(2000)
         }
     }
 
