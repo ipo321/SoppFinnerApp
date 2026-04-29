@@ -90,7 +90,7 @@ fun MushroomInfoScreen(
         }
 
 
-        Spacer(modifier = Modifier.height(padding.outerLarge))
+        Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no
         MushroomWarningBanner(onMushroomControl = onMushroomControl)
 
