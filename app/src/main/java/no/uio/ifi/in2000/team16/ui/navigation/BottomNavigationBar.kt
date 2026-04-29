@@ -113,6 +113,6 @@ private fun parentTabRoute(route: String?): String? = when (route) {
     PROFILE_SCREEN,
     SETTINGS_SCREEN, HISTORY_SCREEN,
     SHROOMSPOT_SCREEN, INFO_SCREEN,
-    SHROOMCONTROL_SCREEN, SHROOMBANK_SCREEN     -> PROFILE_SCREEN
+    SHROOMCONTROL_SCREEN      -> PROFILE_SCREEN
     else                                        -> route
 }
