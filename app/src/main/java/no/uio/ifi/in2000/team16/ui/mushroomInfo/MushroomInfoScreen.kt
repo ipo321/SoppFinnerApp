@@ -51,6 +51,8 @@ import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
@@ -95,7 +97,7 @@ fun MushroomInfoScreen(
         Spacer(modifier = Modifier.height(padding.outer))
 
         // Mushroom image
-        MushroomImage(selected)
+        MushroomImage(selected, 200.dp)
 
         Spacer(modifier = Modifier.height(padding.outerLarge))
 
@@ -271,10 +273,10 @@ fun BackToExploreButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun MushroomImage(selected: Mushroom) {
+fun MushroomImage(selected: Mushroom, size : Dp) {
     Box(
         modifier = Modifier
-            .size(200.dp)
+            .size(size)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.onBackground),
         contentAlignment = Alignment.Center
