@@ -41,7 +41,7 @@ class MushroomRepository @Inject constructor(
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 3.0,
+        radiusKm: Double = 100.0,
         mushRoomType: String = "no Mushroom",
         //limit: Int = 50
     ): OccurrenceResult {
