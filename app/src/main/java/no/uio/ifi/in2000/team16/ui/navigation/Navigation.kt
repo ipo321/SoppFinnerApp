@@ -206,9 +206,7 @@ fun Navigation(
                     onToggleTheme = onToggleTheme,
                 )
             }
-            composable(HISTORY_SCREEN) {
-                HistoryScreen(navController = navController)
-            }
+
             composable(SHROOMSPOT_SCREEN) {
                 ShroomSpotScreen(navController = navController)
             }
