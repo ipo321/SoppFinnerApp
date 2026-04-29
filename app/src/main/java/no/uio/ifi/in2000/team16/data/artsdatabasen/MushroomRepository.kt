@@ -11,30 +11,13 @@ and the amount of mushrooms spotting in a certain area.
 use getSpeciesNearLocation with latitude, longitude and species profile.
 amount of mushroom results have a default limit that can be adjusted (limit)
 and a default radius that can be adjusted (radiusKm).
-
 */
 
 
 class MushroomRepository @Inject constructor(
-    private val mushroomDataSource: MushroomDataSource,
     private val localMushroomDataSource: LocalMushroomDataSource
 ) {
 
-    suspend fun searchMushrooms(query: String): List<MushroomInfo> {
-        Log.d("T16_Mushroom_Repository", "Searching for mushrooms with query: $query")
-        return mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
-    }
-
-
-    suspend fun getMushroomDetails(id: String): MushroomInfo? {
-        Log.d("T16_Mushroom_Repository", "Fetching details for mushroom ID: $id")
-        val result = mushroomDataSource.getMushroomById(id)
-        if (result == null){
-            Log.w("T16_Mushroom_Repository","Could not find mushroom details for ID: $id")
-            return null
-        }
-        return result.toMushroom()
-    }
 
 
     //returns a OccurrenceResult object witch a list of the occurrences and a count inside a radius.
