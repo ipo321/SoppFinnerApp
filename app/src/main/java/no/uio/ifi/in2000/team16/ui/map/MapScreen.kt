@@ -218,6 +218,13 @@ fun MapScreen(
             is ScreenStatus.Idle -> {}
         }
 
+        // this updates the scorecard when someone changes selected mushroom in Soppsiden
+        LaunchedEffect(uiState.selectedMushroom) {
+            val lat = uiState.lastClickedLat ?: return@LaunchedEffect
+            val lon = uiState.lastClickedLon ?: return@LaunchedEffect
+            mapViewModel.onMapClicked(lat, lon)
+        }
+
     }
 }
 
@@ -784,6 +791,7 @@ fun getMapView(
             }
         }
     }
+
 
     //For making the screen start on the user position
     LaunchedEffect(uiState.moveCameraToUser, mapRef) {
