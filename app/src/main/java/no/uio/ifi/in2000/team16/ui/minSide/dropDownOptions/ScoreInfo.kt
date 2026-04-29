@@ -35,7 +35,7 @@ fun ScoreInfo(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD4E6CC))
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     )
@@ -53,7 +53,15 @@ fun ScoreInfo(
         )
         Spacer(modifier=Modifier.height(24.dp))
 
+        Text(
+            text = "Det hentes ut informasjon fra en rekke api-er: " +
+                    "\n\n- Metrologisk Institutt" +
+                    "\n- Artsdatabasen" +
+                    "\n- Kartverket" +
+                    "\n- Frost" +
+                    "\n- Norsk Institutt for Bioøkonomi (NIBIO)"
 
+        )
     }
 }
 

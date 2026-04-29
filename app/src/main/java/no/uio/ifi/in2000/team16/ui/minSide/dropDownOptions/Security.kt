@@ -34,7 +34,7 @@ fun Security(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD4E6CC))
+            .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

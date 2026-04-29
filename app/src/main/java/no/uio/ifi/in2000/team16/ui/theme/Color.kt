@@ -9,7 +9,7 @@ val PrimaryGreen = Color(0xFF384E1B)
 val PrimaryContainer = Color(0xFF4F6630)
 val PrimaryFixed = Color(0xFFD0ECA8)   //Statuses and mushrooms
 
-val SurfaceCream = Color(0xFFC4D6C1)  //Background
+val SurfaceCream = Color(0xFFFFF0D8)  //Background
 val OnSurfaceDark = Color(0xFF1B1C15) // Instead of pure black
 
 val DangerError = Color(0xFFBA1A1A)
