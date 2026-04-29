@@ -140,7 +140,6 @@ fun Navigation(
 
     }
 
-
     Scaffold(
         bottomBar = {
             if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
@@ -152,7 +151,7 @@ fun Navigation(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding/*top = innerPadding.calculateTopPadding()*/)
+                .padding(innerPadding)
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
@@ -220,65 +219,63 @@ fun Navigation(
             composable(SHROOMBANK_SCREEN) {
                 ShroomBankScreen(navController = navController)
             }
-                composable(INFO_SCREEN) {
-                    InfoScreen(navController=navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-
-                composable (SCORE_INFO_SCREEN ){
-                    ScoreInfo(navController=navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-                composable(SECURITY_SCREEN){
-                    Security(navController=navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-                composable (POISON_CONTROLL){
-                    PoisonControl(navController=navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-                composable(DEV_SCREEN) {
-                    val devViewModel: DevViewModel = hiltViewModel()
-                    DevScreen(
-                        mapViewModel = mapViewModel,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        }
-                    )
-                }
-
-                composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
-                    //val viewModel: MushroomInfoViewModel = hiltViewModel(backStackEntry)
-                    MushroomListScreen(
-                        navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
-                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
-                        viewModel = mushroomInfoViewModel
-                    )
-                }
-
-                composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
-                    // Get the list screen's back stack entry to share its ViewModel
-                    val listEntry = remember(backStackEntry) {
-                        navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
-                    }
-                    //val viewModel: MushroomInfoViewModel = hiltViewModel(listEntry)
-                    MushroomInfoScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
-                        onNavigateToMap = { navController.navigate(MAP_SCREEN) },
-                        viewModel = mushroomInfoViewModel
-                    )
-                }
-
+            composable(INFO_SCREEN) {
+                InfoScreen(navController=navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
             }
+
+            composable (SCORE_INFO_SCREEN ){
+                ScoreInfo(navController=navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
+            }
+            composable(SECURITY_SCREEN){
+                Security(navController=navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
+            }
+            composable (POISON_CONTROLL){
+                PoisonControl(navController=navController,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    })
+            }
+            composable(DEV_SCREEN) {
+                val devViewModel: DevViewModel = hiltViewModel()
+                DevScreen(
+                    mapViewModel = mapViewModel,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
+                MushroomListScreen(
+                    navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
+                    onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                    viewModel = mushroomInfoViewModel
+                )
+            }
+
+            composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
+                // Get the list screen's back stack entry to share its ViewModel
+                val listEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
+                }
+                MushroomInfoScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                    onNavigateToMap = { navController.navigate(MAP_SCREEN) },
+                    viewModel = mushroomInfoViewModel
+                )
+            }
+
+        }
 
 //            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
 //                Box(

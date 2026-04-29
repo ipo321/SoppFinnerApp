@@ -42,7 +42,6 @@ import org.maplibre.android.style.sources.TileSet
 
 /*
 Setting up the map and all the layers of the map in this file
-
  */
 
 

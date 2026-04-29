@@ -61,12 +61,38 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import no.uio.ifi.in2000.team16.ui.dev.GridRow
 import no.uio.ifi.in2000.team16.ui.dev.SectionHeader
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
+
+@Composable
+fun BoxScope.InfoPopUp(
+    msg : String,
+    score : Int,
+    onDismiss: (() -> Unit)?,
+    contextData: EnvironmentContext?,
+    modifier: Modifier = Modifier
+) {
+    ScoreCard(
+        score = score,
+        description = msg,
+        contextData = contextData,
+        onDismiss = onDismiss,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth()
+            .padding(
+                top = Team16Theme.padding.outer,
+                end = Team16Theme.padding.outer,
+                start = Team16Theme.padding.outer,
+                bottom = Team16Theme.padding.outer
+            )
+    )
+}
 
 @Composable
 fun ScoreCard(

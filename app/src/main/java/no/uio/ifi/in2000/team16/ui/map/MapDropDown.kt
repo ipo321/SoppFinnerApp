@@ -20,15 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /*
 Dropdown Menu for the map
-
  */
 
 @Composable
@@ -69,12 +67,6 @@ fun Dropdown(
                 onToggleHeatMap()
                 onDismissRequest()
             },
-//            trailingIcon = {
-//                if (isHeatmapEnabled) Icon(
-//                    Icons.Outlined.Check,
-//                    contentDescription = "Check"
-//                )
-//            }
         )
         if (isHeatmapEnabled) {
             ColorRow(
@@ -107,12 +99,6 @@ fun Dropdown(
             text = { Text(if (showWmsForest) "Skjul skoglag" else "Vis skoglag") },
             leadingIcon = { Icon(Icons.Outlined.Forest, contentDescription = "Skog-ikon") },
             onClick = { onToggleWmsForest() },
-//            trailingIcon = {
-//                if (showWmsForest) Icon(
-//                    Icons.Outlined.Check,
-//                    contentDescription = "Check"
-//                )
-//            }
         )
 
         if (showWmsForest) {
