@@ -823,7 +823,7 @@ fun BoxScope.InfoPopUp(
                 top = Team16Theme.padding.outer,
                 end = Team16Theme.padding.outer,
                 start = Team16Theme.padding.outer,
-                bottom = 120.dp
+                bottom = Team16Theme.padding.outer
             )
     )
 }
