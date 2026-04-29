@@ -67,7 +67,7 @@ fun MushroomListScreen(
         Text(
             text = "Soppsiden",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.height(padding.outer))
         //list column with all the mushrooms.
@@ -138,7 +138,10 @@ fun MushroomListItem(
 ) {
     //val cardModifier = mushroomCardModifier(isSelected)
 
-
+    Surface(
+        shadowElevation = 2.dp,
+        shape = MaterialTheme.shapes.medium
+    ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,6 +178,7 @@ fun MushroomListItem(
             onCheckedChange = { onClick() },
             modifier = Modifier.padding(end = 4.dp)
         )
+    }
     }
 }
 //extention Function for the mushroom card. makes it highlighted if it is chosen.
