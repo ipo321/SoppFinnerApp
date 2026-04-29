@@ -222,33 +222,13 @@ fun Navigation(
             composable(SHROOMBANK_SCREEN) {
                 ShroomBankScreen(navController = navController)
             }
-                composable(MAP_SCREEN) {
-                }
-
-
-                //UNDER-ITEMS for Profile-screen
-
-                composable(HISTORY_SCREEN) {
-                    HistoryScreen(navController = navController)
-                }
-                composable(SHROOMSPOT_SCREEN) {
-                    ShroomSpotScreen(navController = navController)
-                }
                 composable(INFO_SCREEN) {
                     InfoScreen(navController=navController,
                         onNavigateBack = {
                             navController.popBackStack()
                         })
                 }
-                composable(SHROOMCONTROL_SCREEN) {
-                    ShroomControlScreen(navController = navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-                composable(SHROOMBANK_SCREEN) {
-                    ShroomBankScreen(navController = navController)
-                }
+
                 composable (SCORE_INFO_SCREEN ){
                     ScoreInfo(navController=navController,
                         onNavigateBack = {
