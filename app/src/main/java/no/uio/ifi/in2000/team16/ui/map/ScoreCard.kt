@@ -279,7 +279,7 @@ fun ScoreCard(
                                 InfoItem("Gran", "${f?.sprucePercentage ?: "--"}%")
                             }
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}")
+                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}%")
                             }
                         }
 
