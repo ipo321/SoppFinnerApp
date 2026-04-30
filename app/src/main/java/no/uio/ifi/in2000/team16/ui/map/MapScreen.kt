@@ -6,11 +6,13 @@ import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -25,12 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
+import no.uio.ifi.in2000.team16.ui.common.ErrorScreen
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -63,35 +65,28 @@ fun MapScreen(
     onMapLoaded: () -> Unit
 ) {
     val context = LocalContext.current
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
     var locationPermissionGranted by remember {mutableStateOf(
         ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         )
     }
-    val uiState by mapViewModel.uiState.collectAsState()
-    val searchTextFieldState = rememberTextFieldState()
-    // The map is made with MapView and remember to save state
-    val mapView = getMapView(mapViewModel, context, lifecycle, onMapLoaded)
-    // mapView is alerted when lifecycle changes
-    MapLifecycle(mapView, isVisible)
-
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
     }
-        //Actually runs the popup and makes sure it doesn't rerun
-    LaunchedEffect(Unit){
-        locationPermissionRequest.launch(arrayOf(
-             Manifest.permission.ACCESS_COARSE_LOCATION,
-             Manifest.permission.ACCESS_FINE_LOCATION
-        ))
-    }
+    val uiState by mapViewModel.uiState.collectAsState()
+    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
+    val searchTextFieldState = rememberTextFieldState()
+    // The map is made with MapView and remember to save state
+    val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
-    //Sets up the GPS listner
+    LaunchEffects(mapViewModel, uiState, mapRef, context, locationPermissionRequest, onMapLoaded)
+    // mapView is alerted when lifecycle changes
+    MapLifecycle(mapView, isVisible)
+    // Sets up the GPS listener
     DisposableEffect(locationPermissionGranted){
         if(!locationPermissionGranted) return@DisposableEffect onDispose{}
 
@@ -112,16 +107,31 @@ fun MapScreen(
         //disposes of the GPS listener(to avoid leaks)
         onDispose{locationManager.removeUpdates(listener)}
     }
+    MapScreenSurface(
+        onNavigateToDev = onNavigateToDev,
+        searchTextFieldState = searchTextFieldState,
+        mapView = mapView,
+        mapViewModel = mapViewModel,
+        uiState = uiState
+    )
+}
 
+@Composable
+fun MapScreenSurface(
+    onNavigateToDev: () -> Unit,
+    searchTextFieldState: TextFieldState,
+    mapView: MapView,
+    mapViewModel: MapViewModel,
+    uiState: MapScreenState,
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
         AndroidView(
             modifier = Modifier.matchParentSize(),
             factory = { mapView }
         )
-
-      
         if (uiState.isFetchingHeatmap) {
             LinearProgressIndicator(
                 modifier = Modifier
@@ -150,34 +160,24 @@ fun MapScreen(
                     )
                 }
             }
-            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0,
-                contextData = null, onDismiss = null)
-            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}",
-                score = 0, contextData = null, onDismiss = null)
+            is ScreenStatus.Loading -> InfoPopUp(
+                msg = stringResource(R.string.laster_inn_data),
+                score = 0,
+                contextData = null,
+                onDismiss = null
+            )
+            is ScreenStatus.Error -> ErrorScreen("Feil: ${uiState.screenStatus.message}")
             is ScreenStatus.Idle -> {}
         }
-
-        // this updates the scorecard when someone changes selected mushroom in Soppsiden
-        LaunchedEffect(uiState.selectedMushroom) {
-            val lat = uiState.lastClickedLat ?: return@LaunchedEffect
-            val lon = uiState.lastClickedLon ?: return@LaunchedEffect
-            mapViewModel.onMapClicked(lat, lon)
-        }
-
     }
 }
 
 @Composable
 fun getMapView(
-    viewModel: MapViewModel,
+    mapViewModel: MapViewModel,
     context: Context,
-    lifeCycle: Lifecycle,
-    onMapLoaded: () -> Unit
+    onMapReady: (MapLibreMap) -> Unit,
 ): MapView {
-    val uiState by viewModel.uiState.collectAsState()
-    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
-
-
     val mapView = remember {
         // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
         val mode = MapLibreMapOptions.createFromAttributes(context, null)
@@ -187,25 +187,25 @@ fun getMapView(
             onCreate(null)
 
             getMapAsync { map ->
-                mapRef = map
+                onMapReady(map)
                 setMapLayout(map, context)
                 map.addOnMapClickListener { coordinate ->
                     Log.d(context.getString(R.string.t16_map), "Map clicked at: $coordinate")
 
-                    viewModel.onMapClicked(
+                    mapViewModel.onMapClicked(
                         lat = coordinate.latitude,
                         lon = coordinate.longitude
                     )
                     true
                 }
                 var lastTarget: LatLng? = null
-                var lastZoom: Double = 0.0
+                var lastZoom = 0.0
 
                 // Checks if map is still
-                map.addOnCameraIdleListener() {
+                map.addOnCameraIdleListener {
                     val currentZoom = map.cameraPosition.zoom
 
-                    if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
+                    if (!mapViewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
 
                     val currentTarget = map.cameraPosition.target
 
@@ -238,35 +238,47 @@ fun getMapView(
                         west = west - (lonDiff * 0.4)
                     )
 
-                    viewModel.fetchHeatmapData(expandedBounds)
+                    mapViewModel.fetchHeatmapData(expandedBounds)
                 }
             }
         }
     }
+    return mapView
+}
+
+@Composable
+fun LaunchEffects(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    mapRef: MapLibreMap?,
+    context: Context,
+    locationPermissionRequest: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+    onMapLoaded: () -> Unit
+) {
+    // Satellite mode
     LaunchedEffect(uiState.isSatelliteMode, mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
         val styleUrl = if (uiState.isSatelliteMode)
-                "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
+            "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
+        else
+            if(isDarkMode(context))
+                "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
-                if(isDarkMode(context))
-                    "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
-                else
-                    "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
 
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
             setupHeatmapLayer(style)
             setupHistoricalFindsLayer(style)
             setupForestLayer(style, uiState.showWmsForest)
-            //setupPointMarker(style)
             addPinImage(style, context)
             setupPinIcon(style)
             setupUserLocationLayer(style)
             onMapLoaded()
         }
     }
-    // WMS
+    // WMS Forest Layer
     LaunchedEffect(uiState.showWmsForest, mapRef) {
         mapRef?.getStyle { style ->
             style.getLayer("satskog-layer")?.setProperties(
@@ -301,10 +313,7 @@ fun getMapView(
             source.setGeoJson(Feature.fromGeometry(point))
         }
     }
-
-
-
-    //Mushroom finding pins
+    // Mushroom finding pins
     // Updating the pins each time they change
     LaunchedEffect(
         uiState.currentContext?.historicalFinds,
@@ -313,8 +322,6 @@ fun getMapView(
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-
-
 
         val features = finds
             .filter { it.decimalLatitude != null && it.decimalLongitude != null }
@@ -335,7 +342,6 @@ fun getMapView(
             }
         }
     }
-
     // Updating the heatMapTiles each time they change
     LaunchedEffect(
         uiState.heatmapTiles,
@@ -384,8 +390,6 @@ fun getMapView(
             }
         }
     }
-
-
     //For making the screen start on the user position
     LaunchedEffect(uiState.moveCameraToUser, mapRef) {
         if(!uiState.moveCameraToUser) return@LaunchedEffect
@@ -398,8 +402,19 @@ fun getMapView(
         //resets the flag
         viewModel.onCameraMoved()
     }
-
-    return mapView
+    // this updates the scorecard when someone changes selected mushroom in Soppsiden
+    LaunchedEffect(uiState.selectedMushroom) {
+        val lat = uiState.lastClickedLat ?: return@LaunchedEffect
+        val lon = uiState.lastClickedLon ?: return@LaunchedEffect
+        viewModel.onMapClicked(lat, lon)
+    }
+    // Actually runs the popup and makes sure it doesn't rerun
+    LaunchedEffect(Unit){
+        locationPermissionRequest.launch(arrayOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ))
+    }
 }
 
 

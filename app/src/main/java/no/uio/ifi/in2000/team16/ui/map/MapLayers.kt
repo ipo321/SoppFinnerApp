@@ -76,21 +76,6 @@ fun setupUserLocationLayer(style: Style){
     style.addLayer(dotLayer)
 }
 
-fun setupPointMarker(style: Style) {
-    val source = GeoJsonSource("position-source")
-    style.addSource(source)
-
-    val circleLayer = CircleLayer("position-layer", "position-source")
-    circleLayer.setProperties(
-        circleRadius(6f),
-        circleColor("#2769DB"),   // blue like Google Maps
-        circleStrokeWidth(1.5f),
-        circleStrokeColor("#FFFFFF")
-    )
-    style.addLayer(circleLayer)
-
-}
-
 fun setupPinIcon(style: Style) {
     val source = GeoJsonSource("clicked-source")
     style.addSource(source)
