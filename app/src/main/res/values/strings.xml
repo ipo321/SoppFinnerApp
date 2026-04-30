@@ -32,4 +32,13 @@
     <string name="sok">Søk</string>
     <string name="t16_map_heat">T16_Map_Heat</string>
     <string name="t16_map">T16_Map</string>
+
+    <string name="mushroom_list_title">Soppsiden</string>
+    <string name="mushroom_list_favorites">Favoritter</string>
+    <string name="mushroom_list_others">Øvrige</string>
+    <string name="cd_soppkontroll_logo">Soppkontroll logo</string>
+    <string name="soppkontroll_brand">Soppkontroll.no</string>
+    <string name="soppkontroll_description">tilbyr digital soppkontroll som lar brukerne sjekke om soppen er spiselig eller ikke.</string>
+    <string name="soppkontroll_visit_button">Besøk Soppkontroll.no</string>
+    <string name="warning_not_for_identification">OBS: Dette er ikke en app for identifikasjon av sopp</string>
 </resources>

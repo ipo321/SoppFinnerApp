@@ -51,10 +51,12 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
+import no.uio.ifi.in2000.team16.ui.common.WarningBanner
 
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
@@ -88,13 +90,28 @@ fun MushroomInfoScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
         ) {
-            BackToExploreButton(onClick = onNavigateBack)
+            MushroomActionButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "go to Soppsiden",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(padding.inner))
+                Text(
+                    text = "Utforsk",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         }
 
 
         Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no
-        MushroomWarningBanner(onMushroomControl = onMushroomControl)
+        WarningBanner(
+            text = "Aldri spis sopp du er usikker på.",
+            linkText = "Se Soppkontroll.no for informasjon",
+            onLinkClick = onMushroomControl
+        )
 
         Spacer(modifier = Modifier.height(padding.outer))
 
@@ -161,6 +178,12 @@ fun MushroomInfoScreen(
             onNavigateToMap()
         }) {
             Text("Velg i kart")
+            Spacer(Modifier.width(padding.inner))
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
         }
         Spacer(modifier = Modifier.height(padding.outer))
 
@@ -209,69 +232,4 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
         )
     }
 }
-
-@Composable
-fun MushroomWarningBanner(onMushroomControl: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.errorContainer,
-        shape = MaterialTheme.shapes.large
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(padding.outer)
-                .clickable { onMushroomControl() },
-            verticalAlignment = Alignment.Top,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(Modifier.width(padding.inner))
-            Column {
-                Text(
-                    text = "Aldri spis sopp du er usikker på.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.surface
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Se Soppkontroll.no for informasjon",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.Link,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BackToExploreButton(onClick: () -> Unit) {
-    MushroomActionButton(onClick = onClick) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(Modifier.width(padding.inner))
-        Text(
-            text = "Utforsk",
-            style = MaterialTheme.typography.titleLarge
-        )
-    }
-}
-
 
