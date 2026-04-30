@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
+import org.maplibre.android.camera.CameraPosition
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -77,13 +78,24 @@ fun MapScreen(
     ) { permissions ->
         locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
     }
+    var hasCenteredInitially by remember { mutableStateOf(false) }
     val uiState by mapViewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
-    LaunchEffects(mapViewModel, uiState, mapRef, context, locationPermissionRequest, onMapLoaded)
+    LaunchEffects(
+        viewModel = mapViewModel,
+        uiState = uiState,
+        mapRef = mapRef,
+        context = context,
+        locationPermissionRequest = locationPermissionRequest,
+        locationPermissionGranted = locationPermissionGranted,
+        hasCenteredInitially = hasCenteredInitially,
+        onHasCenteredInitiallyChange = { },
+        onMapLoaded = onMapLoaded
+    )
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
     // Sets up the GPS listener
@@ -253,8 +265,12 @@ fun LaunchEffects(
     mapRef: MapLibreMap?,
     context: Context,
     locationPermissionRequest: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+    locationPermissionGranted: Boolean,
+    hasCenteredInitially: Boolean,
+    onHasCenteredInitiallyChange: (Boolean) -> Unit,
     onMapLoaded: () -> Unit
 ) {
+    val zoom = 12.0 // The zoom distance used for each zoom() call
     // Satellite mode
     LaunchedEffect(uiState.isSatelliteMode, mapRef) {
         val currentMap = mapRef ?: return@LaunchedEffect
@@ -362,7 +378,7 @@ fun LaunchEffects(
                     tile.size <= uiState.currentTileSize + 0.00001
                 }
 
-                for (tile in tilesToDraw) {
+                tilesToDraw.forEach { tile ->
                     val halfSize = tile.size / 2.0
 
                     val polygonPoints = listOf(
@@ -397,7 +413,7 @@ fun LaunchEffects(
         val location = uiState.userLocation ?: return@LaunchedEffect
 
         currentMap.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(location, 13.0)
+            CameraUpdateFactory.newLatLngZoom(location, zoom)
         )
         //resets the flag
         viewModel.onCameraMoved()
@@ -414,6 +430,39 @@ fun LaunchEffects(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
         ))
+    }
+    LaunchedEffect(uiState.userLocation, locationPermissionGranted, mapRef, hasCenteredInitially
+    ) {
+        val map = mapRef ?: return@LaunchedEffect
+        if (hasCenteredInitially) return@LaunchedEffect
+
+        val userLat = uiState.userLocation?.latitude
+        val userLon = uiState.userLocation?.longitude
+
+        when {
+            // if user location permission is granted, then we can move map to that location
+            userLat != null && userLon != null -> {
+                onHasCenteredInitiallyChange(true)
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(userLat, userLon))
+                    .zoom(zoom)
+                    .build()
+                onMapLoaded()
+            }
+
+            // if user location permission is not granted, we open at default Oslo
+            !locationPermissionGranted -> {
+                onHasCenteredInitiallyChange(true)
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(59.91, 10.75)) // Oslo
+                    .zoom(zoom)
+                    .build()
+                onMapLoaded()
+            }
+
+            // if user location permission is granted, but we are waiting for lat and lon
+            else -> {}
+        }
     }
 }
 

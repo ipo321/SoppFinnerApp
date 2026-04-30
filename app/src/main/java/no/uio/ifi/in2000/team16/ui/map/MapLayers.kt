@@ -173,10 +173,6 @@ fun setupHeatmapLayer(style: Style) {
 }
 
 fun setMapLayout(map: MapLibreMap, context: Context) {
-    map.cameraPosition = CameraPosition.Builder()
-        .target(LatLng(59.91, 10.75)) // Where the map opens, now Oslo
-        .zoom(11.0) // Degree of zoom when map is opened
-        .build()
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
 
