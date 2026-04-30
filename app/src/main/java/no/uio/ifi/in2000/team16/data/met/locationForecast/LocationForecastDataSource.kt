@@ -12,11 +12,19 @@ import javax.inject.Singleton
     API for getting weather data from MET and their locationforecast
 */
 
+interface LocationForecastDataSourceInterface {
+
+    suspend fun fetchWeather(
+        lat: Double,
+        lon: Double
+    ): MetResponse?
+}
+
 @Singleton
 class LocationForecastDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
-    suspend fun fetchWeather(lat: Double, lon: Double): MetResponse? {
+) : LocationForecastDataSourceInterface {
+    override suspend fun fetchWeather(lat: Double, lon: Double): MetResponse? {
         val url =
             "https://in2000.api.met.no/weatherapi/locationforecast/2.0/complete?lat=$lat&lon=$lon"  //Complete gives fog area fraction and condensation point
 

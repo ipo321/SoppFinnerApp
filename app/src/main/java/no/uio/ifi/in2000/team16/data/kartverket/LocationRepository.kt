@@ -5,11 +5,22 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
+interface LocationRepositoryInterface {
+
+    suspend fun search(
+        query: String
+    ): List<SearchableLocation>
+
+    suspend fun getLocationCoordinates(
+        query: String
+    ): SearchableLocation?
+}
+
 class LocationRepository @Inject constructor(
-    private val addressDataSource: AddressDataSource,
-    private val placeDataSource: PlaceDataSource
-) {
-    suspend fun search(query: String): List<SearchableLocation>  = coroutineScope {
+    private val addressDataSource: AddressDataSourceInterface,
+    private val placeDataSource: PlaceDataSourceInterface
+) : LocationRepositoryInterface {
+    override suspend fun search(query: String): List<SearchableLocation>  = coroutineScope {
         val addressSearch = async { addressDataSource.suggest(query) }
         val placeSearch = async { placeDataSource.suggest(query) }
         val addresses = try { addressSearch.await() } catch (e: Exception) {
@@ -35,7 +46,7 @@ class LocationRepository @Inject constructor(
             .take(10)
     }
 
-    suspend fun getLocationCoordinates(query: String): SearchableLocation? {
+    override suspend fun getLocationCoordinates(query: String): SearchableLocation? {
         return search(query).firstOrNull()
     }
 }

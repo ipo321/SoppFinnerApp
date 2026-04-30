@@ -8,20 +8,37 @@ import kotlin.math.cos
 
 */
 
-
-class MushroomRepository @Inject constructor(
-    private val localMushroomDataSource: LocalMushroomDataSource
-) {
-
-    private val defaultKmRadius= 100.0
-    private val kmPerDegreeLat = 111.0 //for the offset of latitude.
-
-    // In data source: signature becomes localSpeciesId: Int (non-null)
-    //returns a OccurrenceResult object witch a list of the occurrences and a count inside a radius.
+interface MushroomRepositoryInterface {
+    val defaultKmRadius: Double
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
         radiusKm: Double = defaultKmRadius,
+        mushroomType: String,
+    ): OccurrenceResult
+
+    suspend fun getMushroomInBoundingBox(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        mushroomType: String,
+    ): OccurrenceResult
+}
+
+class MushroomRepository @Inject constructor(
+    private val localMushroomDataSource: LocalMushroomDataSourceInterface
+) : MushroomRepositoryInterface {
+
+    override val defaultKmRadius = 100.0
+    private val kmPerDegreeLat = 111.0 //for the offset of latitude.
+
+    // In data source: signature becomes localSpeciesId: Int (non-null)
+    //returns a OccurrenceResult object witch a list of the occurrences and a count inside a radius.
+    override suspend fun getMushroomsNearLocation(
+        lat: Double,
+        lon: Double,
+        radiusKm: Double,
         mushroomType: String,
     ): OccurrenceResult {
         val latOffset = radiusKm / kmPerDegreeLat
@@ -47,7 +64,7 @@ class MushroomRepository @Inject constructor(
 
 
 
-    suspend fun getMushroomInBoundingBox(
+    override suspend fun getMushroomInBoundingBox(
         north: Double,
         south: Double,
         east: Double,

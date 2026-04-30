@@ -19,10 +19,18 @@ import kotlin.coroutines.cancellation.CancellationException
    Summarizes the data from the FROST Api
 */
 
+interface FrostRepositoryInterface {
+
+    suspend fun weatherHistory(
+        lat: Double,
+        lon: Double
+    ): WeatherHistory?
+}
+
 class FrostRepository @Inject constructor(
-    private val dataSource: FrostDataSource,
+    private val dataSource: FrostDataSourceInterface,
     private val stationLocator: StationLocator
-) {
+) : FrostRepositoryInterface {
     // In-memory cache, should be made into a room database in the future for better persistence
 
     private val cache = ConcurrentHashMap<String, Deferred<CacheEntry?>>()
@@ -33,7 +41,7 @@ class FrostRepository @Inject constructor(
         val timestamp: Long
     )
 
-    suspend fun weatherHistory(lat: Double, lon: Double): WeatherHistory? = coroutineScope{
+    override suspend fun weatherHistory(lat: Double, lon: Double): WeatherHistory? = coroutineScope{
         val currentTime = System.currentTimeMillis()
 
         //Find best station

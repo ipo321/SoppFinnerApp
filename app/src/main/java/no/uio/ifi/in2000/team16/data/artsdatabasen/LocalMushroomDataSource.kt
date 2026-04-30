@@ -22,11 +22,23 @@ import javax.inject.Singleton
  * Data is loaded once from disk and then cached in memory for the lifetime of the app.
  * Use [getOccurrencesInBoundingBox] to query sightings within a geographic area.
  */
+
+interface LocalMushroomDataSourceInterface {
+
+    suspend fun getOccurrencesInBoundingBox(
+        latMin: Double,
+        latMax: Double,
+        lonMin: Double,
+        lonMax: Double,
+        localSpeciesId: Int
+    ): OccurrenceResult
+}
+
 @Singleton
 class LocalMushroomDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val json: Json
-) {
+) : LocalMushroomDataSourceInterface {
 
     companion object {
         private const val TAG = "T16_LocalMushroomDataSource"
@@ -90,7 +102,7 @@ class LocalMushroomDataSource @Inject constructor(
         )
     }
 
-    suspend fun getOccurrencesInBoundingBox(
+    override suspend fun getOccurrencesInBoundingBox(
         latMin: Double,
         latMax: Double,
         lonMin: Double,

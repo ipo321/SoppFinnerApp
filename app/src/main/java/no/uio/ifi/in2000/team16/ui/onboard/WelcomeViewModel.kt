@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team16.data.onBoard.DataStoreRepositoryInterface
 import javax.inject.Inject
 
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
-    private val repository: DataStoreRepository
+    private val repository: DataStoreRepositoryInterface
 ) : ViewModel() {
 
     // Using nullable Boolean where null means "loading"
