@@ -63,7 +63,8 @@ fun MapScreen(
     onNavigateToDev: () -> Unit,
     mapViewModel: MapViewModel,
     isVisible: Boolean,
-    onMapLoaded: () -> Unit
+    onMapLoaded: () -> Unit,
+    isNetConnected: Boolean
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember {mutableStateOf(
@@ -84,6 +85,21 @@ fun MapScreen(
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
+
+    //Reload Map on internet reconect
+    var hadDisconnection by remember {mutableStateOf(false)}
+
+    LaunchedEffect(isNetConnected) {
+        Log.d("T16_Net", "isNetConnected changed: $isNetConnected " +
+                "hadDisconnection changed: $hadDisconnection")
+        if(!isNetConnected){
+            hadDisconnection = true
+        }else if(hadDisconnection){
+            hadDisconnection = false
+            mapViewModel.retryLastClick()
+        }
+    }
+
 
     LaunchEffects(
         viewModel = mapViewModel,

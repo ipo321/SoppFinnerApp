@@ -252,4 +252,11 @@ class MapViewModel @Inject constructor(
     fun dismissEvaluation() {
         _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null, currentContext = null) }
     }
+
+    fun retryLastClick(){
+        val lat = _uiState.value.lastClickedLat ?: return
+        val lon = _uiState.value.lastClickedLon ?: return
+        Log.d("T16_retry", "Retrying click at lat: $lat, lon: $lon")
+        onMapClicked(lat, lon)
+    }
 }
