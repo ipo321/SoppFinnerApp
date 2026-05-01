@@ -2,12 +2,9 @@ package no.uio.ifi.in2000.team16.ui.map
 
 import android.content.Context
 import android.content.res.Configuration
-import android.view.Gravity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.graphics.drawable.toBitmap
 import no.uio.ifi.in2000.team16.R
-import org.maplibre.android.camera.CameraPosition
-import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.expressions.Expression.get
@@ -175,16 +172,9 @@ fun setupHeatmapLayer(style: Style) {
 fun setMapLayout(map: MapLibreMap, context: Context) {
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
-
-    val density = context.resources.displayMetrics.density
-    val topMargin = (244 * density).toInt() // Transforms dp to pixels
-    val rightMargin = (20 * density).toInt()
     val ui = map.uiSettings
-    // If we want a compass
-    ui.isCompassEnabled = true
-    ui.compassGravity = Gravity.TOP or Gravity.END
-    ui.setCompassMargins(0, topMargin, rightMargin, 0) // Sets the position of the compass
     // Adds zoom, scroll, rotation, tilt and double tap
+    ui.isCompassEnabled = false
     ui.isZoomGesturesEnabled = true
     ui.isScrollGesturesEnabled = true
     ui.isRotateGesturesEnabled = true
