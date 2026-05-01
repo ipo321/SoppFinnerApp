@@ -42,7 +42,7 @@ fun InfoScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
         Text(
             text = "Om appen",
             style = MaterialTheme.typography.headlineLarge,

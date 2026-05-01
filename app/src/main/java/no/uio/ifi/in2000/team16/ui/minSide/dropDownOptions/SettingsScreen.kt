@@ -43,7 +43,7 @@ fun SettingsScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
         Text(
             text = "Innstillinger",
             style = MaterialTheme.typography.headlineLarge,

@@ -85,7 +85,7 @@ fun MushroomInfoScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
 
         Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no

@@ -26,11 +26,13 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 
 @Composable
 fun BackButton(
-    onNavigateBack: () -> Unit
+    alignment: Alignment,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.CenterStart
+        contentAlignment = alignment
     ) {
         MushroomActionButton(onClick = onNavigateBack) {
             Icon(

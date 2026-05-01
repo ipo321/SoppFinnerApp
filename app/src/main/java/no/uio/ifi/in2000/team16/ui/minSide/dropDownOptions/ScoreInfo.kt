@@ -40,7 +40,7 @@ fun ScoreInfo(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
         Text(
             text = "Hvordan beregnes scoren?",
             style = MaterialTheme.typography.headlineLarge,

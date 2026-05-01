@@ -60,7 +60,7 @@ fun PoisonControl(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
 
         Spacer(modifier=Modifier.height(10.dp))
 

@@ -39,7 +39,7 @@ fun Security(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(onNavigateBack)
+        BackButton(Alignment.CenterStart, onNavigateBack)
         Text(
             text = "Personvernerklæring",
             style = MaterialTheme.typography.headlineLarge,
