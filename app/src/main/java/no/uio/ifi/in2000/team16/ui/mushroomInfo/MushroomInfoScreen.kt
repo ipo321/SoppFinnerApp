@@ -93,12 +93,12 @@ fun MushroomInfoScreen(
             MushroomActionButton(onClick = onNavigateBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "go to Soppsiden",
+                    contentDescription = "BackButton",
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(padding.inner))
                 Text(
-                    text = "Utforsk",
+                    text = stringResource(R.string.back_button),
                     style = MaterialTheme.typography.titleLarge
                 )
             }
