@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -40,7 +42,7 @@ fun BottomNavigationBar(
         ),
         BottombarNavItem(
             title = "Kart",
-            icon = rememberVectorPainter(Icons.Default.Place),
+            icon = rememberVectorPainter(Icons.Outlined.Map),
             route = MAP_SCREEN
         ),
 
