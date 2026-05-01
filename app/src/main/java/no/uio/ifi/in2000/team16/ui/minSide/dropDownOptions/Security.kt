@@ -56,6 +56,17 @@ fun Security(
         )
         Spacer(modifier=Modifier.height(24.dp))
 
+        Text(
+            text = "Hensikten med appen er å kunne hjelpe sopp plukkere med å vurdere hvor og når den beste tiden " +
+                    "er å plukke sopp. Scoren man får er basert på vår vurdering av sesong, værforhold og hva vi vet om vekstbetingelser" +
+                    "til de ulike soppene. " +
+                    "\n Soppsiden gir en oversikt over ulike sopper,om der er i sesong, giftig" +
+                    "og om de er en god matsopp. I tillegg er det litt informasjon om soppen. Soppsiden er kun ment for å veilede brukere" +
+                    "og skal ikke brukes som grunnlag for å identifisere sopp eller avgjøre om det er en trygg sopp å spise." +
+                    "\n Det er brukerens eget ansvar å identifisere sopp, vi anbefaler å bruke tjenester som Soppkontroll.no. " +
+                    "Vi har prøvd vårt beste å sikre at informasjonen i appen er korrrekt, men kan ikka garantere at den er feilfri. " +
+                    "Identifikasjon av sopp skjer på eget ansvar, og utviklerne fraskriver seg ansvar for eventuelle skader som følge av informasjonen fra soppsiden."
+        )
 
     }
 }

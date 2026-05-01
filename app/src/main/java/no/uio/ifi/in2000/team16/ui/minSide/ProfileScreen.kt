@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.HelpOutline
@@ -33,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.ui.navigation.HELP_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROLL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
@@ -58,8 +60,9 @@ fun ProfileScreen(
         MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
         MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROLL),
+        MenuItemData("Informasjon", Icons.Default.Book, HELP_SCREEN),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
-    )
+        )
 
     Column(
         modifier = Modifier
@@ -67,13 +70,13 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
     ) {
-//        OutlinedButton(
-//            onClick = onNavigateBack,
-//            modifier = Modifier.fillMaxWidth(),
-//            shape = MaterialTheme.shapes.extraLarge
-//        ) {
-//            Text("Tilbake")
-//        }
+        OutlinedButton(
+            onClick = onNavigateBack,
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge
+        ) {
+            Text("Tilbake")
+        }
         Text(
             text = "Meny",
             style = MaterialTheme.typography.headlineLarge,
