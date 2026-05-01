@@ -438,7 +438,7 @@ fun LaunchEffects(
     LaunchedEffect(uiState.selectedMushroom) {
         val lat = uiState.lastClickedLat ?: return@LaunchedEffect
         val lon = uiState.lastClickedLon ?: return@LaunchedEffect
-        viewModel.onMapClicked(lat, lon)
+        viewModel.refreshCurrentLocation()
     }
     // Actually runs the popup and makes sure it doesn't rerun
     LaunchedEffect(Unit){
