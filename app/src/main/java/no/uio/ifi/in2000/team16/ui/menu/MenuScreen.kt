@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.menu
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,7 +29,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -37,6 +41,8 @@ import no.uio.ifi.in2000.team16.ui.navigation.MENU_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
+import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 data class MenuItemData(
     val text: String,
@@ -68,10 +74,7 @@ fun MenuScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,6 +101,15 @@ fun MenuScreen(
                     } else null // for the rest we don't want a trailing icon
                 )
             }
+            // Adds the image of the cute mushroom to the menu screen
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(R.drawable.cute_mushroom),
+                contentDescription = "Søt sopp",
+                modifier = Modifier
+                    .padding(Team16Theme.padding.outerLarge)
+                    .align(Alignment.CenterHorizontally)
+            )
         }
     }
 }
