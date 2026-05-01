@@ -120,7 +120,7 @@ fun MenuListItem(
         Icon(
             imageVector = item.icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.size(24.dp)
         )
 
@@ -129,7 +129,7 @@ fun MenuListItem(
         Text(
             text = item.text,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }
 }

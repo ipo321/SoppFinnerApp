@@ -63,7 +63,7 @@ fun PoisonControl(
             onClick = onNavigateBack,
             modifier = Modifier.wrapContentSize(),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurface
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
         ) {
@@ -74,7 +74,7 @@ fun PoisonControl(
         Text(
             text = "Giftinformasjonen",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
 
         Spacer(modifier=Modifier.height(34.dp))
@@ -83,7 +83,7 @@ fun PoisonControl(
             onClick = { context.startActivity(intentPIN) },
             modifier = Modifier.wrapContentSize(),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onSurface
+                contentColor = MaterialTheme.colorScheme.onPrimary
             ),
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
         ) {

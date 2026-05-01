@@ -42,14 +42,17 @@ fun ScoreInfo(
     {    OutlinedButton(
         onClick = onNavigateBack,
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        )
     ) {
         Text("Tilbake")
     }
         Text(
             text = "Hvordan beregnes scoren?",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onPrimary,
         )
         Spacer(modifier=Modifier.height(24.dp))
 

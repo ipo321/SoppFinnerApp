@@ -65,6 +65,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import no.uio.ifi.in2000.team16.ui.dev.GridRow
 import no.uio.ifi.in2000.team16.ui.dev.SectionHeader
+import no.uio.ifi.in2000.team16.ui.theme.SurfaceCream
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
 
@@ -89,7 +90,7 @@ fun ScoreCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()){

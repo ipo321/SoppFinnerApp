@@ -60,14 +60,14 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.secondary)
             .padding(24.dp)
     ){
         //topText
         Text(
             text = "Soppsiden",
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Spacer(modifier = Modifier.height(padding.outer))
         //list column with all the mushrooms.
@@ -86,7 +86,7 @@ fun MushroomListScreen(
             Text(
                 text = "Favoritter",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             uiState.favorites.forEach { mushroom ->
@@ -105,7 +105,7 @@ fun MushroomListScreen(
             Text(
                 text = "Øvrige",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             uiState.otherMushrooms.forEach { mushroom ->

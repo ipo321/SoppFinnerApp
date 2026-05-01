@@ -105,12 +105,12 @@ fun MushroomInfoScreen(
         Text(
             text = selected.commonName,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = selected.latinName,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onPrimary
         )
 
         Spacer(modifier = Modifier.height(padding.outer))
@@ -148,7 +148,7 @@ fun MushroomInfoScreen(
             Spacer(Modifier.width(padding.inner))
             Text(
                 if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter",
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
@@ -166,7 +166,7 @@ fun MushroomInfoScreen(
         Text(
             text = "Om soppen",
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(modifier = Modifier.height(padding.inner))
         //the about the mushroom text
@@ -203,7 +203,7 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
         Text(
             text = property.label,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -232,7 +232,7 @@ fun MushroomWarningBanner(onMushroomControl: () -> Unit) {
                 Text(
                     text = "Aldri spis sopp du er usikker på.",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.surface
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -240,7 +240,7 @@ fun MushroomWarningBanner(onMushroomControl: () -> Unit) {
                     Text(
                         text = "Se Soppkontroll.no for informasjon",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         textDecoration = TextDecoration.Underline
                     )
                     Spacer(Modifier.width(4.dp))
@@ -262,12 +262,14 @@ fun BackToExploreButton(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = null,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
         )
         Spacer(Modifier.width(padding.inner))
         Text(
             text = "Utforsk",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -295,14 +297,14 @@ fun MushroomImage(selected: Mushroom, size : Dp) {
 @Composable
 fun MushroomActionButton(
     onClick: () -> Unit,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     content: @Composable RowScope.() -> Unit
 ) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier.wrapContentSize(),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onPrimary),
         content = content
     )
 }
