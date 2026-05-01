@@ -286,7 +286,7 @@ fun LaunchEffects(
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
             setupHeatmapLayer(style)
-            setupHistoricalFindsLayer(style)
+            setupHistoricalFindsLayer(style, context)
             setupForestLayer(style, uiState.showWmsForest)
             addPinImage(style, context)
             setupPinIcon(style)
