@@ -63,7 +63,7 @@ fun MushroomListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.secondary)
-            .padding(24.dp)
+            .padding(start = padding.outerMedium, padding.outerMedium, padding.outerMedium)
     ){
         //topText
         Text(
@@ -126,7 +126,7 @@ fun MushroomListScreen(
                     }
                 )
             }
-
+            Spacer(modifier = Modifier.height(padding.inner))
         }
 
     }

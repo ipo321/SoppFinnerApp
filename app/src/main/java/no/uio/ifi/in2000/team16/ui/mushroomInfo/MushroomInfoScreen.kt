@@ -80,7 +80,7 @@ fun MushroomInfoScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(padding.outer)
+            .padding(start = padding.outer, padding.outer, padding.outer)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
