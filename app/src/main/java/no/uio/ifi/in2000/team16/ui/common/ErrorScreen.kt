@@ -23,7 +23,7 @@ fun ErrorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.secondary)
             .padding(Team16Theme.padding.outerLarge)
     ) {
         Text(
@@ -39,5 +39,5 @@ fun ErrorScreen(
 )
 @Composable
 fun ErrorPreview() {
-    ErrorScreen("Det har skjedd en feil")
+    Team16Theme { ErrorScreen("Det har skjedd en feil") }
 }
