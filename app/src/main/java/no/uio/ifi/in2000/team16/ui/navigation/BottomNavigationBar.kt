@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Icon
@@ -48,8 +49,8 @@ fun BottomNavigationBar(
 
 
         BottombarNavItem(
-            title = "Min side",
-            icon = rememberVectorPainter(Icons.Default.Home),
+            title = "Meny",
+            icon = rememberVectorPainter(Icons.Default.Menu),
             route = PROFILE_SCREEN
         )
     )
