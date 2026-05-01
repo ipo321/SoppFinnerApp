@@ -1,24 +1,18 @@
-package no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions
+package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.ui.common.BackButton
-import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreenViewModel
+import no.uio.ifi.in2000.team16.ui.menu.MenuViewModel
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 
@@ -27,7 +21,7 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 fun ShroomControlScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
-    viewModel: ProfileScreenViewModel = hiltViewModel(),
+    viewModel: MenuViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     Box {

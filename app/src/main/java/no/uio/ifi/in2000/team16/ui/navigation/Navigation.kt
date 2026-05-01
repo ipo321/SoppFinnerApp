@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
-import androidx.compose.foundation.layout.WindowInsets
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,39 +28,38 @@ import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
+import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.SettingsScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SettingsScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ShroomControlScreen
+import no.uio.ifi.in2000.team16.ui.menu.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
-import no.uio.ifi.in2000.team16.ui.minSide.InfoScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.PoisonControl
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ScoreInfo
+import no.uio.ifi.in2000.team16.ui.menu.InfoScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 
-//
 const val MAP_SCREEN = "map"
 const val DEV_SCREEN = "dev"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 const val ONBOARDING_SCREEN = "onboarding"
 const val MUSHROOM_LIST_SCREEN = "mushroomList"
-const val PROFILE_SCREEN = "profileScreen"
-const val SETTINGS_SCREEN = "profileScreen/settings"
-const val HISTORY_SCREEN = "profileScreen/history"
-const val SHROOMSPOT_SCREEN = "profileScreen/shroomSpots"
+const val MENU_SCREEN = "menuScreen"
+const val SETTINGS_SCREEN = "menuScreen/settings"
+const val HISTORY_SCREEN = "menuScreen/history"
+const val SHROOMSPOT_SCREEN = "menuScreen/shroomSpots"
 const val INFO_SCREEN = "InfoScreen"
-const val SHROOMCONTROL_SCREEN = "profileScreen/shroomControl"
+const val SHROOMCONTROL_SCREEN = "mushroomInfo/shroomControl"
 
 const val SECURITY_SCREEN = "Security"
 
 const val SCORE_INFO_SCREEN = "ScoreInfo"
 
-const val POISON_CONTROLL = "PoisonControll"
+const val POISON_CONTROL = "PoisonControll"
 
 
 @Composable
@@ -172,8 +170,8 @@ fun Navigation(
             composable(MAP_SCREEN) {
             }
 
-            composable(PROFILE_SCREEN) {
-                ProfileScreen(
+            composable(MENU_SCREEN) {
+                MenuScreen(
                     navController = navController,
                     onNavigateBack = {
                         navController.popBackStack()
@@ -182,7 +180,7 @@ fun Navigation(
                     onToggleTheme = onToggleTheme
                 )
             }
-            //UNDER-ITEMS for Profile-screen
+            //UNDER-ITEMS for Menu-screen
             composable(SETTINGS_SCREEN) {
                 SettingsScreen(
                     navController = navController,
@@ -224,7 +222,7 @@ fun Navigation(
                         navController.popBackStack()
                     })
             }
-            composable (POISON_CONTROLL){
+            composable (POISON_CONTROL){
                 PoisonControl(navController=navController,
                     onNavigateBack = {
                         navController.popBackStack()

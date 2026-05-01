@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.menu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,14 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,11 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
-import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROLL
+import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
-import no.uio.ifi.in2000.team16.ui.navigation.SHROOMCONTROL_SCREEN
 
 data class MenuItemData(
     val text: String,
@@ -46,18 +43,18 @@ data class MenuItemData(
     val route: String)
 
 @Composable
-fun ProfileScreen(
+fun MenuScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
     darkTheme: Boolean,
     onToggleTheme: () -> Unit,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: MenuViewModel = hiltViewModel()
 ) {
     val menuItems = listOf(
         MenuItemData("Innstillinger", Icons.Default.Settings, SETTINGS_SCREEN),
         MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
-        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROLL),
+        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROL),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
     )
 

@@ -52,7 +52,7 @@ fun BottomNavigationBar(
         BottombarNavItem(
             title = "Meny",
             icon = rememberVectorPainter(Icons.Default.Menu),
-            route = PROFILE_SCREEN
+            route = MENU_SCREEN
         )
     )
 
@@ -115,10 +115,12 @@ fun BottomNavigationBarPreview() {
 }
 private fun parentTabRoute(route: String?): String? = when (route) {
     MUSHROOM_LIST_SCREEN, MUSHROOM_INFO_SCREEN -> MUSHROOM_LIST_SCREEN
-    MAP_SCREEN                                  -> MAP_SCREEN
-    PROFILE_SCREEN,
+    MAP_SCREEN                                 -> MAP_SCREEN
+    MENU_SCREEN,
     SETTINGS_SCREEN, HISTORY_SCREEN,
     SHROOMSPOT_SCREEN, INFO_SCREEN,
-    SHROOMCONTROL_SCREEN      -> PROFILE_SCREEN
-    else                                        -> route
+    POISON_CONTROL, SCORE_INFO_SCREEN,
+    SECURITY_SCREEN -> MENU_SCREEN
+    SHROOMCONTROL_SCREEN                       -> MUSHROOM_LIST_SCREEN
+    else                                       -> route
 }

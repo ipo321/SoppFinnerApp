@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.menu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -20,7 +19,7 @@ import androidx.navigation.NavController
 @Composable
 fun ShroomSpotScreen(
     navController: NavController,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: MenuViewModel = hiltViewModel()
 
 ){
     //Test to so if its loading in the terminal:

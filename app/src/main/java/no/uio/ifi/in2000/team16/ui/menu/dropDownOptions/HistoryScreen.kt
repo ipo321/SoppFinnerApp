@@ -1,4 +1,4 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.menu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 @Composable
 fun HistoryScreen(
     navController: NavController,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
+    viewModel: MenuViewModel = hiltViewModel()
 
 ){
     //Test to so if its loading in the terminal:
