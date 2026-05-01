@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.menu
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,15 +28,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 data class MenuItemData(
     val text: String,
@@ -76,10 +81,7 @@ fun MenuScreen(
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,9 +97,17 @@ fun MenuScreen(
                     }
                 )
             }
+            // Adds the image of the cute mushroom to the menu screen
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(R.drawable.cute_mushroom),
+                contentDescription = "Søt sopp",
+                modifier = Modifier
+                    .padding(Team16Theme.padding.outerLarge)
+                    .align(Alignment.CenterHorizontally)
+            )
         }
     }
-
 }
 
 @Composable
