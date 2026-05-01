@@ -48,6 +48,9 @@ class MainActivity : ComponentActivity() {
                     darkTheme = darkTheme
 
                 ){
+                    //Track if connection has been lost
+                    var hadDisconnection by remember {mutableStateOf(false)}
+
                     val navController = rememberNavController()
                     val context = LocalContext.current
 
@@ -65,6 +68,7 @@ class MainActivity : ComponentActivity() {
                     //LaunchEffect for snackBar that shows No internet
                     LaunchedEffect(isNetConnected) {
                         if (!isNetConnected) {
+                            hadDisconnection = true
                             internetSnackbarState.showSnackbar(
                                 message = "Ingen internettforbindelse..",
                                 duration = SnackbarDuration.Indefinite
