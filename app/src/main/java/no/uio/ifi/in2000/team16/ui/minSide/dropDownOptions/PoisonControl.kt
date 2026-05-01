@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.serialization.json.JsonNull.content
+import no.uio.ifi.in2000.team16.ui.common.BackButton
 import org.w3c.dom.Text
 
 
@@ -59,16 +60,8 @@ fun PoisonControl(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedButton(
-            onClick = onNavigateBack,
-            modifier = Modifier.wrapContentSize(),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
-        ) {
-            Text("Tilbake")
-        }
+        BackButton(Alignment.CenterStart, onNavigateBack)
+
         Spacer(modifier=Modifier.height(10.dp))
 
         Text(
