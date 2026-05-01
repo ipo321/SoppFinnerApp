@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.ui.common.BackButton
 import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreenViewModel
 import no.uio.ifi.in2000.team16.ui.minSide.Toggle
 
@@ -42,16 +43,7 @@ fun SettingsScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedButton(
-        onClick = onNavigateBack,
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-            colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-    ) {
-        Text("Tilbake")
-    }
+        BackButton(onNavigateBack)
         Text(
             text = "Innstillinger",
             style = MaterialTheme.typography.headlineLarge,

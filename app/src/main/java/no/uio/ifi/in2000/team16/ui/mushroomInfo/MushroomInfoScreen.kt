@@ -55,6 +55,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import no.uio.ifi.in2000.team16.ui.common.BackButton
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
 import no.uio.ifi.in2000.team16.ui.common.WarningBanner
 
@@ -84,26 +85,7 @@ fun MushroomInfoScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        //back button
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            MushroomActionButton(onClick = onNavigateBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "BackButton",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(padding.inner))
-                Text(
-                    text = stringResource(R.string.back_button),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
-        }
-
+        BackButton(onNavigateBack)
 
         Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no

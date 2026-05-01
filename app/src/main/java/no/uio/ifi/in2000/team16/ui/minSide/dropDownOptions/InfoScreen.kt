@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.ui.common.BackButton
 
 
 @Composable
@@ -40,16 +41,8 @@ fun InfoScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {    OutlinedButton(
-        onClick = onNavigateBack,
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary
-        )
     ) {
-        Text("Tilbake")
-    }
+        BackButton(onNavigateBack)
         Text(
             text = "Om appen",
             style = MaterialTheme.typography.headlineLarge,
