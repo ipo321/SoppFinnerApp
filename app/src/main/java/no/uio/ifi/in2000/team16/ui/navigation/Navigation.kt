@@ -173,9 +173,6 @@ fun Navigation(
             composable(MENU_SCREEN) {
                 MenuScreen(
                     navController = navController,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
                     darkTheme = darkTheme,
                     onToggleTheme = onToggleTheme
                 )

@@ -22,7 +22,7 @@ private val DarkColorScheme = darkColorScheme(
 
     //Secondary
     secondary = DarkSecondary,
-    secondaryContainer = DarkPrimary,
+    secondaryContainer = DarkSurfaceContainerHigh,
     onSecondaryContainer = DarkBackground,
 
     // The base layer of the app

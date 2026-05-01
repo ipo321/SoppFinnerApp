@@ -23,19 +23,16 @@ fun Toggle(
     onCheckedChange: () -> Unit
 ) {
     val animateSize by animateDpAsState(
-        targetValue = if (checked) 30.dp else 0.dp,
+        targetValue = if (checked) 24.dp else 0.dp, // Moves the button when toggled
         label = "toggleAnimation"
     )
 
     Row(
         modifier = Modifier
             .clip(CircleShape)
-            .width(80.dp)
-            .height(50.dp)
-            .background(
-                if (checked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline
-            )
+            .width(60.dp)
+            .height(24.dp)
+            .background(MaterialTheme.colorScheme.primary)
             .clickable { onCheckedChange() }
     ) {
         Box(
@@ -48,8 +45,8 @@ fun Toggle(
             modifier = Modifier
                 .padding(5.dp)
                 .clip(CircleShape)
-                .width(40.dp)
-                .height(40.dp)
+                .width(24.dp)
+                .height(24.dp)
                 .background(MaterialTheme.colorScheme.surface)
         )
     }

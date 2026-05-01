@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,14 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
+import no.uio.ifi.in2000.team16.ui.navigation.MENU_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
-import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
 
 data class MenuItemData(
     val text: String,
@@ -45,14 +46,12 @@ data class MenuItemData(
 @Composable
 fun MenuScreen(
     navController: NavController,
-    onNavigateBack: () -> Unit,
     darkTheme: Boolean,
     onToggleTheme: () -> Unit,
-    viewModel: MenuViewModel = hiltViewModel()
 ) {
     val menuItems = listOf(
-        MenuItemData("Innstillinger", Icons.Default.Settings, SETTINGS_SCREEN),
-        MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
+        MenuItemData("Mørkemodus", Icons.Default.Lightbulb, MENU_SCREEN),
+        MenuItemData("Hvordan beregnes scoren?", Icons.AutoMirrored.Filled.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
         MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROL),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
@@ -64,15 +63,8 @@ fun MenuScreen(
             .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
     ) {
-//        OutlinedButton(
-//            onClick = onNavigateBack,
-//            modifier = Modifier.fillMaxWidth(),
-//            shape = MaterialTheme.shapes.extraLarge
-//        ) {
-//            Text("Tilbake")
-//        }
         Text(
-            text = "Meny",
+            text = stringResource(R.string.meny),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
@@ -86,24 +78,35 @@ fun MenuScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             menuItems.forEach { item ->
                 MenuListItem(
                     item = item,
                     onClick = {
-                        navController.navigate(item.route)
-                    }
+                        if (item.text == "Mørkemodus") { // For dark mode we want toggle and no route
+                            onToggleTheme()
+                        } else { // For the rest we want to navigate
+                            navController.navigate(item.route)
+                        }
+                    },
+                    trailingContent = if (item.text == "Mørkemodus") {
+                        { // For dark mode we want the toggle to be visible
+                            Toggle(
+                                checked = darkTheme,
+                                onCheckedChange = onToggleTheme
+                            )
+                        }
+                    } else null // for the rest we don't want a trailing icon
                 )
             }
         }
     }
-
 }
 
 @Composable
 fun MenuListItem(
     item: MenuItemData,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    trailingContent: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -125,8 +128,13 @@ fun MenuListItem(
 
         Text(
             text = item.text,
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
+
+        if (trailingContent != null) {
+            trailingContent()
+        }
     }
 }
