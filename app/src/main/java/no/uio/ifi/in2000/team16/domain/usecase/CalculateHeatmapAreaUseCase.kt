@@ -21,13 +21,17 @@ import kotlinx.coroutines.CancellationException
 import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.supervisorScope
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.frost.FrostRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepositoryInterface
 
 
 class CalculateHeatmapAreaUseCase @Inject constructor(
-    private val locationForecastRepository: LocationForecastRepository,
-    private val mushroomRepository: MushroomRepository,
-    private val forestRepository: SatSkogRepository,
-    private val frostRepository: FrostRepository,
+    private val locationForecastRepository: LocationForecastRepositoryInterface,
+    private val mushroomRepository: MushroomRepositoryInterface,
+    private val forestRepository: SatSkogRepositoryInterface,
+    private val frostRepository: FrostRepositoryInterface,
     private val scorerProvider: ScorerProvider,
 ){
     suspend operator fun invoke(
@@ -73,7 +77,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                 south = bounds.south,
                                 east = bounds.east,
                                 west = bounds.west,
-                                mushRoomType = profile.name
+                                mushroomType = profile.name
                             )
                         }
                     }

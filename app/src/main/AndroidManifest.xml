@@ -29,6 +29,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.popUp.CrashActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:process=":crash" />
+
     </application>
 
 </manifest>

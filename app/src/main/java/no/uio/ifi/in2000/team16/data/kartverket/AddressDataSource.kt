@@ -7,15 +7,21 @@ import io.ktor.client.request.get
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface AddressDataSourceInterface {
+
+    suspend fun suggest(
+        query: String
+    ): List<Address>
+}
+
 @Singleton
 class AddressDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
+) : AddressDataSourceInterface {
     private val baseUrl = "https://ws.geonorge.no/adresser/v1"
 
     // Searches while user is writing
-    suspend fun suggest(query: String): List<Address> {
-        //if (query.length < 3) return emptyList()
+    override suspend fun suggest(query: String): List<Address> {
         return try {
             val response: AddressSearchResponse = httpClient.get("$baseUrl/sok") {
                 url {

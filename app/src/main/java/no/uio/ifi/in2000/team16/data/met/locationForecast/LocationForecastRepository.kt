@@ -15,9 +15,17 @@ import kotlin.math.roundToInt
    Summarizes the data from the MET Api
 */
 
+interface LocationForecastRepositoryInterface {
+
+    suspend fun weatherNext8Hours(
+        lat: Double,
+        lon: Double
+    ): WeatherData?
+}
+
 class LocationForecastRepository @Inject constructor(
-    private val dataSource: LocationForecastDataSource
-) {
+    private val dataSource: LocationForecastDataSourceInterface
+) : LocationForecastRepositoryInterface {
     // In-memory cache, should be made into a room database in the future for better persistence
 
     private val cache = ConcurrentHashMap<String, Deferred<CacheEntry?>>()
@@ -34,7 +42,7 @@ class LocationForecastRepository @Inject constructor(
     }
 
 
-    suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? = coroutineScope {
+    override suspend fun weatherNext8Hours(lat: Double, lon: Double): WeatherData? = coroutineScope {
 
         //Rounding to two decimals since that is the precision of the weather model (about 1x1 km)
         val roundedLat = roundToTwoDecimals(lat)

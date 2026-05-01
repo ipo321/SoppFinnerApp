@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team16.R
 import javax.inject.Inject
@@ -20,11 +22,23 @@ import javax.inject.Singleton
  * Data is loaded once from disk and then cached in memory for the lifetime of the app.
  * Use [getOccurrencesInBoundingBox] to query sightings within a geographic area.
  */
+
+interface LocalMushroomDataSourceInterface {
+
+    suspend fun getOccurrencesInBoundingBox(
+        latMin: Double,
+        latMax: Double,
+        lonMin: Double,
+        lonMax: Double,
+        localSpeciesId: Int
+    ): OccurrenceResult
+}
+
 @Singleton
 class LocalMushroomDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val json: Json
-) {
+) : LocalMushroomDataSourceInterface {
 
     companion object {
         private const val TAG = "T16_LocalMushroomDataSource"
@@ -33,7 +47,7 @@ class LocalMushroomDataSource @Inject constructor(
 
     private var cachedOccurrences: OccurrenceResult? = null
 
-    suspend fun getAllOccurrences(): OccurrenceResult {
+    private suspend fun getAllOccurrences(): OccurrenceResult {
         return cachedOccurrences ?: mutex.withLock {
             // Check again inside the lock in case another coroutine loaded it first
             cachedOccurrences ?: loadFromDisk().also { cachedOccurrences = it }
@@ -54,11 +68,13 @@ class LocalMushroomDataSource @Inject constructor(
             withContext(Dispatchers.Default){
                 parseGeoJson(text) //sends raw jason string to parse function.
             }
-        }catch (e: Exception) {
-            Log.e(TAG, "Failed to load mushroom data: ${e.message}", e)
+        }catch (e: IOException) {
+            Log.e(TAG, "Failed to read mushroom_map_data from raw resources", e)
+            OccurrenceResult()
+        } catch (e: SerializationException) {
+            Log.e(TAG, "Failed to parse mushroom GeoJSON — file is malformed", e)
             OccurrenceResult()
         }
-
 }
 
     private fun parseGeoJson(text: String): OccurrenceResult {
@@ -86,16 +102,14 @@ class LocalMushroomDataSource @Inject constructor(
         )
     }
 
-    suspend fun getOccurrencesInBoundingBox(
+    override suspend fun getOccurrencesInBoundingBox(
         latMin: Double,
         latMax: Double,
         lonMin: Double,
         lonMax: Double,
-        localSpeciesId: Int? // null = unrecognized species
+        localSpeciesId: Int
     ): OccurrenceResult = withContext(Dispatchers.Default) {
-        if (localSpeciesId == null) return@withContext OccurrenceResult()
         val all = getAllOccurrences()
-        Log.d(TAG, "Filtering ${all.count} occurrences...")
         val bySpecies = all.results.filter { it.localSpeciesId == localSpeciesId }
 
 
@@ -108,9 +122,6 @@ class LocalMushroomDataSource @Inject constructor(
             if (lat == null || lon == null) return@filter false
             lat in latMin..latMax && lon in lonMin..lonMax
         }
-
-
-        Log.d(TAG, "Filter result: ${filtered.size} occurrences")
 
         OccurrenceResult(
             count = filtered.size,

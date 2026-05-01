@@ -16,9 +16,18 @@ import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "on_boarding_pref")
 
+interface DataStoreRepositoryInterface {
+
+    suspend fun saveOnBoardingState(
+        completed: Boolean
+    )
+
+    fun readOnBoardingState(): Flow<Boolean>
+}
+
 class DataStoreRepository @Inject constructor(
     @param:ApplicationContext private val context: Context
-) {
+) : DataStoreRepositoryInterface {
 
     private object PreferencesKey {
         val onBoardingKey = booleanPreferencesKey(name = "on_boarding_completed")
@@ -26,13 +35,13 @@ class DataStoreRepository @Inject constructor(
 
     private val dataStore = context.dataStore
 
-    suspend fun saveOnBoardingState(completed: Boolean) {
+    override suspend fun saveOnBoardingState(completed: Boolean) {
         dataStore.edit { preferences ->
             preferences[PreferencesKey.onBoardingKey] = completed
         }
     }
 
-    fun readOnBoardingState(): Flow<Boolean> {
+    override fun readOnBoardingState(): Flow<Boolean> {
         return dataStore.data
             .catch { exception ->
                 if (exception is IOException) {

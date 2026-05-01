@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.R
 
@@ -51,19 +52,18 @@ fun BottomNavigationBar(
         )
     )
 
-    var selectedNavigationIndex by rememberSaveable {
-        mutableIntStateOf(1)
-    }
-
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val activeRoute = parentTabRoute(currentRoute)
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
         navigationItems.forEachIndexed { index, item ->
             NavigationBarItem(
-                selected = selectedNavigationIndex == index,
+                selected = activeRoute == item.route,
                 onClick = {
-                    selectedNavigationIndex = index
+                    //selectedNavigationIndex = index
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
@@ -106,4 +106,13 @@ fun BottomNavigationBarPreview() {
     BottomNavigationBar(
         navController = navController
     )
+}
+private fun parentTabRoute(route: String?): String? = when (route) {
+    MUSHROOM_LIST_SCREEN, MUSHROOM_INFO_SCREEN -> MUSHROOM_LIST_SCREEN
+    MAP_SCREEN                                  -> MAP_SCREEN
+    PROFILE_SCREEN,
+    SETTINGS_SCREEN, HISTORY_SCREEN,
+    SHROOMSPOT_SCREEN, INFO_SCREEN,
+    SHROOMCONTROL_SCREEN      -> PROFILE_SCREEN
+    else                                        -> route
 }

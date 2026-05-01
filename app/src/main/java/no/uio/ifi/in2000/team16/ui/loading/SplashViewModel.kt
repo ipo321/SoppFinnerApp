@@ -12,12 +12,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team16.data.onBoard.DataStoreRepositoryInterface
 import javax.inject.Inject
 
 @Suppress("unused")
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val repository: DataStoreRepository
+    private val repository: DataStoreRepositoryInterface
 ) : ViewModel() {
 
     private val _isLoading: MutableState<Boolean> = mutableStateOf(true)

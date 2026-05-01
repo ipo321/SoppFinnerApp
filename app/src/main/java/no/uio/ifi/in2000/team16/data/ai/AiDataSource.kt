@@ -12,9 +12,16 @@ import kotlinx.serialization.json.Json
 import no.uio.ifi.in2000.team16.BuildConfig
 import javax.inject.Inject
 
+interface AiDataSourceInterface {
+
+    suspend fun fetchEvaluation(
+        prompt: String
+    ): AiEvaluationResponse
+}
+
 class AiDataSource @Inject constructor(
     private val client: HttpClient
-){
+) : AiDataSourceInterface {
     private val azureEndpoint = BuildConfig.AZURE_ENDPOINT.ifBlank {
         "https://missing-key-localy.no"   //
     }
@@ -25,7 +32,7 @@ class AiDataSource @Inject constructor(
 
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
-    suspend fun fetchEvaluation(prompt: String): AiEvaluationResponse {
+    override suspend fun fetchEvaluation(prompt: String): AiEvaluationResponse {
         Log.d("T16_Ai_DataSource", "Fetching evaluation from AI: $prompt")
         val request = ChatRequest(
             model = modelName,

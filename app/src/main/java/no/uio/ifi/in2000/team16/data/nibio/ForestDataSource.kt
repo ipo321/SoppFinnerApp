@@ -12,13 +12,20 @@ import javax.inject.Singleton
     SAT-Skog using Get Feature Info and GML.
 */
 
+interface ForestDataSourceInterface {
+    suspend fun fetchArealType(
+        lat: Double,
+        lon: Double
+    ): String?
+}
+
 @Singleton
 class ForestDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
+) : ForestDataSourceInterface {
     private val baseUrl = "https://wms.nibio.no/cgi-bin/ar5"
 
-    suspend fun fetchArealType(lat: Double, lon: Double): String? {
+    override suspend fun fetchArealType(lat: Double, lon: Double): String? {
         val offset = 0.0001
         val minLat = lat - offset
         val minLon = lon - offset
@@ -32,7 +39,7 @@ class ForestDataSource @Inject constructor(
                 "&INFO_FORMAT=application/vnd.ogc.gml"
 
         return try {
-            Log.d("AR5_CALL", "Fetching AR5 data from URL: $url")
+            Log.d("T16_AR5_CALL", "Fetching AR5 data from URL: $url")
             val responseText = httpClient.get(url).bodyAsText()
 
             val regex = "<[^>]*artype_beskrivelse>(.*?)</[^>]*artype_beskrivelse>".toRegex(RegexOption.IGNORE_CASE)

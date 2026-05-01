@@ -42,7 +42,6 @@ import org.maplibre.android.style.sources.TileSet
 
 /*
 Setting up the map and all the layers of the map in this file
-
  */
 
 
@@ -75,21 +74,6 @@ fun setupUserLocationLayer(style: Style){
         circleStrokeColor("#FFFFFF")
     )
     style.addLayer(dotLayer)
-}
-
-fun setupPointMarker(style: Style) {
-    val source = GeoJsonSource("position-source")
-    style.addSource(source)
-
-    val circleLayer = CircleLayer("position-layer", "position-source")
-    circleLayer.setProperties(
-        circleRadius(6f),
-        circleColor("#2769DB"),   // blue like Google Maps
-        circleStrokeWidth(1.5f),
-        circleStrokeColor("#FFFFFF")
-    )
-    style.addLayer(circleLayer)
-
 }
 
 fun setupPinIcon(style: Style) {
@@ -189,10 +173,6 @@ fun setupHeatmapLayer(style: Style) {
 }
 
 fun setMapLayout(map: MapLibreMap, context: Context) {
-    map.cameraPosition = CameraPosition.Builder()
-        .target(LatLng(59.91, 10.75)) // Where the map opens, now Oslo
-        .zoom(11.0) // Degree of zoom when map is opened
-        .build()
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
 

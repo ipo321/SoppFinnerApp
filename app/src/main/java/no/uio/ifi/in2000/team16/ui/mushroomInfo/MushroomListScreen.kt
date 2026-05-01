@@ -38,10 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.common.WarningBanner
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 
 /*
@@ -65,7 +67,7 @@ fun MushroomListScreen(
     ){
         //topText
         Text(
-            text = "Soppsiden",
+            text = stringResource(R.string.mushroom_list_title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSecondaryContainer
         )
@@ -73,18 +75,21 @@ fun MushroomListScreen(
         //list column with all the mushrooms.
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(padding.inner)
         ) {
             //Spacer(modifier = Modifier.height(8.dp))
-            WarningBanner()
+            WarningBanner(
+                text = stringResource(R.string.warning_not_for_identification),
+                textStyle = MaterialTheme.typography.bodySmall
+            )
             //Spacer(modifier = Modifier.height(8.dp))
             MushroomControlBanner(onVisitSoppkontroll = onMushroomControl)
             //Spacer(modifier = Modifier.height(4.dp))
             //favorites column
             Text(
-                text = "Favoritter",
+                text = stringResource(R.string.mushroom_list_favorites),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -103,7 +108,7 @@ fun MushroomListScreen(
                 )
             }
             Text(
-                text = "Øvrige",
+                text = stringResource(R.string.mushroom_list_others),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
@@ -138,14 +143,17 @@ fun MushroomListItem(
 ) {
     //val cardModifier = mushroomCardModifier(isSelected)
 
-
+    Surface(
+        shadowElevation = 2.dp,
+        shape = MaterialTheme.shapes.medium
+    ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .mushroomCard(isSelected)
             .clickable {
                 navigateToMushroom() }
-            .padding(12.dp),
+            .padding(padding.outer),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -175,6 +183,7 @@ fun MushroomListItem(
             onCheckedChange = { onClick() },
             modifier = Modifier.padding(end = 4.dp)
         )
+    }
     }
 }
 //extention Function for the mushroom card. makes it highlighted if it is chosen.
@@ -228,7 +237,7 @@ fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "tilbyr digital soppkontroll som lar brukerne sjekke om soppen er spiselig eller ikke.",
+                        text = stringResource(R.string.soppkontroll_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -242,8 +251,9 @@ fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE07B20)),
                 shape = MaterialTheme.shapes.medium
             ) {
-                Text("Besøk Soppkontroll.no", color = Color.White)
-                Spacer(Modifier.width(8.dp))
+                Text(text = stringResource(R.string.soppkontroll_visit_button)
+                    , color = Color.White)
+                Spacer(Modifier.width(padding.inner))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
@@ -251,36 +261,6 @@ fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
                     modifier = Modifier.size(16.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun WarningBanner(){
-    Surface(
-        color = MaterialTheme.colorScheme.errorContainer,
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.fillMaxWidth()
-            .border(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.errorContainer, width = 1.dp),
-
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(20.dp)
-            )
-
-
-            Text(
-                text = "OBS: Dette er ikke en app for identifikasjon av sopp",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-            )
         }
     }
 }

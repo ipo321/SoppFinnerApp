@@ -17,11 +17,24 @@ class RepositoryException(
     cause: Throwable? = null
 ) : RuntimeException(message, cause)
 
+interface SpeciesRepositoryInterface {
+
+    val selectedMushroom: Flow<Mushroom>
+    val favoriteMushrooms: Flow<List<Mushroom>>
+
+    suspend fun initializeDefaults()
+    suspend fun updateSelectedMushroom(mushroom: Mushroom)
+    suspend fun toggleFavorite(mushroom: Mushroom)
+    fun getMushroomByName(name: String): Mushroom?
+    fun getAllMushrooms(): List<Mushroom>
+    fun getMushroomCount(): Int
+}
+
 @Singleton
 class SpeciesRepository @Inject constructor(
-    private val speciesDataSource: SpeciesDataSource,
+    private val speciesDataSource: SpeciesDataSourceInterface,
     private val dataStore: DataStore<Preferences>
-) {
+) : SpeciesRepositoryInterface {
 
     companion object {
         private val SELECTED_MUSHROOM_KEY =
@@ -50,7 +63,7 @@ class SpeciesRepository @Inject constructor(
      *
      * Uses the in-memory SpeciesDataSource synchronously (no suspend needed).
      */
-    val selectedMushroom: Flow<Mushroom> =
+    override val selectedMushroom: Flow<Mushroom> =
         selectedMushroomNameFlow.map { storedName ->
             val all = try {
                 speciesDataSource.getAllMushrooms()
@@ -88,7 +101,7 @@ class SpeciesRepository @Inject constructor(
      *
      * Uses the in-memory SpeciesDataSource synchronously.
      */
-    val favoriteMushrooms: Flow<List<Mushroom>> =
+    override val favoriteMushrooms: Flow<List<Mushroom>> =
         favoriteNamesFlow.map { savedNames ->
             val all = try {
                 speciesDataSource.getAllMushrooms()
@@ -112,7 +125,7 @@ class SpeciesRepository @Inject constructor(
      * - A default selected mushroom (DEFAULT_SELECTED_NAME or the first available).
      * - Default favorites (first DEFAULT_FAVORITES_COUNT mushrooms).
      */
-    suspend fun initializeDefaults() {
+    override suspend fun initializeDefaults() {
         try {
             dataStore.edit { prefs ->
                 val all = try {
@@ -159,7 +172,7 @@ class SpeciesRepository @Inject constructor(
      * Update the selected mushroom in DataStore.
      * The public selectedMushroom flow will emit updated values.
      */
-    suspend fun updateSelectedMushroom(mushroom: Mushroom) {
+    override suspend fun updateSelectedMushroom(mushroom: Mushroom) {
         try {
             dataStore.edit { prefs ->
                 prefs[SELECTED_MUSHROOM_KEY] = mushroom.commonName
@@ -178,7 +191,7 @@ class SpeciesRepository @Inject constructor(
      * We operate directly on the stored set of names; the favoriteMushrooms flow
      * will reflect the changes automatically.
      */
-    suspend fun toggleFavorite(mushroom: Mushroom) {
+    override suspend fun toggleFavorite(mushroom: Mushroom) {
         val name: String = mushroom.commonName
 
         try {
@@ -208,7 +221,7 @@ class SpeciesRepository @Inject constructor(
      *
      * Non-suspend because SpeciesDataSource is in-memory.
      */
-    fun getMushroomByName(name: String): Mushroom? {
+    override fun getMushroomByName(name: String): Mushroom? {
         val all = try {
             speciesDataSource.getAllMushrooms()
         } catch (e: Exception) {
@@ -229,7 +242,7 @@ class SpeciesRepository @Inject constructor(
      *
      * Non-suspend because SpeciesDataSource is in-memory.
      */
-    fun getAllMushrooms(): List<Mushroom> {
+    override fun getAllMushrooms(): List<Mushroom> {
         return try {
             speciesDataSource.getAllMushrooms()
         } catch (e: Exception) {
@@ -245,7 +258,7 @@ class SpeciesRepository @Inject constructor(
      *
      * Non-suspend because SpeciesDataSource is in-memory.
      */
-    fun getMushroomCount(): Int {
+    override fun getMushroomCount(): Int {
         return try {
             speciesDataSource.getAmountOfMushrooms()
         } catch (e: Exception) {

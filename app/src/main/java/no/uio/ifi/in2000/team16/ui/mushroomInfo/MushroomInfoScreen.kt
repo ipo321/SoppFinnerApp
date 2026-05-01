@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
+import no.uio.ifi.in2000.team16.ui.common.MushroomActionButton
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,9 +51,12 @@ import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.domain.model.MushroomProperty
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import no.uio.ifi.in2000.team16.ui.common.MushroomImage
+import no.uio.ifi.in2000.team16.ui.common.WarningBanner
 
 
 /* screen for mushroom info, it has a dropdown meny button that is clickable to change mushroom,
@@ -86,18 +90,33 @@ fun MushroomInfoScreen(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
         ) {
-            BackToExploreButton(onClick = onNavigateBack)
+            MushroomActionButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "go to Soppsiden",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(padding.inner))
+                Text(
+                    text = "Utforsk",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         }
 
 
         Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no
-        MushroomWarningBanner(onMushroomControl = onMushroomControl)
+        WarningBanner(
+            text = "Aldri spis sopp du er usikker på.",
+            linkText = "Se Soppkontroll.no for informasjon",
+            onLinkClick = onMushroomControl
+        )
 
         Spacer(modifier = Modifier.height(padding.outer))
 
         // Mushroom image
-        MushroomImage(selected, 200.dp)
+        MushroomImage(selected, 200.dp, MaterialTheme.colorScheme.onBackground)
 
         Spacer(modifier = Modifier.height(padding.outerLarge))
 
@@ -159,6 +178,12 @@ fun MushroomInfoScreen(
             onNavigateToMap()
         }) {
             Text("Velg i kart")
+            Spacer(Modifier.width(padding.inner))
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
         }
         Spacer(modifier = Modifier.height(padding.outer))
 
