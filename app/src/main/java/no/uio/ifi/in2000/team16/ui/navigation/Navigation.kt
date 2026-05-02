@@ -146,7 +146,8 @@ fun Navigation(
                     onNavigateToDev = { navController.navigate(DEV_SCREEN) },
                     mapViewModel = mapViewModel,
                     isVisible = isMapVisible,
-                    onMapLoaded = { isMapLoaded = true }
+                    onMapLoaded = { isMapLoaded = true },
+                    isDarkMode = darkTheme
                 )
             }
             NavHost(
