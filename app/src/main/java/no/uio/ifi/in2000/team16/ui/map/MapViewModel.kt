@@ -50,7 +50,10 @@ class MapViewModel @Inject constructor(
     init{
         viewModelScope.launch {
             speciesRepository.selectedMushroom.collect { mushroom ->
-                _uiState.update { it.copy(selectedMushroom = mushroom) }
+                _uiState.update { it.copy(selectedMushroom = mushroom, heatmapTiles = emptyList()) }
+                if (_uiState.value.isHeatmapEnabled) {
+                    savedBounds?.let { fetchHeatmapData(it) }
+                }
                 try {
                     val env = getEnvironmentContextUseCase(
                         59.91,
@@ -106,6 +109,7 @@ class MapViewModel @Inject constructor(
         }
     }
     fun fetchHeatmapData(bounds: BoundingBox) {
+        savedBounds = bounds
         if (!_uiState.value.isHeatmapEnabled) return
         val currentMushroom = _uiState.value.selectedMushroom ?: return
 
@@ -174,9 +178,6 @@ class MapViewModel @Inject constructor(
     fun onMushroomSelected(mushroom: Mushroom) {
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
-
-            _uiState.update { it.copy(heatmapTiles = emptyList()) }
-            savedBounds?.let { fetchHeatmapData(it) }
 
             val lat = _uiState.value.lastClickedLat
             val lon = _uiState.value.lastClickedLon
