@@ -21,37 +21,19 @@ import no.uio.ifi.in2000.team16.ui.common.BackButton
 
 @Composable
 fun ScoreInfo(
-    navController: NavController,
     onNavigateBack: () -> Unit,
-    viewModel: MenuViewModel = hiltViewModel()
-
 ){
-    //Test to so if its loading in the terminal:
+    //Test to so if it's loading in the terminal:
     println("ScoreInfo loaded")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        BackButton(Alignment.CenterStart, onNavigateBack)
-        Text(
-            text = "Hvordan beregnes scoren?",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
-        )
-        Spacer(modifier=Modifier.height(24.dp))
-
-        Text(
-            text = "Det hentes ut informasjon fra en rekke api-er: " +
-                    "\n\n- Metrologisk Institutt" +
-                    "\n- Artsdatabasen" +
-                    "\n- Kartverket" +
-                    "\n- Frost" +
-                    "\n- Norsk Institutt for Bioøkonomi (NIBIO)"
-
-        )
-    }
+    FromMenuDefaultScreen(
+        header = "Hvordan beregnes scoren?",
+        body = "Det hentes ut informasjon fra en rekke api-er: " +
+                "\n\n- Metrologisk Institutt" +
+                "\n- Artsdatabasen" +
+                "\n- Kartverket" +
+                "\n- Frost" +
+                "\n- Norsk Institutt for Bioøkonomi (NIBIO)",
+        onNavigateBack = onNavigateBack
+    )
 }
 

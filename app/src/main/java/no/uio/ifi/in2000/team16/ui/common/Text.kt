@@ -81,7 +81,8 @@ fun WarningBanner(
                     if (onLinkClick != null) Modifier.clickable { onLinkClick() }
                     else Modifier
                 ),
-            verticalAlignment = Alignment.Top,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Warning,
@@ -94,21 +95,21 @@ fun WarningBanner(
                 Text(
                     text = text,
                     style = textStyle,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onErrorContainer
                 )
                 if (linkText != null && onLinkClick != null) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = linkText,
                             style = textStyle,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
                             textDecoration = TextDecoration.Underline
                         )
                         Spacer(Modifier.width(4.dp))
                         Icon(
                             imageVector = Icons.Default.Link,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = MaterialTheme.colorScheme.onErrorContainer,
                             modifier = Modifier.size(12.dp)
                         )
                     }

@@ -184,7 +184,7 @@ fun MushroomListItem(
             onCheckedChange = { onClick() },
             colors = CheckboxDefaults.colors(
                 checkedColor = MaterialTheme.colorScheme.primary,
-                checkmarkColor = MaterialTheme.colorScheme.onPrimaryContainer
+                checkmarkColor = MaterialTheme.colorScheme.secondary
             ),
             modifier = Modifier.padding(end = 4.dp)
         )

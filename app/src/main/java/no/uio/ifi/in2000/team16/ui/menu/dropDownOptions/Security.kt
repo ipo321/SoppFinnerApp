@@ -20,29 +20,14 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuViewModel
 
 @Composable
 fun Security(
-    navController: NavController,
     onNavigateBack: () -> Unit,
-    viewModel: MenuViewModel = hiltViewModel()
-
 ){
-    //Test to so if its loading in the terminal:
+    //Test to so if it's loading in the terminal:
     println("Security loaded")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        BackButton(Alignment.CenterStart, onNavigateBack)
-        Text(
-            text = "Personvernerklæring",
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
-        )
-        Spacer(modifier=Modifier.height(24.dp))
-
-
-    }
+    FromMenuDefaultScreen(
+        header = "Personvernerklæring",
+        body = "Noe tekst",
+        onNavigateBack = onNavigateBack
+    )
 }
 

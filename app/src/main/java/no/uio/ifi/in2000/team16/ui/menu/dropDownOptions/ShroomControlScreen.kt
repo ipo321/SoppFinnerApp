@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
@@ -17,17 +18,16 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 
 //Overlays the screen with a networkScreen of SoppPortal
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun ShroomControlScreen(
     navController: NavController,
-    onNavigateBack: () -> Unit,
-    viewModel: MenuViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     Box {
 
         AndroidView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             factory = { context ->
                 WebView(context).apply {
                     webViewClient = WebViewClient()

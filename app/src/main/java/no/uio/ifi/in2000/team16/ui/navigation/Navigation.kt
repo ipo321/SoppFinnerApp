@@ -38,7 +38,7 @@ import no.uio.ifi.in2000.team16.ui.menu.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
-import no.uio.ifi.in2000.team16.ui.menu.InfoScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
@@ -194,33 +194,30 @@ fun Navigation(
             }
 
             composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController,
+                ShroomControlScreen(navController = navController)
+            }
+
+            composable(INFO_SCREEN) {
+                InfoScreen(
                     onNavigateBack = {
                         navController.popBackStack()
                     })
             }
 
-                composable(INFO_SCREEN) {
-                    InfoScreen(navController=navController,
-                        onNavigateBack = {
-                            navController.popBackStack()
-                        })
-                }
-
             composable (SCORE_INFO_SCREEN ){
-                ScoreInfo(navController=navController,
+                ScoreInfo(
                     onNavigateBack = {
                         navController.popBackStack()
                     })
             }
             composable(SECURITY_SCREEN){
-                Security(navController=navController,
+                Security(
                     onNavigateBack = {
                         navController.popBackStack()
                     })
             }
             composable (POISON_CONTROL){
-                PoisonControl(navController=navController,
+                PoisonControl(
                     onNavigateBack = {
                         navController.popBackStack()
                     })
