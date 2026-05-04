@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    //LaunchEffect for snackBar that shows No internet
+                    //LaunchEffect for snackBar that shows No position
                     LaunchedEffect(isPosConnected) {
                         if (!isPosConnected) {
                             locationSnackbarState.showSnackbar(
