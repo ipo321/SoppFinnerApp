@@ -64,7 +64,8 @@ fun MapScreen(
     mapViewModel: MapViewModel,
     isVisible: Boolean,
     onMapLoaded: () -> Unit,
-    isNetConnected: Boolean
+    isNetConnected: Boolean,
+    isDarkMode: Boolean
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember {mutableStateOf(
@@ -110,7 +111,8 @@ fun MapScreen(
         locationPermissionGranted = locationPermissionGranted,
         hasCenteredInitially = hasCenteredInitially,
         onHasCenteredInitiallyChange = { },
-        onMapLoaded = onMapLoaded
+        onMapLoaded = onMapLoaded,
+        isDarkMode = isDarkMode
     )
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
@@ -284,17 +286,18 @@ fun LaunchEffects(
     locationPermissionGranted: Boolean,
     hasCenteredInitially: Boolean,
     onHasCenteredInitiallyChange: (Boolean) -> Unit,
-    onMapLoaded: () -> Unit
+    onMapLoaded: () -> Unit,
+    isDarkMode: Boolean
 ) {
     val zoom = 12.0 // The zoom distance used for each zoom() call
     // Satellite mode
-    LaunchedEffect(uiState.isSatelliteMode, mapRef) {
+    LaunchedEffect(uiState.isSatelliteMode, mapRef, isDarkMode) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
         val styleUrl = if (uiState.isSatelliteMode)
             "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
         else
-            if(isDarkMode(context))
+            if(isDarkMode)
                 "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
                 "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
@@ -302,7 +305,7 @@ fun LaunchEffects(
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
             setupHeatmapLayer(style)
-            setupHistoricalFindsLayer(style)
+            setupHistoricalFindsLayer(style, context)
             setupForestLayer(style, uiState.showWmsForest)
             addPinImage(style, context)
             setupPinIcon(style)
@@ -311,7 +314,7 @@ fun LaunchEffects(
         }
     }
     // WMS Forest Layer
-    LaunchedEffect(uiState.showWmsForest, mapRef) {
+    LaunchedEffect(uiState.showWmsForest, mapRef,  isDarkMode, uiState.isSatelliteMode) {
         mapRef?.getStyle { style ->
             style.getLayer("satskog-layer")?.setProperties(
                 visibility(if (uiState.showWmsForest) VISIBLE else NONE)
@@ -322,7 +325,9 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.lastClickedLat,
         uiState.lastClickedLon,
-        mapRef
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val lat = uiState.lastClickedLat ?: return@LaunchedEffect
@@ -335,7 +340,7 @@ fun LaunchEffects(
         }
     }
     //Drawing the users position dot
-    LaunchedEffect(uiState.userLocation, mapRef){
+    LaunchedEffect(uiState.userLocation, mapRef, isDarkMode, uiState.isSatelliteMode){
         val currentMap = mapRef ?: return@LaunchedEffect
         val location = uiState.userLocation ?: return@LaunchedEffect
         currentMap.getStyle{ style ->
@@ -350,7 +355,9 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.currentContext?.historicalFinds,
         uiState.isHistoricalFindsEnabled,
-        mapRef
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val finds = uiState.currentContext?.historicalFinds ?: emptyList()
@@ -378,7 +385,10 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.heatmapTiles,
         uiState.isHeatmapEnabled,
-        mapRef) {
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
+    ) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
 

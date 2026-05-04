@@ -1,13 +1,12 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,8 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -174,9 +172,14 @@ fun MapMenu(
         modifier = modifier
             .size(Team16Theme.padding.mapButtonsSize)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape
             ),
+//        .border(
+//            width = Team16Theme.padding.borderWidthSmall,
+//            color = MaterialTheme.colorScheme.primaryContainer,
+//            shape = CircleShape
+//        ),
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = onClick) {
@@ -236,10 +239,15 @@ fun MapSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .semantics { traversalIndex = 0f },
+//            .border(
+//                width = Team16Theme.padding.borderWidthSmall,
+//                color = MaterialTheme.colorScheme.primaryContainer,
+//                shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape
+//            ),
         colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
-        shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
+        shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape,
         inputField = {
             SearchBarDefaults.InputField(
                 modifier = Modifier.fillMaxWidth(),
@@ -269,13 +277,12 @@ fun MapSearchBar(
                             onClick = {
                                 textFieldState.edit { replace(0, length, "") }
                                 viewModel.onSearchQueryChanged("")
-                                //onExpandedChange(false)
                             }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.tom_sok),
-                                tint = MaterialTheme.colorScheme.primaryContainer
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -344,29 +351,42 @@ fun MushroomIcon(
         modifier = modifier
             .clip(MaterialTheme.shapes.large)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest
+                color = MaterialTheme.colorScheme.surfaceContainerHigh
             )
-            .padding(Team16Theme.padding.inner)
             .clickable {
                 expanded = !expanded
             }
+//            .border(
+//                width = Team16Theme.padding.borderWidthSmall,
+//                color = MaterialTheme.colorScheme.primaryContainer,
+//                shape = CircleShape
+//            )
+            .padding(Team16Theme.padding.inner)
     ) {
         if (expanded) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .padding(Team16Theme.padding.inner)
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(R.string.viser_resultater_for),
-                    style = MaterialTheme.typography.labelSmall
+                Icon(
+                    imageVector = Icons.Outlined.ArrowForwardIos,
+                    contentDescription = "Pil fremover"
                 )
-                Text(
-                    text = selected.commonName,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelSmall
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(Team16Theme.padding.inner)
+                ) {
+                    Text(
+                        text = stringResource(R.string.viser_resultater_for),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Text(
+                        text = selected.commonName,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
             }
         }
 
@@ -374,7 +394,7 @@ fun MushroomIcon(
             MushroomImage(
                 selected = selected,
                 size = Team16Theme.padding.mapButtonsSize,
-                background = MaterialTheme.colorScheme.surfaceContainerHighest
+                background = MaterialTheme.colorScheme.surfaceContainerHigh
             )
         }
     }
@@ -390,9 +410,14 @@ fun CentralizeMap(
             .padding(top = Team16Theme.padding.outer)
             .size(Team16Theme.padding.mapButtonsSize)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape
             ),
+//            .border(
+//                width = Team16Theme.padding.borderWidthSmall,
+//                color = MaterialTheme.colorScheme.primaryContainer,
+//                shape = CircleShape
+//            ),
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = onClick) {

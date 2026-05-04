@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -62,14 +63,14 @@ fun MushroomListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp)
+            .background(MaterialTheme.colorScheme.secondary)
+            .padding(start = padding.outerMedium, padding.outerMedium, padding.outerMedium)
     ){
         //topText
         Text(
             text = stringResource(R.string.mushroom_list_title),
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
         Spacer(modifier = Modifier.height(padding.outer))
         //list column with all the mushrooms.
@@ -91,7 +92,7 @@ fun MushroomListScreen(
             Text(
                 text = stringResource(R.string.mushroom_list_favorites),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             uiState.favorites.forEach { mushroom ->
@@ -110,7 +111,7 @@ fun MushroomListScreen(
             Text(
                 text = stringResource(R.string.mushroom_list_others),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             uiState.otherMushrooms.forEach { mushroom ->
@@ -126,7 +127,7 @@ fun MushroomListScreen(
                     }
                 )
             }
-
+            Spacer(modifier = Modifier.height(padding.inner))
         }
 
     }
@@ -141,6 +142,7 @@ fun MushroomListItem(
     onClick: () -> Unit,
     navigateToMushroom: () -> Unit,
 ) {
+    //val cardModifier = mushroomCardModifier(isSelected)
 
     Surface(
         shadowElevation = 2.dp,
@@ -180,6 +182,10 @@ fun MushroomListItem(
         Checkbox(
             checked = isSelected,
             onCheckedChange = { onClick() },
+            colors = CheckboxDefaults.colors(
+                checkedColor = MaterialTheme.colorScheme.primary,
+                checkmarkColor = MaterialTheme.colorScheme.secondary
+            ),
             modifier = Modifier.padding(end = 4.dp)
         )
     }

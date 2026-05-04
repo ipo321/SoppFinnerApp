@@ -22,11 +22,12 @@ private val DarkColorScheme = darkColorScheme(
 
     //Secondary
     secondary = DarkSecondary,
-    secondaryContainer = DarkPrimary,
+    secondaryContainer = DarkSurfaceContainerHigh,
     onSecondaryContainer = DarkBackground,
 
     // The base layer of the app
-    background = DarkBackground,
+    background = DarkSurface,
+    surface = DarkSurface,
     onSurface = DarkOnSurface,
 
     // Tonal Hierarchy: Use these to create depth and stacked layers without using lines
@@ -53,7 +54,7 @@ private val LightColorScheme = lightColorScheme(
 
     //Primary  for important buttons ands actions
     primary = PrimaryGreen,   // Used for buttons, Outlines, Large text/ Headlines
-    onPrimary = SurfaceCream,   // Things put on top of primary color
+    onPrimary = OnSurfaceDark,   // Things put on top of primary color
     primaryContainer = PrimaryContainer,
     onPrimaryContainer = SurfaceCream,
 
@@ -63,7 +64,7 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = OnSurfaceDark,
 
     // The base layer of the app
-    background = SurfaceCream,    // Use for main background on each screen
+    background = SurfaceContainerLowest,    // Use for main background on each screen
     surface = SurfaceCream,       // Used for smaller boxes/surfaces and other that should be the same as background
     onSurface = OnSurfaceDark,   //  Normal text on the background/surface
 

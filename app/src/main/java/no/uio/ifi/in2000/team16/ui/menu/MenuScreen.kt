@@ -1,5 +1,6 @@
-package no.uio.ifi.in2000.team16.ui.minSide
+package no.uio.ifi.in2000.team16.ui.menu
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,30 +16,33 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.navigation.INFO_SCREEN
-import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROLL
+import no.uio.ifi.in2000.team16.ui.navigation.MENU_SCREEN
+import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SETTINGS_SCREEN
-import no.uio.ifi.in2000.team16.ui.navigation.SHROOMCONTROL_SCREEN
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 data class MenuItemData(
     val text: String,
@@ -46,18 +50,16 @@ data class MenuItemData(
     val route: String)
 
 @Composable
-fun ProfileScreen(
+fun MenuScreen(
     navController: NavController,
-    onNavigateBack: () -> Unit,
     darkTheme: Boolean,
     onToggleTheme: () -> Unit,
-    viewModel: ProfileScreenViewModel = hiltViewModel()
 ) {
     val menuItems = listOf(
-        MenuItemData("Innstillinger", Icons.Default.Settings, SETTINGS_SCREEN),
-        MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
+        MenuItemData("Mørkemodus", Icons.Default.Lightbulb, MENU_SCREEN),
+        MenuItemData("Hvordan beregnes scoren?", Icons.AutoMirrored.Filled.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
-        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROLL),
+        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROL),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
     )
 
@@ -67,46 +69,56 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
     ) {
-//        OutlinedButton(
-//            onClick = onNavigateBack,
-//            modifier = Modifier.fillMaxWidth(),
-//            shape = MaterialTheme.shapes.extraLarge
-//        ) {
-//            Text("Tilbake")
-//        }
         Text(
-            text = "Meny",
+            text = stringResource(R.string.meny),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(36.dp))
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             menuItems.forEach { item ->
                 MenuListItem(
                     item = item,
                     onClick = {
-                        navController.navigate(item.route)
-                    }
+                        if (item.text == "Mørkemodus") { // For dark mode we want toggle and no route
+                            onToggleTheme()
+                        } else { // For the rest we want to navigate
+                            navController.navigate(item.route)
+                        }
+                    },
+                    trailingContent = if (item.text == "Mørkemodus") {
+                        { // For dark mode we want the toggle to be visible
+                            Toggle(
+                                checked = darkTheme,
+                                onCheckedChange = onToggleTheme
+                            )
+                        }
+                    } else null // for the rest we don't want a trailing icon
                 )
             }
+            // Adds the image of the cute mushroom to the menu screen
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(R.drawable.cute_mushroom),
+                contentDescription = "Søt sopp",
+                modifier = Modifier
+                    .padding(Team16Theme.padding.outerLarge)
+                    .align(Alignment.CenterHorizontally)
+            )
         }
     }
-
 }
 
 @Composable
 fun MenuListItem(
     item: MenuItemData,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    trailingContent: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -120,7 +132,7 @@ fun MenuListItem(
         Icon(
             imageVector = item.icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.size(24.dp)
         )
 
@@ -128,8 +140,13 @@ fun MenuListItem(
 
         Text(
             text = item.text,
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSecondaryContainer
         )
+
+        if (trailingContent != null) {
+            trailingContent()
+        }
     }
 }

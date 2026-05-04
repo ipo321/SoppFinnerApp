@@ -1,10 +1,13 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -13,11 +16,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
@@ -26,7 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.R
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 
+import androidx.compose.foundation.layout.navigationBars
+
+private val NavBarContentHeight = 64.dp //for the bottomBarSize
 @Composable
 fun BottomNavigationBar(
     navController: NavController
@@ -40,22 +44,25 @@ fun BottomNavigationBar(
         ),
         BottombarNavItem(
             title = "Kart",
-            icon = rememberVectorPainter(Icons.Default.Place),
+            icon = rememberVectorPainter(Icons.Outlined.Map),
             route = MAP_SCREEN
         ),
 
 
         BottombarNavItem(
-            title = "Min side",
-            icon = rememberVectorPainter(Icons.Default.Home),
-            route = PROFILE_SCREEN
+            title = "Meny",
+            icon = rememberVectorPainter(Icons.Default.Menu),
+            route = MENU_SCREEN
         )
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val activeRoute = parentTabRoute(currentRoute)
+    val gestureInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()// Prevent bottom bar from overlapping system navigation
+
     NavigationBar(
+       modifier = Modifier.height(NavBarContentHeight + gestureInset),
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
@@ -63,7 +70,6 @@ fun BottomNavigationBar(
             NavigationBarItem(
                 selected = activeRoute == item.route,
                 onClick = {
-                    //selectedNavigationIndex = index
                     navController.navigate(item.route) {
                         popUpTo(navController.graph.startDestinationId) {
                             saveState = true
@@ -81,13 +87,13 @@ fun BottomNavigationBar(
                 label = {
                     Text(
                         text = item.title,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelMedium
                     )
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onSurface,
                     selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                    indicatorColor = MaterialTheme.colorScheme.surfaceContainerHigh,
 
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -109,10 +115,12 @@ fun BottomNavigationBarPreview() {
 }
 private fun parentTabRoute(route: String?): String? = when (route) {
     MUSHROOM_LIST_SCREEN, MUSHROOM_INFO_SCREEN -> MUSHROOM_LIST_SCREEN
-    MAP_SCREEN                                  -> MAP_SCREEN
-    PROFILE_SCREEN,
+    MAP_SCREEN                                 -> MAP_SCREEN
+    MENU_SCREEN,
     SETTINGS_SCREEN, HISTORY_SCREEN,
     SHROOMSPOT_SCREEN, INFO_SCREEN,
-    SHROOMCONTROL_SCREEN      -> PROFILE_SCREEN
-    else                                        -> route
+    POISON_CONTROL, SCORE_INFO_SCREEN,
+    SECURITY_SCREEN -> MENU_SCREEN
+    SHROOMCONTROL_SCREEN                       -> MUSHROOM_LIST_SCREEN
+    else                                       -> route
 }

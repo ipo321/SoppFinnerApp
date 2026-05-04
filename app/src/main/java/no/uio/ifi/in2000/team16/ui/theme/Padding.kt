@@ -8,10 +8,14 @@ data class Padding(
     val noPadding: Dp = 0.dp,
     val inner: Dp = 8.dp,
     val outer: Dp = 16.dp,
+    val outerMedium: Dp = 24.dp,
     val outerLarge: Dp = 32.dp,
     val mapButtonsSize: Dp = 56.dp, // Not exactly padding, but the size of the buttons on the map screen
     val colorExplanationSize: Dp = 10.dp,
-    val searchResultHeight: Dp = 500.dp
+    val searchResultHeight: Dp = 500.dp,
+    val borderWidthSmall: Dp = 2.dp,
+    val borderWidthMedium: Dp = 4.dp,
+    val shadowElevation: Dp = 2.dp,
     // Add more here when needed
 )
 
