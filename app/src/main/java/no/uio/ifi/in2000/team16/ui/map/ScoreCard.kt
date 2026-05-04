@@ -167,16 +167,12 @@ fun ScoreCard(
                         Spacer(Modifier.height(16.dp))
 
                         //Rows intended for extra info like humidity exct :
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+
+
+                        DisplayInfoItem(
+                            "Snitt-temp",h?.avgTempPast14Days?.let {"%.1f°C".format(it)} ?: "--",
+                            "Nedbør (14d)", h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--"
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
@@ -237,26 +233,18 @@ fun ScoreCard(
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Temp", "${w?.temp?.toInt() ?: "--"}°C")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Regn", "${w?.rain ?: "--"} mm")
-                            }
-                        }
+
+                        DisplayInfoItem(
+                            "Temp", "${w?.temp?.toInt() ?: "--"}°C",
+                            "Regn", "${w?.rain ?: "--"} mm"
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Fukt",
-                                    w?.humidity?.let {"%.2f%%".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Vind", "${w?.windSpeed ?: "--"} m/s")
-                            }
-                        }
+                        DisplayInfoItem(
+                            "Fukt", w?.humidity?.let {"%.2f%%".format(it)} ?: "--",
+                            "Vind", "${w?.windSpeed ?: "--"} m/s"
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
@@ -273,27 +261,22 @@ fun ScoreCard(
                             }
                         }
 
-                        Spacer(Modifier.height(20.dp))
-
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Gran", "${f?.sprucePercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}%")
-                            }
-                        }
+                        DisplayInfoItem(
+                            "Minste temp",h?.minTempPast14Days?.let { "%.1f°C".format(it) } ?: "--",
+                            "Max temp",h?.maxTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Lauv", "${f?.broadleafPercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Bonitet", f?.fertilityCategory ?: "--")
-                            }
-                        }
+
+                        DisplayInfoItem(
+                            "Gran", "${f?.sprucePercentage ?: "--"}%",
+                            "Bonitet", f?.fertilityCategory ?: "--")
+
+                        Spacer(Modifier.height(20.dp))
+
+                        DisplayInfoItem(
+                            "Lauv", "${f?.broadleafPercentage ?: "--"}%",
+                            "Bonitet", f?.fertilityCategory ?: "--")
 
                         Spacer(Modifier.height(20.dp))
                     }
@@ -333,16 +316,10 @@ fun ScoreCard(
 
                         Spacer(Modifier.height(16.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+                        DisplayInfoItem(
+                            "Snitt-temp",h?.avgTempPast14Days?.let {"%.1f°C".format(it)} ?: "--",
+                            "Nedbør (14d)", h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--"
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
@@ -585,3 +562,14 @@ fun InfoCapsule(
     }
 }
 
+@Composable
+fun DisplayInfoItem(
+    label1: String, value1: String,
+    label2: String, value2: String,
+    modifier: Modifier = Modifier
+){
+    Row(modifier = Modifier.fillMaxWidth()){
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label1, value1)}
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label2, value2)}
+    }
+}
