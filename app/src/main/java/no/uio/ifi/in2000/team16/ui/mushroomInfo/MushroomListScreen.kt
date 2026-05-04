@@ -216,7 +216,7 @@ fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
         modifier = Modifier.fillMaxWidth()
             .border(width = 4.dp,
                 color = MaterialTheme.colorScheme.outlineVariant,
-                shape = MaterialTheme.shapes.medium),
+                shape = MaterialTheme.shapes.large),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.large,
         shadowElevation = 2.dp
