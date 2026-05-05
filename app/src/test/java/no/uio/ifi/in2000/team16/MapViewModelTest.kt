@@ -9,14 +9,12 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
@@ -32,8 +30,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-/*
-    Test for MapViewModel. Requirements:
+/**
+    A test for MapViewModel.
+    ------------------------
+    Requirements:
     - State is Idle when initiated
     - State is Loading when data is about to be fetched
     - State is Success when data is fetched
@@ -43,27 +43,28 @@ import org.junit.Test
 
 class MapViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
-    private val mockRepository = mockk<SpeciesRepository>(relaxed = true)
     private val mockEnvironmentContext = mockk<GetEnvironmentContextUseCase>(relaxed = true)
     private val mockHeatMapArea = mockk<CalculateHeatmapAreaUseCase>(relaxed = true)
     private val mockScorerProvider = mockk<ScorerProvider>(relaxed = true)
     private val mockMushroomScorer = mockk<MushroomScorer>(relaxed = true)
     private lateinit var viewModel: MapViewModel
+    private lateinit var fakeSpeciesRepository: FakeSpeciesRepository
+    private lateinit var fakeLocationRepository: FakeLocationRepository
 
-    // MutableStateFlow objects that the test controls
-    private val selectedMushroomFlow = MutableStateFlow<Mushroom>(mockk(relaxed = true))
-    private val favoriteMushroomsFlow = MutableStateFlow<List<Mushroom>>(emptyList())
+    private val lat = 59.0
+    private val lon = 10.0
 
     // Setup happens before the test runs
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        fakeSpeciesRepository = FakeSpeciesRepository()
+        fakeLocationRepository = FakeLocationRepository()
         every { mockScorerProvider.activeScorer } returns mockMushroomScorer
-        every { mockRepository.favoriteMushrooms } returns favoriteMushroomsFlow
-        every { mockRepository.selectedMushroom } returns selectedMushroomFlow
         viewModel = MapViewModel(
-            mockRepository,
+            fakeSpeciesRepository,
+            fakeLocationRepository,
             mockEnvironmentContext,
             mockHeatMapArea,
             mockScorerProvider
@@ -88,12 +89,9 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun loadingState() = runTest {
-        val lat = 59.0
-        val lon = 10.0
-        val mushroom = mockk<Mushroom>(relaxed = true)
-
-        // Makes sure the viewmodel selects this mushroom
-        selectedMushroomFlow.value = mushroom
+        val mushroom = fakeSpeciesRepository.getAllMushrooms().first()
+        // Makes sure the repository holds this mushroom
+        fakeSpeciesRepository.selectedMushroom.value = mushroom
         advanceUntilIdle() // Makes sure the test waits until all coroutines are done
 
         coEvery { mockEnvironmentContext(any(), any(), any()) } coAnswers {
@@ -115,14 +113,11 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun successState() = runTest {
-        val lat = 59.0
-        val lon = 10.0
-        val mushroom = mockk<Mushroom>(relaxed = true)
+        val mushroom = fakeSpeciesRepository.getAllMushrooms().first()
         val context = mockk<EnvironmentContext>(relaxed = true)
         val evaluation = EvaluationResult(85, "Bra!")
 
-        // Makes sure the viewmodel selects this mushroom
-        selectedMushroomFlow.value = mushroom
+        fakeSpeciesRepository.selectedMushroom.value = mushroom
         advanceUntilIdle()
 
         // Makes sure the viewmodel uses the mock data, and does not try to connect to the internet
@@ -145,9 +140,6 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun errorState() = runTest {
-        val lat = 59.0
-        val lon = 10.0
-
         // Makes sure the viewmodel throws exception when trying to fetch context
         coEvery { mockEnvironmentContext(any(), any(), any()) } throws Exception("Test error")
 
@@ -163,11 +155,11 @@ class MapViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun fetchHeatMapSuccessState() = runTest {
-        val bounds = BoundingBox(59.0, 58.0, 11.0, 10.0)
+        val bounds = BoundingBox(lat, 58.0, 11.0, lon)
         val mushroom = mockk<Mushroom>(relaxed = true)
-        val tiles = listOf(HeatmapTile(59.1, 10.1, 80))
+        val tiles = listOf(HeatmapTile(lat, lon, 80, 0.032358))
 
-        selectedMushroomFlow.value = mushroom
+        fakeSpeciesRepository.selectedMushroom.value = mushroom
         advanceUntilIdle()
 
         viewModel.toggleHeatmap(null)
