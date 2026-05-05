@@ -30,7 +30,7 @@ class MushroomRepository @Inject constructor(
     private val localMushroomDataSource: LocalMushroomDataSourceInterface
 ) : MushroomRepositoryInterface {
 
-    override val defaultKmRadius = 100.0
+    override val defaultKmRadius = 10000000.0//quick fix give alot of range
     private val kmPerDegreeLat = 111.0 //for the offset of latitude.
 
     // In data source: signature becomes localSpeciesId: Int (non-null)
