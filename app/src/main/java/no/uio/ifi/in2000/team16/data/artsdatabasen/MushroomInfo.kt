@@ -3,23 +3,31 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
 
+/**
+ * The result of an occurrence query — a list of sightings and how many were found.
+ * [count] always equals [results].size; it is kept as a convenience field.
+ */
 @Serializable
 data class OccurrenceResult(
     val count: Int = 0,
     val results: List<Occurrence> = emptyList()
 )
 
-//Data about the report in location (findings)
+/** A single recorded mushroom sighting from the local GeoJSON dataset. */
 @Serializable
 data class Occurrence(
     val key: Long,
-    val localSpeciesId: Int? = null,
+    val localSpeciesId: Int? = null,  // maps to LocalSpeciesIdMapper ID
     val decimalLatitude: Double? = null,
     val decimalLongitude: Double? = null,
     val year: Int? = null,
     val month: Int? = null,
     val day: Int? = null
 )
+
+// ── Internal GeoJSON parsing models ─────────────────────────────────────────
+// These mirror the structure of res/raw/mushroom_map_data.geojson exactly.
+// They are only used by LocalMushroomDataSource and should not leak to other layers.
 
 @Serializable
 data class GeoJsonFeatureCollection(
