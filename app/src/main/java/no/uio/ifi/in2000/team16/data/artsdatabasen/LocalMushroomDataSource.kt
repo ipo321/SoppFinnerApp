@@ -46,11 +46,15 @@ class LocalMushroomDataSource @Inject constructor(
     private val mutex = Mutex()
 
     private var cachedOccurrences: OccurrenceResult? = null
+    private var speciesIndex: Map<Int, List<Occurrence>> = emptyMap()
 
     private suspend fun getAllOccurrences(): OccurrenceResult {
         return cachedOccurrences ?: mutex.withLock {
             // Check again inside the lock in case another coroutine loaded it first
-            cachedOccurrences ?: loadFromDisk().also { cachedOccurrences = it }
+            cachedOccurrences ?: loadFromDisk().also {
+                cachedOccurrences = it
+                speciesIndex = it.results.groupBy { occ -> occ.localSpeciesId ?: -1 }
+            }
         }
     }
 
@@ -109,8 +113,8 @@ class LocalMushroomDataSource @Inject constructor(
         lonMax: Double,
         localSpeciesId: Int
     ): OccurrenceResult = withContext(Dispatchers.Default) {
-        val all = getAllOccurrences()
-        val bySpecies = all.results.filter { it.localSpeciesId == localSpeciesId }
+        getAllOccurrences()
+        val bySpecies = speciesIndex[localSpeciesId] ?: emptyList()
 
 
         Log.d(TAG, "Species filter result: ${bySpecies.size} occurrences")
