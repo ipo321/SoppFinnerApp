@@ -62,8 +62,6 @@ class MushroomRepository @Inject constructor(
         )
     }
 
-
-
     override suspend fun getMushroomInBoundingBox(
         north: Double,
         south: Double,
@@ -84,5 +82,4 @@ class MushroomRepository @Inject constructor(
             localSpeciesId = localSpeciesId
         )
     }
-
 }
