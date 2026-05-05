@@ -299,8 +299,8 @@ fun ScoreCard(
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
-                                    label = "Nedbør (14 dgr)",
-                                    value = uiState.totalRain
+                                    label = "Dominant tre-art",
+                                    value = uiState.dominantTreeSpecies
                                 )
                             }
 
