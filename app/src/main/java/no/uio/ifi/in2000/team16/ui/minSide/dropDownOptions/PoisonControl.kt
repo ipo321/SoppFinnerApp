@@ -16,9 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -28,10 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.serialization.json.JsonNull.content
+import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.common.MushroomActionButton
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.w3c.dom.Text
 
 
@@ -59,16 +68,35 @@ fun PoisonControl(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedButton(
-            onClick = onNavigateBack,
-            modifier = Modifier.wrapContentSize(),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+//        OutlinedButton(
+//            onClick = onNavigateBack,
+//            modifier = Modifier.wrapContentSize(),
+//            colors = ButtonDefaults.outlinedButtonColors(
+//                contentColor = MaterialTheme.colorScheme.onPrimary
+//            ),
+//            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+//        ) {
+//            Text("Tilbake")
+//        }
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
         ) {
-            Text("Tilbake")
+            MushroomActionButton(onClick = onNavigateBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "BackButton",
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(Team16Theme.padding.inner))
+                Text(
+                    text = stringResource(R.string.back_button),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         }
+        Spacer(modifier=Modifier.height(24.dp))
+
         Spacer(modifier=Modifier.height(10.dp))
 
         Text(

@@ -70,13 +70,13 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
     ) {
-        OutlinedButton(
-            onClick = onNavigateBack,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge
-        ) {
-            Text("Tilbake")
-        }
+//        OutlinedButton(
+//            onClick = onNavigateBack,
+//            modifier = Modifier.fillMaxWidth(),
+//            shape = MaterialTheme.shapes.extraLarge
+//        ) {
+//            Text("Tilbake")
+//        }
         Text(
             text = "Meny",
             style = MaterialTheme.typography.headlineLarge,
