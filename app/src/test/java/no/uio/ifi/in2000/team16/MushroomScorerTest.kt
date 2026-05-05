@@ -4,8 +4,8 @@ import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.BasicAlgorithm
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorer
-import no.uio.ifi.in2000.team16.domain.logic.mushroom.MushroomScorerV2
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.ForestData
 import no.uio.ifi.in2000.team16.domain.model.TerrainData
@@ -13,18 +13,29 @@ import no.uio.ifi.in2000.team16.domain.model.WeatherData
 import no.uio.ifi.in2000.team16.domain.model.WeatherHistory
 import org.junit.Test
 
+
+/**
+ * A test for the BasicAlgorithm.
+ * -----------------------------
+ * Requirements:
+ *  - The score must be in interval 0 <= ... <= 100
+ *  - The score must increase when humidity is high
+ *  - The score must be 0 when current month is wrong
+ *  - The calculation must handle null data
+ */
+
 class MushroomScorerTest {
 
     @Test
     fun testScore() = runTest { // runTest makes it possible to call suspend functions from test function
-        val scorer: MushroomScorer = MushroomScorerV2()
+        val scorer: MushroomScorer = BasicAlgorithm()
         val speciesDS = SpeciesDataSource()
         val mushroom = speciesDS.allSpeciesProfiles[0] // Kantarell
 
         // The score should be in interval 0 <= ... <= 100 when given "normal" values
         assert(
             scorer.calculateScore(makeMockContext(), mushroom).score
-                    in 0..100
+                in 0..100
         )
         // The score should be in interval 0 <= ... <= 100 when given boundary values
         assert(
@@ -49,16 +60,16 @@ class MushroomScorerTest {
                 rain = -50.0,
                 fogFraction = -50.0
             ), mushroom).score
-                    in 0..100
+                in 0..100
         )
         // Score should increase when humidity is high
         assert(
             scorer.calculateScore(makeMockContext(humidity = 100.0), mushroom).score >
-                    scorer.calculateScore(makeMockContext(humidity = 0.0), mushroom).score
+                scorer.calculateScore(makeMockContext(humidity = 0.0), mushroom).score
         )
         // Score should be 0 when current month is wrong
-        assertEquals("Score should be 0 when current month is wrong",
-            0, scorer.calculateScore(makeMockContext(month = 1), mushroom).score
+        assertEquals(
+            0,scorer.calculateScore(makeMockContext(month = 1), mushroom).score
         )
         // The calculation should handle null data
         assert(
@@ -72,11 +83,7 @@ class MushroomScorerTest {
                 mushroom).score
                     in 0..100
         )
-
-        // Score should be 0 when not suitable terrain
-        // Test can be added when we have terrain data
     }
-
 
     fun makeMockContext(
         temp: Double? = 8.0,
@@ -90,7 +97,7 @@ class MushroomScorerTest {
 
         avgTempPast14Days: Double? = 4.0,
         totalRainPast14Days: Double? = 40.0,
-        minTempPast14Days: Double? = -3.0,
+        minTempPast14Days: Double? = -0.5,
         maxTempPast14Days: Double? = 12.0,
 
         terrainData: TerrainData? = null,

@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import androidx.core.view.ViewCompat
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -31,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsCompat
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.ui.common.ErrorScreen
@@ -214,6 +216,7 @@ fun getMapView(
             .textureMode(true)
 
         MapView(context, mode).apply { // mode are sent as argument here to fix the bug
+            ViewCompat.setOnApplyWindowInsetsListener(this) { _, _ -> WindowInsetsCompat.CONSUMED } //bottom gap fix
             onCreate(null)
 
             getMapAsync { map ->

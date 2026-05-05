@@ -181,6 +181,7 @@ fun MushroomInfoScreen(
             text = stringResource(id = selected.bioRes.toInt()),
             style = MaterialTheme.typography.bodyLarge,
         )
+        Spacer(modifier = Modifier.height(padding.outer))
     }
 }
 

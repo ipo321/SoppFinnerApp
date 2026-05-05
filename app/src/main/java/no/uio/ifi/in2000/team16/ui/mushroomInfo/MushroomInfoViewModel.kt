@@ -1,21 +1,16 @@
 package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
+import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import javax.inject.Inject
-import java.time.LocalDate
 
 /*
 viwemodel for both the mushroom listScreen and the MushroomInfoscreen.
@@ -32,7 +27,7 @@ data class MushroomInfoUiState(
 
 @HiltViewModel
 class MushroomInfoViewModel @Inject constructor(
-    private val repository: SpeciesRepository
+    private val repository: SpeciesRepositoryInterface
 ) : ViewModel() {
 
 
@@ -42,15 +37,15 @@ class MushroomInfoViewModel @Inject constructor(
     val uiState: StateFlow<MushroomInfoUiState> = _uiState.asStateFlow()
     init {
         // Load static mushroom list once
-        val allMushrooms = repository.getAllMushrooms()
-        _uiState.update {
-            it.copy(
-               // mushrooms = allMushrooms,
-                otherMushrooms = allMushrooms,
-                selectedMushroom = allMushrooms.firstOrNull()
-            )
-        }
         viewModelScope.launch {
+            val allMushrooms = repository.getAllMushrooms()
+            _uiState.update {
+                it.copy(
+                    // mushrooms = allMushrooms,
+                    otherMushrooms = allMushrooms,
+                    selectedMushroom = allMushrooms.firstOrNull()
+                )
+            }
             repository.favoriteMushrooms.collect { favs ->
                 val favNames = favs.map { it.commonName }.toSet()
                 val favoriteList = allMushrooms.filter { it.commonName in favNames }

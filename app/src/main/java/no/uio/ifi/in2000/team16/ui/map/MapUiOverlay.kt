@@ -28,6 +28,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
@@ -315,6 +316,7 @@ fun MapSearchBar(
                 ListItem(
                     headlineContent = { Text(suggestion.title) },
                     supportingContent = { Text(suggestion.subtitle) },
+                    //colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { // each item is clickable

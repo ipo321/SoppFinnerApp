@@ -144,7 +144,7 @@ fun setupHistoricalFindsLayer(style: Style, context: Context) {
         GeoJsonOptions()
             .withCluster(true)
             .withClusterMaxZoom(13)
-            .withClusterRadius((50 * d).toInt())
+            .withClusterRadius((30 * d).toInt())
     )
     style.addSource(source)
 
@@ -154,9 +154,9 @@ fun setupHistoricalFindsLayer(style: Style, context: Context) {
             circleRadius(
                 interpolate(
                     linear(), zoom(),
-                    stop(8,  3f * d),
-                    stop(14, 6f * d),
-                    stop(18, 10f * d)
+                    stop(8,  3f),
+                    stop(14, 6f),
+                    stop(18, 10f)
                 )
             ),
             circleColor("#D0ECA8"),
@@ -172,9 +172,9 @@ fun setupHistoricalFindsLayer(style: Style, context: Context) {
             circleRadius(
                 step(
                     get("point_count"),
-                    10f * d,
-                    stop(10, 13f * d),
-                    stop(50, 17f * d)
+                    15f,
+                    stop(10, 20f),
+                    stop(50, 30f)
                 )
             ),
             circleColor(
@@ -194,7 +194,7 @@ fun setupHistoricalFindsLayer(style: Style, context: Context) {
     val countLayer = SymbolLayer("historical-finds-cluster-count", "historical-finds-source")
         .withProperties(
             textField(Expression.toString(get("point_count"))),
-            textSize(10f * d),
+            textSize(10f),
             textColor("#1B1C15"),
             textIgnorePlacement(true),
             textAllowOverlap(true)
