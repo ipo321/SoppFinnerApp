@@ -16,7 +16,11 @@ data class Padding(
     val searchResultHeight: Dp = 500.dp,
     val borderWidthSmall: Dp = 2.dp,
     val borderWidthMedium: Dp = 4.dp,
-    val shadowElevation: Dp = 2.dp,
+    val shadowElevationSmall: Dp = 2.dp,
+    val shadowElevationMedium: Dp = 8.dp,
+    val spacingMinimum: Dp = 10.dp,
+    val spacingSmall: Dp = 16.dp,
+    val spacing: Dp = 24.dp
     // Add more here when needed
 )
 

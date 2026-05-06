@@ -109,9 +109,9 @@ fun ScoreCard(
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Team16Theme.padding.shadowElevationMedium)
     ) {
         Box(modifier = Modifier.fillMaxWidth()){
 
@@ -131,11 +131,11 @@ fun ScoreCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                            .padding(top = 8.dp),
+                            .padding(Team16Theme.padding.outer)
+                            .padding(top = Team16Theme.padding.inner),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacing))
 
                         //The Score Circle itself:
                         Box(contentAlignment = Alignment.Center) {
@@ -150,7 +150,7 @@ fun ScoreCard(
                             )
                         }
 
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacingMinimum))
 
                         Text(
                             text = uiState.description,
@@ -159,10 +159,9 @@ fun ScoreCard(
                             color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacingSmall))
 
                         //Rows intended for extra info like humidity exct :
-
 
                         DisplayInfoItem("Snitt-temp", uiState.avgTemp,
                             "Nedbør (14d)", uiState.totalRain)
@@ -177,8 +176,8 @@ fun ScoreCard(
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
-                                    label = "Nedbør (14 dgr)",
-                                    value = uiState.totalRain
+                                    label = "Dominant tre-art",
+                                    value = uiState.dominantTreeSpecies
                                 )
                             }
 
@@ -284,7 +283,8 @@ fun ScoreCard(
                         Text(
                             text = uiState.description,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Spacer(Modifier.height(16.dp))

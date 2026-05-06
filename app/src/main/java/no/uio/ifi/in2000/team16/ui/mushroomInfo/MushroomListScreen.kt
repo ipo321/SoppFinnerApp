@@ -45,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.WarningBanner
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 
 
@@ -131,7 +132,7 @@ private fun MushroomListItem(
 ) {
 
     Surface(
-        shadowElevation = 2.dp,
+        shadowElevation = padding.shadowElevationSmall,
         shape = MaterialTheme.shapes.medium
     ) {
         Row(
@@ -216,7 +217,7 @@ private fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
             ),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.large,
-        shadowElevation = 2.dp
+        shadowElevation = padding.shadowElevationSmall
     ) {
         Column(
             modifier = Modifier
