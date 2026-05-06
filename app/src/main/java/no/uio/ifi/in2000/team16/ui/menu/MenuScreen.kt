@@ -67,7 +67,7 @@ fun MenuScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.secondary)
-            .padding(24.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 24.dp),
     ) {
         Text(
             text = stringResource(R.string.meny),
