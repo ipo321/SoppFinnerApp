@@ -89,6 +89,7 @@ fun MushroomListScreen(
                 text = stringResource(R.string.warning_not_for_identification),
                 textStyle = MaterialTheme.typography.bodySmall
             )
+            Spacer(modifier = Modifier.height(padding.inner))
 
             MushroomControlBanner(onVisitSoppkontroll = onMushroomControl)
 
@@ -184,7 +185,7 @@ private fun MushroomListItem(
 private fun Modifier.mushroomCard(isSelected: Boolean): Modifier {
     val borderWidth = if (isSelected) 4.dp else 2.dp
     val borderColor = if (isSelected)
-        MaterialTheme.colorScheme.primaryContainer
+        MaterialTheme.colorScheme.primary
     else
         MaterialTheme.colorScheme.outlineVariant
 

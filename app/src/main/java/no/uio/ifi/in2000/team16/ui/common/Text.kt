@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.common
 
 
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.MaterialTheme
@@ -70,7 +71,13 @@ fun WarningBanner(
     onLinkClick: (() -> Unit)? = null,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.error,
+                shape = MaterialTheme.shapes.large
+            ),
         color = MaterialTheme.colorScheme.errorContainer,
         shape = MaterialTheme.shapes.large
     ) {

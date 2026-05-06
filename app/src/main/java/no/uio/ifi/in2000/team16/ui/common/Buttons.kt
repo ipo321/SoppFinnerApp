@@ -31,7 +31,7 @@ fun BackButton(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         contentAlignment = alignment
     ) {
         MushroomActionButton(onClick = onNavigateBack) {
@@ -52,7 +52,7 @@ fun BackButton(
 @Composable
 fun MushroomActionButton(
     onClick: () -> Unit,
-    contentColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     content: @Composable RowScope.() -> Unit
 ) {
     OutlinedButton(

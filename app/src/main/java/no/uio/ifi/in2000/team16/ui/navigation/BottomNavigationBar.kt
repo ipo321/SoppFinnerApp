@@ -63,7 +63,7 @@ fun BottomNavigationBar(
 
     NavigationBar(
        modifier = Modifier.height(NavBarContentHeight + gestureInset),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 8.dp
     ) {
         navigationItems.forEachIndexed { index, item ->
@@ -93,7 +93,7 @@ fun BottomNavigationBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onSurface,
                     selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    indicatorColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    indicatorColor = MaterialTheme.colorScheme.surface,
 
                     unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant

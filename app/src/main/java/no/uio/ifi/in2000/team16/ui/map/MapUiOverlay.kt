@@ -173,7 +173,7 @@ fun MapMenu(
         modifier = modifier
             .size(Team16Theme.padding.mapButtonsSize)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
 //        .border(
@@ -246,7 +246,7 @@ fun MapSearchBar(
 //                shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape
 //            ),
         colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
         shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape,
         inputField = {
@@ -316,7 +316,7 @@ fun MapSearchBar(
                 ListItem(
                     headlineContent = { Text(suggestion.title) },
                     supportingContent = { Text(suggestion.subtitle) },
-                    //colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { // each item is clickable
@@ -353,7 +353,7 @@ fun MushroomIcon(
         modifier = modifier
             .clip(MaterialTheme.shapes.large)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                color = MaterialTheme.colorScheme.background
             )
             .clickable {
                 expanded = !expanded
@@ -396,7 +396,7 @@ fun MushroomIcon(
             MushroomImage(
                 selected = selected,
                 size = Team16Theme.padding.mapButtonsSize,
-                background = MaterialTheme.colorScheme.surfaceContainerHigh
+                background = MaterialTheme.colorScheme.background
             )
         }
     }
@@ -412,7 +412,7 @@ fun CentralizeMap(
             .padding(top = Team16Theme.padding.outer)
             .size(Team16Theme.padding.mapButtonsSize)
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
 //            .border(

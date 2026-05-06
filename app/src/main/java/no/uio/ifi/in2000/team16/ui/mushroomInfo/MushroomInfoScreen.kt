@@ -80,7 +80,7 @@ fun MushroomInfoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(start = padding.outer, padding.outer, padding.outer)
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -149,7 +149,7 @@ fun MushroomInfoScreen(
             Spacer(Modifier.width(padding.inner))
             Text(
                 if (isFavorite) "Fjern fra favoritter" else "Legg til i favoritter",
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -180,6 +180,7 @@ fun MushroomInfoScreen(
         Text(
             text = stringResource(id = selected.bioRes.toInt()),
             style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(padding.outer))
     }
@@ -211,108 +212,7 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
         Text(
             text = property.label,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSecondary
         )
     }
-}
-
-@Composable
-fun MushroomWarningBanner(onMushroomControl: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.errorContainer,
-        shape = MaterialTheme.shapes.large
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(padding.outer)
-                .clickable { onMushroomControl() },
-            verticalAlignment = Alignment.Top,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(Modifier.width(padding.inner))
-            Column {
-                Text(
-                    text = "Aldri spis sopp du er usikker på.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Se Soppkontroll.no for informasjon",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        textDecoration = TextDecoration.Underline
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.Link,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BackToExploreButton(onClick: () -> Unit) {
-    MushroomActionButton(onClick = onClick) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = MaterialTheme.colorScheme.onPrimary
-        )
-        Spacer(Modifier.width(padding.inner))
-        Text(
-            text = "Utforsk",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-    }
-}
-
-@Composable
-fun MushroomImage(selected: Mushroom, size : Dp) {
-    Box(
-        modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.onBackground),
-        contentAlignment = Alignment.Center
-    ) {
-
-        Image(
-            painter = painterResource(id = selected.imageRes),
-            contentDescription = selected.commonName,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-}
-
-
-@Composable
-fun MushroomActionButton(
-    onClick: () -> Unit,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
-    content: @Composable RowScope.() -> Unit
-) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.wrapContentSize(),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.onPrimary),
-        content = content
-    )
 }

@@ -43,13 +43,13 @@ fun FromMenuDefaultScreen(
         Text(
             text = header,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier=Modifier.height(Team16Theme.padding.outerMedium))
         Text(
             text = body,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
         )
 
         if (bodyCentered != null) {
@@ -57,7 +57,7 @@ fun FromMenuDefaultScreen(
             Text(
                 text = bodyCentered,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
@@ -76,7 +76,7 @@ fun FromMenuDefaultScreen(
                 onClick = { context.startActivity(intentPIN) },
                 modifier = Modifier.wrapContentSize(),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimary
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 ),
                 border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
             ) {
