@@ -179,11 +179,10 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             speciesRepository.updateSelectedMushroom(mushroom)
 
-            val lat = _uiState.value.lastClickedLat
-            val lon = _uiState.value.lastClickedLon
-            if (lat != null && lon != null) {//change mushroom trigges a onMapClicked reload
-                onMapClicked(lat, lon)
-            }
+            _uiState.update { it.copy(heatmapTiles = emptyList()) }
+            savedBounds?.let { fetchHeatmapData(it) }
+
+            refreshCurrentLocation()
         }
     }
     
@@ -252,5 +251,34 @@ class MapViewModel @Inject constructor(
 
     fun dismissEvaluation() {
         _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null) }
+    }
+
+    internal fun refreshCurrentLocation(){
+        val lat = _uiState.value.lastClickedLat ?: return
+        val lon = _uiState.value.lastClickedLon ?: return
+        val currentMushroom = _uiState.value.selectedMushroom ?: return
+
+        viewModelScope.launch{
+            _uiState.update{it.copy(screenStatus = ScreenStatus.Loading)}
+            try{
+                val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)
+                val scorer = scorerProvider.activeScorer
+                val evaluation = scorer.calculateScore(context, currentMushroom.profile)
+                _uiState.update {
+                    it.copy(
+                        screenStatus = ScreenStatus.Success,
+                        currentContext = context,
+                        evaluation = evaluation
+                    )
+                }
+            } catch(e: Exception){
+                _uiState.update{it.copy(screenStatus = ScreenStatus.Error(e.message ?: "Ukjent feil"))}
+            }
+        }
+    }
+
+    fun retryLastClick(){
+        Log.d("T16_retry", "Retrying click at lat: ${_uiState.value.lastClickedLat}, lon: ${_uiState.value.lastClickedLon}")
+        refreshCurrentLocation()
     }
 }

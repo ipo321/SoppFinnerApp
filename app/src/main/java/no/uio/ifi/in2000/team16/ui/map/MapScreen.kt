@@ -66,6 +66,7 @@ fun MapScreen(
     mapViewModel: MapViewModel,
     isVisible: Boolean,
     onMapLoaded: () -> Unit,
+    isNetConnected: Boolean,
     isDarkMode: Boolean
 ) {
     val context = LocalContext.current
@@ -87,6 +88,21 @@ fun MapScreen(
     val searchTextFieldState = rememberTextFieldState()
     // The map is made with MapView and remember to save state
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
+
+    //Reload Map on internet reconect
+    var hadDisconnection by remember {mutableStateOf(false)}
+
+    LaunchedEffect(isNetConnected) {
+        Log.d("T16_Net", "isNetConnected changed: $isNetConnected " +
+                "hadDisconnection changed: $hadDisconnection")
+        if(!isNetConnected){
+            hadDisconnection = true
+        }else if(hadDisconnection){
+            hadDisconnection = false
+            mapViewModel.retryLastClick()
+        }
+    }
+
 
     LaunchEffects(
         viewModel = mapViewModel,
@@ -435,7 +451,7 @@ fun LaunchEffects(
     LaunchedEffect(uiState.selectedMushroom) {
         val lat = uiState.lastClickedLat ?: return@LaunchedEffect
         val lon = uiState.lastClickedLon ?: return@LaunchedEffect
-        viewModel.onMapClicked(lat, lon)
+        viewModel.refreshCurrentLocation()
     }
     // Actually runs the popup and makes sure it doesn't rerun
     LaunchedEffect(Unit){

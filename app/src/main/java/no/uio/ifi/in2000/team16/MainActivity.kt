@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,11 +30,16 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    //gets the mapviewmodel so score can be reloaded on internet reconnect
+    private val mapViewModel : MapViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -76,7 +82,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    //LaunchEffect for snackBar that shows No internet
+                    //LaunchEffect for snackBar that shows No position
                     LaunchedEffect(isPosConnected) {
                         if (!isPosConnected) {
                             locationSnackbarState.showSnackbar(
@@ -95,7 +101,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier,
                             navController = navController,
                             darkTheme = darkTheme,
-                            onToggleTheme = { darkTheme = !darkTheme }
+                            onToggleTheme = { darkTheme = !darkTheme },
+                            isNetConnected = isNetConnected
                         )
 
                         //Internet

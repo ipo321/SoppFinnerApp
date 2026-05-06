@@ -67,7 +67,8 @@ fun Navigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     darkTheme: Boolean,
-    onToggleTheme: () -> Unit
+    onToggleTheme: () -> Unit,
+    isNetConnected: Boolean
 ) {
     val welcomeViewModel: WelcomeViewModel = hiltViewModel()
     val onboardingCompleted by welcomeViewModel.onBoardingCompleted.collectAsState()
@@ -147,6 +148,7 @@ fun Navigation(
                     mapViewModel = mapViewModel,
                     isVisible = isMapVisible,
                     onMapLoaded = { isMapLoaded = true },
+                    isNetConnected = isNetConnected,
                     isDarkMode = darkTheme
                 )
             }

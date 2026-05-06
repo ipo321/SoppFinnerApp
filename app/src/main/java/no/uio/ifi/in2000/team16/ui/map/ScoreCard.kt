@@ -78,10 +78,10 @@ fun BoxScope.InfoPopUp(
     contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
+    val uiState = contextData?.toUiState(score, msg) ?: return
+
     ScoreCard(
-        score = score,
-        description = msg,
-        contextData = contextData,
+        uiState = uiState,
         onDismiss = onDismiss,
         modifier = Modifier
             .align(Alignment.BottomCenter)
@@ -97,21 +97,13 @@ fun BoxScope.InfoPopUp(
 
 @Composable
 fun ScoreCard(
+    uiState: ScoreCardUiState,
     modifier: Modifier = Modifier,
-    description: String,
-    score: Int,
     onDismiss: (() -> Unit)? = null,
-    contextData: EnvironmentContext?
 ) {
     val context = LocalContext.current
     //controls weather the card is extended or not
     var isExpanded by remember {mutableStateOf(false)}
-
-    val w = contextData?.currentWeather
-    val h = contextData?.weatherHistory
-    val f = contextData?.forestData
-    val t = contextData?.terrainData
-
 
     Card(
         modifier = modifier,
@@ -145,7 +137,7 @@ fun ScoreCard(
 
                         //The Score Cirlce itself:
                         Box(contentAlignment = Alignment.Center) {
-                            ScoreCircle(score = score)
+                            ScoreCircle(score = uiState.score)
                             InfoCapsule(
                                 infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
                                         " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
@@ -159,7 +151,7 @@ fun ScoreCard(
                         Spacer(Modifier.height(10.dp))
 
                         Text(
-                            text = description,
+                            text = uiState.description,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -167,16 +159,10 @@ fun ScoreCard(
                         Spacer(Modifier.height(16.dp))
 
                         //Rows intended for extra info like humidity exct :
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+
+
+                        DisplayInfoItem("Snitt-temp", uiState.avgTemp,
+                            "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
 
@@ -185,12 +171,11 @@ fun ScoreCard(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val rain = contextData?.weatherHistory?.totalRainPast14Days
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
                                     label = "Nedbør (14 dgr)",
-                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
+                                    value = uiState.totalRain
                                 )
                             }
 
@@ -205,10 +190,9 @@ fun ScoreCard(
                                     )
                                     Row(verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center) {
-                                        val symbolCode = contextData?.currentWeather?.symbolCode
-                                        if (symbolCode != null) {
+                                        if (uiState.symbolCode != null) {
                                             val imageRes = context.resources.getIdentifier(
-                                                symbolCode,
+                                                uiState.symbolCode,
                                                 "drawable",
                                                 context.packageName
                                             )
@@ -223,9 +207,8 @@ fun ScoreCard(
                                         }
 
 
-                                        val currentTemp = contextData?.currentWeather?.temp
                                         Text(
-                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            text = uiState.currentTemp,
                                             style = MaterialTheme.typography.bodySmall,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -237,63 +220,32 @@ fun ScoreCard(
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Temp", "${w?.temp?.toInt() ?: "--"}°C")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Regn", "${w?.rain ?: "--"} mm")
-                            }
-                        }
+
+                        DisplayInfoItem(
+                            "Temp", uiState.currentTemp,
+                            "Regn", uiState.rain
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Fukt",
-                                    w?.humidity?.let {"%.2f%%".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Vind", "${w?.windSpeed ?: "--"} m/s")
-                            }
-                        }
+                        DisplayInfoItem("Fukt", uiState.humidity,
+                            "Vind", uiState.windSpeed)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Minste temp",
-                                    h?.minTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
-
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Max temp",
-                                    h?.maxTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
-
-                            }
-                        }
+                        DisplayInfoItem("Minste temp",uiState.minTemp,
+                            "Max temp", uiState.maxTemp)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Gran", "${f?.sprucePercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}%")
-                            }
-                        }
+
+                        DisplayInfoItem("Gran", uiState.sprucePercent,
+                            "Furu", uiState.pinePercent)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Lauv", "${f?.broadleafPercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Bonitet", f?.fertilityCategory ?: "--")
-                            }
-                        }
+                        DisplayInfoItem("Lauv", uiState.broadleafPercent,
+                            "Bonitet", uiState.fertility)
 
                         Spacer(Modifier.height(20.dp))
                     }
@@ -312,7 +264,7 @@ fun ScoreCard(
 
                         //The Score Cirlce itself:
                         Box(contentAlignment = Alignment.Center) {
-                            ScoreCircle(score = score)
+                            ScoreCircle(score = uiState.score)
                             InfoCapsule(
                                 infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
                                         " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
@@ -326,23 +278,16 @@ fun ScoreCard(
                         Spacer(Modifier.height(10.dp))
 
                         Text(
-                            text = description,
+                            text = uiState.description,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyMedium
                         )
 
                         Spacer(Modifier.height(16.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+                        DisplayInfoItem(
+                            "Snitt-temp",uiState.avgTemp,
+                            "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
 
@@ -351,12 +296,11 @@ fun ScoreCard(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val rain = contextData?.weatherHistory?.totalRainPast14Days
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
-                                    label = "Nedbør (14 dgr)",
-                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
+                                    label = "Dominant tre-art",
+                                    value = uiState.dominantTreeSpecies
                                 )
                             }
 
@@ -373,10 +317,9 @@ fun ScoreCard(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        val symbolCode = contextData?.currentWeather?.symbolCode
-                                        if (symbolCode != null) {
+                                        if (uiState.symbolCode != null) {
                                             val imageRes = context.resources.getIdentifier(
-                                                symbolCode,
+                                                uiState.symbolCode,
                                                 "drawable",
                                                 context.packageName
                                             )
@@ -391,9 +334,8 @@ fun ScoreCard(
                                         }
 
 
-                                        val currentTemp = contextData?.currentWeather?.temp
                                         Text(
-                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            text = uiState.currentTemp,
                                             style = MaterialTheme.typography.bodySmall,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -585,3 +527,14 @@ fun InfoCapsule(
     }
 }
 
+@Composable
+fun DisplayInfoItem(
+    label1: String, value1: String,
+    label2: String, value2: String,
+    modifier: Modifier = Modifier
+){
+    Row(modifier = Modifier.fillMaxWidth()){
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label1, value1)}
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label2, value2)}
+    }
+}
