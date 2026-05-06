@@ -85,7 +85,7 @@ fun MushroomInfoScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(Alignment.CenterStart, onNavigateBack)
+        BackButton(Alignment.CenterStart, MaterialTheme.colorScheme.onSurface, onNavigateBack)
 
         Spacer(modifier = Modifier.height(padding.outer))
         //warning with link to soppkontroll.no
@@ -159,12 +159,16 @@ fun MushroomInfoScreen(
             viewModel.onMushroomSelected(selected)
             onNavigateToMap()
         }) {
-            Text("Velg i kart")
+            Text(
+                text = "Velg i kart",
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Spacer(Modifier.width(padding.inner))
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
         Spacer(modifier = Modifier.height(padding.outer))
@@ -212,7 +216,7 @@ fun MushroomPropertyBadge(property: MushroomProperty) {
         Text(
             text = property.label,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSecondary
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

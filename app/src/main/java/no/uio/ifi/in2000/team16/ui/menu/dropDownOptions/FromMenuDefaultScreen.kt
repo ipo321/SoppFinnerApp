@@ -42,7 +42,7 @@ fun FromMenuDefaultScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(Alignment.CenterStart, onNavigateBack)
+        BackButton(Alignment.CenterStart, MaterialTheme.colorScheme.onSurface, onNavigateBack)
         Spacer(modifier=Modifier.height(Team16Theme.padding.outerMedium))
         Text(
             text = header,

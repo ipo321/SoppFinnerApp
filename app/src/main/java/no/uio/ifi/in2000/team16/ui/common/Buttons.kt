@@ -27,6 +27,7 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 @Composable
 fun BackButton(
     alignment: Alignment,
+    textColor: Color,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -38,12 +39,14 @@ fun BackButton(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "BackButton",
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(20.dp),
+                tint = textColor
             )
             Spacer(Modifier.width(padding.inner))
             Text(
                 text = stringResource(R.string.back_button),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = textColor
             )
         }
     }
