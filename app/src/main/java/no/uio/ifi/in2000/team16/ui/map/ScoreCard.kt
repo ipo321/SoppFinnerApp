@@ -1,12 +1,9 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-//Version-3.5
+//View-component that shows the scorecard in the app.
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +48,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import no.uio.ifi.in2000.team16.R
@@ -64,9 +60,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import no.uio.ifi.in2000.team16.ui.dev.GridRow
-import no.uio.ifi.in2000.team16.ui.dev.SectionHeader
-import no.uio.ifi.in2000.team16.ui.theme.SurfaceCream
+import androidx.compose.ui.zIndex
 
 //Initialize it with the arguments from the logic/MushroomScorer data.
 
@@ -135,7 +129,7 @@ fun ScoreCard(
                     ) {
                         Spacer(Modifier.height(24.dp))
 
-                        //The Score Cirlce itself:
+                        //The Score Circle itself:
                         Box(contentAlignment = Alignment.Center) {
                             ScoreCircle(score = uiState.score)
                             InfoCapsule(
@@ -357,6 +351,7 @@ fun ScoreCard(
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
                         .size(32.dp)
+                        .zIndex(1f)
                 ){
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -372,6 +367,7 @@ fun ScoreCard(
                     .align(Alignment.TopStart)
                     .padding(4.dp)
                     .size(32.dp)
+                    .zIndex(1f)
             ){
                 Icon(
                     painter = painterResource(
