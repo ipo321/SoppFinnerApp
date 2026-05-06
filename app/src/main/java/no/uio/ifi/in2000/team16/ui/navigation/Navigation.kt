@@ -171,6 +171,7 @@ fun Navigation(
 
             composable(MENU_SCREEN) {
                 MenuScreen(
+                    mapViewModel = mapViewModel,
                     navController = navController,
                     darkTheme = darkTheme,
                     onToggleTheme = onToggleTheme
