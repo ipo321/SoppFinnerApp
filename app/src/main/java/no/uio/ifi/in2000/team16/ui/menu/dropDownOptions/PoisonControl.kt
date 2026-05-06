@@ -6,8 +6,6 @@ import androidx.compose.runtime.Composable
 fun PoisonControl(
     onNavigateBack: () -> Unit,
 ){
-    //Test to so if it's loading in the terminal:
-    println("PoisonScreen loaded")
     FromMenuDefaultScreen(
         header = "Giftinformasjonen",
         body = "Dersom du mistenker soppforgiftning bør du ta kontakt med Giftinformasjonen umiddelbart. De kan nås hele døgnet.",

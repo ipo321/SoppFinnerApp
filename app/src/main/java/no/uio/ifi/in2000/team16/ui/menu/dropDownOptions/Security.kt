@@ -22,8 +22,6 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuViewModel
 fun Security(
     onNavigateBack: () -> Unit,
 ){
-    //Test to so if it's loading in the terminal:
-    println("Security loaded")
     FromMenuDefaultScreen(
         header = "Personvernerklæring",
         body = "Noe tekst",

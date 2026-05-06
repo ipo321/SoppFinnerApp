@@ -32,9 +32,6 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SettingsScreen
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.menu.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
@@ -181,25 +178,6 @@ fun Navigation(
                 )
             }
             //UNDER-ITEMS for Menu-screen
-            composable(SETTINGS_SCREEN) {
-                SettingsScreen(
-                    navController = navController,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    darkTheme = darkTheme,
-                    onToggleTheme = onToggleTheme,
-                )
-            }
-
-            composable(SHROOMSPOT_SCREEN) {
-                ShroomSpotScreen(navController = navController)
-            }
-
-            composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController)
-            }
-
             composable(INFO_SCREEN) {
                 InfoScreen(
                     onNavigateBack = {
