@@ -96,6 +96,7 @@ fun MushroomListScreen(
             //favorites column
             MushroomSelectionSection(
                 title = stringResource(R.string.mushroom_list_favorites),
+                isFavorites = true,
                 trailingLabel = stringResource(R.string.checkBox_description),
                 mushrooms = uiState.favorites,
                 selectedMushroom = selectedMushroom,
@@ -105,6 +106,7 @@ fun MushroomListScreen(
             //others column
             MushroomSelectionSection(
                 title = stringResource(R.string.mushroom_list_others),
+                isFavorites = false,
                 trailingLabel = stringResource(R.string.checkBox_description),
                 mushrooms = uiState.otherMushrooms,
                 selectedMushroom = selectedMushroom,
@@ -278,6 +280,7 @@ private fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
 @Composable
 private fun MushroomSelectionSection(
     title: String,
+    isFavorites: Boolean,
     trailingLabel: String? = null,
     mushrooms: List<Mushroom>,
     selectedMushroom: Mushroom?,
@@ -295,6 +298,12 @@ private fun MushroomSelectionSection(
         if (trailingLabel != null) {
             Text(text = trailingLabel, style = MaterialTheme.typography.labelLarge)
         }
+    }
+    if (isFavorites && mushrooms.isEmpty()) {
+        Text(
+            text = "Her kan du legge til favorittsoppene dine",
+            style = MaterialTheme.typography.labelLarge
+        )
     }
     mushrooms.forEach { mushroom ->
         MushroomListItem(
