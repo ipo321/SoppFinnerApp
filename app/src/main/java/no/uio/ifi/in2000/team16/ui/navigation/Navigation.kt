@@ -32,15 +32,13 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SettingsScreen
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.menu.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 
 const val MAP_SCREEN = "map"
@@ -79,7 +77,7 @@ fun Navigation(
     //A slights delay to show the loading screen before the app starts
     //Not good code practice
     LaunchedEffect(Unit) {
-        delay(2000) // 2 second delay
+        delay(2000) // 2 seconds delay
         isTimerFinished = true
 
     }
@@ -181,25 +179,6 @@ fun Navigation(
                 )
             }
             //UNDER-ITEMS for Menu-screen
-            composable(SETTINGS_SCREEN) {
-                SettingsScreen(
-                    navController = navController,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    darkTheme = darkTheme,
-                    onToggleTheme = onToggleTheme,
-                )
-            }
-
-            composable(SHROOMSPOT_SCREEN) {
-                ShroomSpotScreen(navController = navController)
-            }
-
-            composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(navController = navController)
-            }
-
             composable(INFO_SCREEN) {
                 InfoScreen(
                     onNavigateBack = {
@@ -253,6 +232,12 @@ fun Navigation(
                     onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
                     onNavigateToMap = { navController.navigate(MAP_SCREEN) },
                     viewModel = mushroomInfoViewModel
+                )
+            }
+
+            composable(SHROOMCONTROL_SCREEN) {
+                ShroomControlScreen(
+                    navController = navController
                 )
             }
 

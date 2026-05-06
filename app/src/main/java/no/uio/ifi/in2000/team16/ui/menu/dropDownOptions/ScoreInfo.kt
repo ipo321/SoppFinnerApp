@@ -23,8 +23,6 @@ import no.uio.ifi.in2000.team16.ui.common.BackButton
 fun ScoreInfo(
     onNavigateBack: () -> Unit,
 ){
-    //Test to so if it's loading in the terminal:
-    println("ScoreInfo loaded")
     FromMenuDefaultScreen(
         header = "Hvordan beregnes scoren?",
         body = "Det hentes ut informasjon fra en rekke api-er: " +

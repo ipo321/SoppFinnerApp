@@ -1,19 +1,18 @@
-package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
+package no.uio.ifi.in2000.team16.ui.mushroomInfo
 
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import no.uio.ifi.in2000.team16.ui.common.BackButton
-import no.uio.ifi.in2000.team16.ui.menu.MenuViewModel
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 
@@ -44,9 +43,9 @@ fun ShroomControlScreen(
         ) {
             BackButton(
                 alignment = Alignment.BottomStart,
+                textColor = MaterialTheme.colorScheme.secondary,
                 onNavigateBack = { navController.popBackStack() },
             )
         }
     }
 }
-

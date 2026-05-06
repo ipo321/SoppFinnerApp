@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.dp
 data class Padding(
     val noPadding: Dp = 0.dp,
     val inner: Dp = 8.dp,
+    val innerMedium: Dp = 12.dp,
     val outer: Dp = 16.dp,
     val outerMedium: Dp = 24.dp,
     val outerLarge: Dp = 32.dp,

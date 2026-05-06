@@ -67,19 +67,23 @@ fun MenuScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.secondary)
-            .padding(start = 24.dp, end = 24.dp, top = 24.dp),
+            .padding(
+                start = Team16Theme.padding.outerMedium,
+                end = Team16Theme.padding.outerMedium,
+                top = Team16Theme.padding.outerMedium
+            ),
     ) {
         Text(
             text = stringResource(R.string.meny),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(Team16Theme.padding.outerLarge))
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(Team16Theme.padding.innerMedium)
         ) {
             menuItems.forEach { item ->
                 MenuListItem(

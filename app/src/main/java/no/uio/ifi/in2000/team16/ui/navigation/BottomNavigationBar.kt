@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.ui.res.stringResource
 
 private val NavBarContentHeight = 64.dp //for the bottomBarSize
 @Composable
@@ -38,19 +39,19 @@ fun BottomNavigationBar(
     val navigationItems = listOf(
 
         BottombarNavItem(
-            title = "Soppesiden",
+            title = stringResource(R.string.mushroom_list_title),
             icon = painterResource(id= R.drawable.black_mushroom),
             route = MUSHROOM_LIST_SCREEN
         ),
         BottombarNavItem(
-            title = "Kart",
+            title = stringResource(R.string.kart_big_k),
             icon = rememberVectorPainter(Icons.Outlined.Map),
             route = MAP_SCREEN
         ),
 
 
         BottombarNavItem(
-            title = "Meny",
+            title = stringResource(R.string.meny),
             icon = rememberVectorPainter(Icons.Default.Menu),
             route = MENU_SCREEN
         )

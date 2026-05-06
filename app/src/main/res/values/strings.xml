@@ -44,4 +44,5 @@
     <string name="laster_inn_data">Laster inn data...</string>
     <string name="back_button">Tilbake</string>
     <string name="checkBox_description">Velg til kart</string>
+    <string name="kart_big_k">Kart</string>
 </resources>
