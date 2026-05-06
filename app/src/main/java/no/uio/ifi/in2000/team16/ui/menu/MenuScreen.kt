@@ -59,7 +59,7 @@ fun MenuScreen(
         MenuItemData("Mørkemodus", Icons.Default.Lightbulb, MENU_SCREEN),
         MenuItemData("Hvordan beregnes scoren?", Icons.AutoMirrored.Filled.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
-        MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROL),
+        MenuItemData("Ring Giftinformasjonen",Icons.Default.Call,POISON_CONTROL),
         MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
     )
 

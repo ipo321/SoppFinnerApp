@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.popUp
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,9 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -37,8 +42,9 @@ fun DialogWithImage(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(375.dp)
-                .padding(16.dp),
+                .height(400.dp)
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(
@@ -56,10 +62,13 @@ fun DialogWithImage(
                 )
                 Text(
                     text = "Advarsel",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Ikke dø!",
+                    text = "Noen sopparter kan være giftige. Vær sikker på at soppen er trygg før du spiser den. Ta kontakt med Giftinformasjonen dersom du mistenker å ha fått i deg giftig sopp.",
                     modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.labelMedium
                 )
                 Row(
                     modifier = Modifier
@@ -70,7 +79,11 @@ fun DialogWithImage(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("okay")
+                        Text(
+                            text = "Jeg forstår",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
 
                 }
