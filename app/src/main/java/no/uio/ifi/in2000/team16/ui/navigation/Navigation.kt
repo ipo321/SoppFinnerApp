@@ -116,11 +116,9 @@ fun Navigation(
     if (showMapWarning) {
         DialogWithImage(
             onDismissRequest = { showMapWarning = false },
-            onConfirmation = { showMapWarning = false },
             painter = painterResource(id = R.drawable.dead_sprite),
             imageDescription = "Warning image"
         )
-
     }
 
 

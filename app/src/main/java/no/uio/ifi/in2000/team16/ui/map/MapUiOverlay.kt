@@ -439,7 +439,8 @@ fun ColorRow(
                 )
                 Text(
                     text = text[index],
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
