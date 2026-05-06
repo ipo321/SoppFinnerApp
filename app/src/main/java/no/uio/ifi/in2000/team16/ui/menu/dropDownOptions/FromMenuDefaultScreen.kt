@@ -38,7 +38,11 @@ fun FromMenuDefaultScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(Team16Theme.padding.outerMedium)
+            .padding(
+                start = Team16Theme.padding.outerMedium,
+                end = Team16Theme.padding.outerMedium,
+                top = Team16Theme.padding.outerMedium
+            )
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

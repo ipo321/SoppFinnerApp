@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +16,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -48,7 +47,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
@@ -58,9 +56,8 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 
-/*
-Smaller elements on hte map like the center button, loading indicators and so on
-
+/**
+    Smaller elements on the map like the center button, loading indicators and so on
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +73,7 @@ fun MapComponents(
 ) {
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
-    Column() {
+    Column {
         Row(
             horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.outer),
             verticalAlignment = Alignment.Top,
@@ -176,11 +173,6 @@ fun MapMenu(
                 color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
-//        .border(
-//            width = Team16Theme.padding.borderWidthSmall,
-//            color = MaterialTheme.colorScheme.primaryContainer,
-//            shape = CircleShape
-//        ),
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = onClick) {
@@ -240,11 +232,6 @@ fun MapSearchBar(
         modifier = modifier
             .fillMaxWidth()
             .semantics { traversalIndex = 0f },
-//            .border(
-//                width = Team16Theme.padding.borderWidthSmall,
-//                color = MaterialTheme.colorScheme.primaryContainer,
-//                shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape
-//            ),
         colors = SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.background,
         ),
@@ -358,11 +345,6 @@ fun MushroomIcon(
             .clickable {
                 expanded = !expanded
             }
-//            .border(
-//                width = Team16Theme.padding.borderWidthSmall,
-//                color = MaterialTheme.colorScheme.primaryContainer,
-//                shape = CircleShape
-//            )
             .padding(Team16Theme.padding.inner)
     ) {
         if (expanded) {
@@ -370,8 +352,9 @@ fun MushroomIcon(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowForwardIos,
-                    contentDescription = "Pil fremover"
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                    contentDescription = "Pil fremover",
+                    tint =  MaterialTheme.colorScheme.onSurface
                 )
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -381,18 +364,20 @@ fun MushroomIcon(
                 ) {
                     Text(
                         text = stringResource(R.string.viser_resultater_for),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = selected.commonName,
                         fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
         }
 
-        Column() {
+        Column {
             MushroomImage(
                 selected = selected,
                 size = Team16Theme.padding.mapButtonsSize,
@@ -415,11 +400,6 @@ fun CentralizeMap(
                 color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
-//            .border(
-//                width = Team16Theme.padding.borderWidthSmall,
-//                color = MaterialTheme.colorScheme.primaryContainer,
-//                shape = CircleShape
-//            ),
         contentAlignment = Alignment.Center
     ) {
         IconButton(onClick = onClick) {
@@ -441,7 +421,7 @@ fun ColorRow(
     text: List<String>,
     modifier: Modifier = Modifier
 ) {
-    Column() {
+    Column {
         repeat(numberOfRows) { index ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.inner),
