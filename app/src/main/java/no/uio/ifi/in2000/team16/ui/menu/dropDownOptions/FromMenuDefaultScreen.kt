@@ -1,6 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
@@ -28,7 +29,7 @@ fun FromMenuDefaultScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.secondary)
             .padding(
                 start = Team16Theme.padding.outerMedium,
                 end = Team16Theme.padding.outerMedium,
@@ -37,7 +38,12 @@ fun FromMenuDefaultScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(Alignment.CenterStart, MaterialTheme.colorScheme.onSurface, onNavigateBack)
+        BackButton(
+            alignment = Alignment.CenterStart,
+            textColor =MaterialTheme.colorScheme.onSurface,
+            onNavigateBack = onNavigateBack,
+            borderColor = MaterialTheme.colorScheme.surface
+        )
         Spacer(modifier=Modifier.height(Team16Theme.padding.outerMedium))
         Text(
             text = header,

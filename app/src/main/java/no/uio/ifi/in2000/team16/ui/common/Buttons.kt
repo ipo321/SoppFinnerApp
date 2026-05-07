@@ -29,13 +29,17 @@ fun BackButton(
     alignment: Alignment,
     textColor: Color,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    borderColor: Color = MaterialTheme.colorScheme.secondary
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = alignment
     ) {
-        MushroomActionButton(onClick = onNavigateBack) {
+        MushroomActionButton(
+            onClick = onNavigateBack,
+            borderColor = borderColor
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "BackButton",
@@ -55,6 +59,7 @@ fun BackButton(
 @Composable
 fun MushroomActionButton(
     onClick: () -> Unit,
+    borderColor: Color = MaterialTheme.colorScheme.secondary,
     contentColor: Color = MaterialTheme.colorScheme.onPrimary,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -62,7 +67,7 @@ fun MushroomActionButton(
         onClick = onClick,
         modifier = Modifier.wrapContentSize(),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = contentColor),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+        border = BorderStroke(2.dp, borderColor),
         content = content
     )
 }

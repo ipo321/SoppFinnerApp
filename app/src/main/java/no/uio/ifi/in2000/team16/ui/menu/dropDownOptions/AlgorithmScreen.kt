@@ -1,9 +1,8 @@
 package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
@@ -14,10 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +28,6 @@ fun AlgorithmScreen(
     algorithmViewModel: AlgorithmViewModel,
     onNavigateBack: () -> Unit
 ) {
-    var isSelected by remember { mutableStateOf(false) }
     val alUiState = algorithmViewModel.uiState.collectAsState()
     val mapUiState = mapViewModel.uiState.collectAsState()
     val lat = mapUiState.value.lastClickedLat
@@ -41,41 +35,51 @@ fun AlgorithmScreen(
 
     FromMenuDefaultScreen(
         header = "Velg algoritme for beregning",
-        body = "Velg",
+        body = "Her kan du velge mellom tre ulike algoritmer for å beregne score for soppfunn. " +
+               "Standard-algoritmen er en lokal maskinlæringsmodell, men det er også mulig å velge " +
+               "en lokal forenklet algoritme, eller en KI-evaluering.",
         onNavigateBack = onNavigateBack,
         content = { AlgorithmScreenContent(
             uiState = alUiState,
             onClick = {
                 algorithmViewModel.onAlgorithmSelected(it)
                 if (lat != null && lon != null) mapViewModel.onMapClicked(lat, lon)
-                isSelected != isSelected
             },
-            isSelected = isSelected
         ) }
     )
 }
 
 @Composable
-fun ColumnScope.AlgorithmScreenContent(
+fun AlgorithmScreenContent(
     uiState: State<AlgorithmUiState>,
-    isSelected: Boolean,
     onClick: (String) -> Unit
 ) {
     val algorithms = uiState.value.availableAlgorithms
+    val active = uiState.value.activeAlgorithm
+
+    Spacer(modifier = Modifier.padding(padding.spacingSmall))
     algorithms.forEach { algorithm ->
+        val isSelected = (algorithm == active)
         AlgorithmCard(
             algorithm = algorithm,
             onClick = onClick,
             isSelected = isSelected
         )
+        Spacer(modifier = Modifier.padding(padding.spacingMinimum))
+        Text(
+            text = getAlgorithmDescription(algorithm),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.padding(padding.spacingSmall))
     }
 }
 
 @Composable
 fun AlgorithmCard(
     algorithm: String,
-    isSelected: Boolean,
     onClick: (String) -> Unit,
+    isSelected: Boolean,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -86,14 +90,16 @@ fun AlgorithmCard(
             modifier = modifier
                 .fillMaxWidth()
                 .algorithmCard(isSelected)
-                //.clickable { onClick(algorithm) }
-                .padding(padding.outer),
+                .padding(padding.inner),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = algorithm,
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp, end = 8.dp)
             )
             // Checkbox selects this algorithm for the calculation
             Checkbox(
@@ -112,10 +118,9 @@ fun AlgorithmCard(
 @Composable
 private fun Modifier.algorithmCard(isSelected: Boolean): Modifier {
     val borderWidth = if (isSelected) 4.dp else 2.dp
-    val borderColor = if (isSelected)
-        MaterialTheme.colorScheme.primary
-    else
-        MaterialTheme.colorScheme.outlineVariant
+    val borderColor =
+        if (isSelected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.outlineVariant
 
     return this
         .clip(MaterialTheme.shapes.medium)
@@ -125,3 +130,11 @@ private fun Modifier.algorithmCard(isSelected: Boolean): Modifier {
             shape = MaterialTheme.shapes.medium
         )
 }
+
+private fun getAlgorithmDescription(algorithm: String): String =
+    when (algorithm) {
+        "Forenklet" -> "Den lokale forenklede algoritmen er beregnet sånn og sånn"
+        "ML"    -> "Den lokale maskinlæringsmodellen bruker noe greier"
+        "KI"    -> "Kunstig intelligens bruker noe greier for å beregne"
+        else    -> ""
+    }

@@ -24,15 +24,24 @@ class ScorerProvider @Inject constructor(
             AlgorithmType.AI -> aiAlgorithm
         }
     }
-    fun setHeatAlgorithm(type: AlgorithmType) {
-        activeHeatScorer = when (type) {
-            AlgorithmType.BASIC -> BasicAlgorithm()
-            AlgorithmType.ML -> MlAlgorithm(context)
-            AlgorithmType.AI -> aiAlgorithm
+
+    fun getActiveAlgorithm(): AlgorithmType {
+        return when (activeScorer) {
+            is BasicAlgorithm -> AlgorithmType.BASIC
+            is MlAlgorithm -> AlgorithmType.ML
+            is AiAlgorithm -> AlgorithmType.AI
+            else -> AlgorithmType.ML
         }
     }
 }
 
 enum class AlgorithmType {
     BASIC, ML, AI
+}
+
+// Maps the type to the name used on screen
+fun AlgorithmType.toUiName(): String = when (this) {
+    AlgorithmType.BASIC -> "Forenklet"
+    AlgorithmType.ML    -> "ML"
+    AlgorithmType.AI    -> "KI"
 }

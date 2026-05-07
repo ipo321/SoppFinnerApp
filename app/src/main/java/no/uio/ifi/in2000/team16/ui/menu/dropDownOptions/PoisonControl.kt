@@ -57,7 +57,7 @@ fun ColumnScope.PoisonControlContent() {
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
     ) {
         Text("Ring Giftinformasjonen")
     }

@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.AlgorithmType
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
+import no.uio.ifi.in2000.team16.domain.logic.mushroom.toUiName
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import javax.inject.Inject
@@ -18,8 +19,8 @@ import javax.inject.Inject
 data class AlgorithmUiState(
     val selectedMushroom: Mushroom? = null,
     val availableMushrooms: List<Mushroom> = emptyList(),
-    val availableAlgorithms: List<String> = listOf("BASIC", "ML", "AI"),
-    val activeAlgorithm: String = "BASIC",
+    val availableAlgorithms: List<String> = listOf("ML", "Forenklet", "KI"),
+    val activeAlgorithm: String = "ML",
     val lastEvaluation: EvaluationResult? = null
 )
 
@@ -35,9 +36,10 @@ class AlgorithmViewModel @Inject constructor(
 
     init {
         val allMushrooms = speciesRepository.getAllMushrooms()
+        val currentType = scorerProvider.getActiveAlgorithm()
         _uiState.update { it.copy(
             availableMushrooms = allMushrooms,
-            activeAlgorithm = scorerProvider.activeScorer.javaClass.simpleName
+            activeAlgorithm = currentType.toUiName()
         )}
         viewModelScope.launch {
             speciesRepository.selectedMushroom.collect { globalSelectedMushroom ->
@@ -47,14 +49,17 @@ class AlgorithmViewModel @Inject constructor(
     }
 
     fun onAlgorithmSelected(version: String) {
-        val type = when(version) {
-            "Basic" -> AlgorithmType.BASIC
-            "ML" -> AlgorithmType.ML
-            "AI" -> AlgorithmType.AI
-            else -> AlgorithmType.BASIC
-        }
-
+        val type = version.toAlgorithmType()
         scorerProvider.setAlgorithm(type)
         _uiState.update { it.copy(activeAlgorithm = version) }
     }
+
+    // Maps the string type to the enum type
+    private fun String.toAlgorithmType(): AlgorithmType =
+        when (this) {
+            "Lokal" -> AlgorithmType.BASIC
+            "ML"    -> AlgorithmType.ML
+            "KI"    -> AlgorithmType.AI
+            else    -> AlgorithmType.ML // ML is default
+        }
 }
