@@ -30,6 +30,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -39,7 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -51,7 +52,7 @@ import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
@@ -74,14 +75,14 @@ fun MapComponents(
 
     Column {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.outer),
+            horizontalArrangement = Arrangement.spacedBy(padding.outer),
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
                 .padding(
-                    top = Team16Theme.padding.outer,
-                    start = Team16Theme.padding.outer,
-                    end = Team16Theme.padding.outer
+                    top = padding.outer,
+                    start = padding.outer,
+                    end = padding.outer
                 )
                 .semantics { isTraversalGroup = true }
         ) {
@@ -118,8 +119,8 @@ fun MapComponents(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(
-                    top = Team16Theme.padding.outer,
-                    end = Team16Theme.padding.outer
+                    top = padding.outer,
+                    end = padding.outer
                 )
         ) {
             MushroomIcon(
@@ -131,7 +132,7 @@ fun MapComponents(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(end = Team16Theme.padding.outer)
+                .padding(end = padding.outer)
         ) {
             CentralizeMap(
                 onClick = {
@@ -165,7 +166,12 @@ fun MapMenu(
 ) {
     Box(
         modifier = modifier
-            .size(Team16Theme.padding.mapButtonsSize)
+            .size(padding.mapButtonsSize)
+            .shadow(
+                elevation = padding.shadowElevationSmall,
+                shape = CircleShape,
+                clip = false
+            )
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
@@ -231,7 +237,7 @@ fun MapSearchBar(
         colors = SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.background,
         ),
-        shape = if (searchExpanded) RoundedCornerShape(Team16Theme.padding.inner) else CircleShape,
+        shape = if (searchExpanded) RoundedCornerShape(padding.inner) else CircleShape,
         inputField = {
             SearchBarDefaults.InputField(
                 modifier = Modifier.fillMaxWidth(),
@@ -286,14 +292,14 @@ fun MapSearchBar(
         },
         expanded = searchExpanded,
         onExpandedChange = onExpandedChange,
-        shadowElevation = Team16Theme.padding.noPadding,
-        tonalElevation = Team16Theme.padding.noPadding
+        shadowElevation = padding.shadowElevationSmall,
+        tonalElevation = padding.noPadding
     ) {
         // Displays search results in a scrollable column
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = Team16Theme.padding.searchResultHeight) // Max height of search result list
+                .heightIn(max = padding.searchResultHeight) // Max height of search result list
         ) {
             items(uiState.searchSuggestions) { suggestion ->
                 ListItem(
@@ -331,54 +337,57 @@ fun MushroomIcon(
 ) {
     val selected = mushroom ?: return
     var expanded by rememberSaveable { mutableStateOf(true) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .clip(MaterialTheme.shapes.large)
-            .background(
-                color = MaterialTheme.colorScheme.background
-            )
-            .clickable {
-                expanded = !expanded
-            }
-            .padding(Team16Theme.padding.inner)
+
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.background,
+        shadowElevation = padding.shadowElevationSmall,
     ) {
-        if (expanded) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
-                    contentDescription = "Pil fremover",
-                    tint =  MaterialTheme.colorScheme.onSurface
-                )
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(Team16Theme.padding.inner)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(padding.inner)
+        ) {
+            if (expanded) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.viser_resultater_for),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                        contentDescription = "Pil fremover",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
-                    Text(
-                        text = selected.commonName,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(padding.inner)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.viser_resultater_for),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = selected.commonName,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
-        }
 
-        Column {
-            MushroomImage(
-                selected = selected,
-                size = Team16Theme.padding.mapButtonsSize,
-                background = MaterialTheme.colorScheme.background
-            )
+            Column {
+                MushroomImage(
+                    selected = selected,
+                    size = padding.mapButtonsSize,
+                    background = MaterialTheme.colorScheme.background
+                )
+            }
         }
     }
 }
@@ -390,8 +399,13 @@ fun CentralizeMap(
 ) {
     Box(
         modifier = modifier
-            .padding(top = Team16Theme.padding.outer)
-            .size(Team16Theme.padding.mapButtonsSize)
+            .padding(top = padding.outer)
+            .size(padding.mapButtonsSize)
+            .shadow(
+                elevation = padding.shadowElevationSmall,
+                shape = CircleShape,
+                clip = false
+            )
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
@@ -420,17 +434,17 @@ fun ColorRow(
     Column {
         repeat(numberOfRows) { index ->
             Row(
-                horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.inner),
+                horizontalArrangement = Arrangement.spacedBy(padding.inner),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(
-                        start = Team16Theme.padding.outer,
+                        start = padding.outer,
                     )
             ) {
                 Box(
                     modifier = Modifier
-                        .size(Team16Theme.padding.colorExplanationSize)
+                        .size(padding.colorExplanationSize)
                         .background(colors[index])
                 )
                 Text(
