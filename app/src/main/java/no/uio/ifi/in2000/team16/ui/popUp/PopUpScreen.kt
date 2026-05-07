@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.popUp
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +39,7 @@ fun DialogWithImage(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+                .height(430.dp)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             shape = RoundedCornerShape(16.dp),
@@ -61,24 +65,26 @@ fun DialogWithImage(
                 Text(
                     text = "Noen sopparter kan være giftige. Vær sikker på at soppen er trygg før du spiser den. Ta kontakt med Giftinformasjonen dersom du mistenker å ha fått i deg giftig sopp.",
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    TextButton(
+                    OutlinedButton(
                         onClick = { onDismissRequest() },
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        Text(
-                            text = "Jeg forstår",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-
+                        modifier = Modifier.wrapContentSize(),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                        content = {
+                            Text(
+                                text = "Jeg forstår",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    )
                 }
             }
         }
