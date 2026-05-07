@@ -3,12 +3,14 @@ package no.uio.ifi.in2000.team16.ui.menu
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.AlgorithmType
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
-import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import javax.inject.Inject
@@ -54,20 +56,5 @@ class AlgorithmViewModel @Inject constructor(
 
         scorerProvider.setAlgorithm(type)
         _uiState.update { it.copy(activeAlgorithm = version) }
-    }
-    fun onMushroomSelected(mushroom: Mushroom) {
-        viewModelScope.launch {
-            speciesRepository.updateSelectedMushroom(mushroom)
-        }
-    }
-
-    fun recalculate(context: EnvironmentContext?) {
-        if (context == null) return
-        val mushroom = _uiState.value.selectedMushroom ?: return
-
-        viewModelScope.launch {
-            val result = scorerProvider.activeScorer.calculateScore(context, mushroom.profile)
-            _uiState.update { it.copy(lastEvaluation = result) }
-        }
     }
 }
