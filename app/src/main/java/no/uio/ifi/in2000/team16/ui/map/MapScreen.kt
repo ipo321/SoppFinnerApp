@@ -7,10 +7,12 @@ import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
+import android.view.ViewGroup
 import org.maplibre.android.camera.CameraPosition
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -155,11 +159,39 @@ fun MapScreenSurface(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .onGloballyPositioned { parentBounds ->
+                val parentHeightPx = parentBounds.size.height
+
+                mapView.post {
+                    // post runs after layout calculations are done
+                    // Makes sure the layout parameters are the same as the parent's.
+                    // This fixes the recurring bug we have with the gap between map and nav-bar
+                    val lp = mapView.layoutParams
+                    if (lp != null && lp.height != parentHeightPx) {
+                        lp.height = parentHeightPx
+                        mapView.layoutParams = lp
+                        mapView.requestLayout()
+                    }
+                }
+            }
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(), //matchParentSize(),
-            factory = { mapView }
+            factory = { mapView },
+            update = { view ->
+                val lp = view.layoutParams
+                if (lp == null ||
+                    lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
+                    lp.height != ViewGroup.LayoutParams.MATCH_PARENT
+                ) {
+                    view.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                }
+            }
         )
         if (uiState.isFetchingHeatmap) {
             LinearProgressIndicator(
