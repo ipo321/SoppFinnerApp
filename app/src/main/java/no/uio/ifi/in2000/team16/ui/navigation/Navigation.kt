@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -124,7 +125,7 @@ fun Navigation(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets.systemBars
+        contentWindowInsets = WindowInsets.statusBars
             .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal), // Makes sure there is no extra padding over the bottom bar
         bottomBar = {
             if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
