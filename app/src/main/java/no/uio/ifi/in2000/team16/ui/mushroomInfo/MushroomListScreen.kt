@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,8 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.OpenInNew
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -45,7 +42,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.WarningBanner
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 
 
@@ -222,14 +218,14 @@ private fun MushroomControlBanner(onVisitSoppkontroll: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(padding.outer),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Logo + text row
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(id = R.drawable.soppkontroll_logo),
-                    contentDescription = "Soppkontroll logo",
+                    contentDescription = stringResource(R.string.soppkontroll_brand),
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
