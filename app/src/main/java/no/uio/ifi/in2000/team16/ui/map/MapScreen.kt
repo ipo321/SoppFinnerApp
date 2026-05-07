@@ -62,7 +62,6 @@ import kotlin.math.abs
 
 @Composable
 fun MapScreen(
-    onNavigateToDev: () -> Unit,
     mapViewModel: MapViewModel,
     isVisible: Boolean,
     onMapLoaded: () -> Unit,
@@ -140,7 +139,6 @@ fun MapScreen(
         onDispose{locationManager.removeUpdates(listener)}
     }
     MapScreenSurface(
-        onNavigateToDev = onNavigateToDev,
         searchTextFieldState = searchTextFieldState,
         mapView = mapView,
         mapViewModel = mapViewModel,
@@ -150,7 +148,6 @@ fun MapScreen(
 
 @Composable
 fun MapScreenSurface(
-    onNavigateToDev: () -> Unit,
     searchTextFieldState: TextFieldState,
     mapView: MapView,
     mapViewModel: MapViewModel,
@@ -176,7 +173,6 @@ fun MapScreenSurface(
             viewModel = mapViewModel,
             uiState = uiState,
             mapView = mapView,
-            onNavigateToDev = onNavigateToDev,
             textFieldState = searchTextFieldState,
             onSearch = { },
         )
