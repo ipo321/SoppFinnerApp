@@ -68,7 +68,7 @@ import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /**
  *  View-component that shows the scorecard in the app.
- *  Initialized with the arguments from the logic/MushroomScorer data.
+ *  Initialized with the arguments uiState from ScoreCardViewModel.
 */
 
 @Composable

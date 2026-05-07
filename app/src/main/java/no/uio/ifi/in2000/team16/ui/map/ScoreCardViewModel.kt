@@ -4,6 +4,12 @@ import android.os.Environment
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import kotlin.Int
 
+/**
+ *  ViewModel-component initialized with arguments from the
+ *  logic/MushroomScorer data, and connects to the scorecard-view.
+ */
+
+
 class ScoreCardUiState(
     val score: Int,
     val description: String,
