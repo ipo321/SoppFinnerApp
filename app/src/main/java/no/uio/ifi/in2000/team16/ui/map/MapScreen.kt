@@ -158,7 +158,7 @@ fun MapScreenSurface(
         modifier = modifier.fillMaxSize()
     ) {
         AndroidView(
-            modifier = Modifier.matchParentSize(),
+            modifier = Modifier.fillMaxSize(), //matchParentSize(),
             factory = { mapView }
         )
         if (uiState.isFetchingHeatmap) {
@@ -174,7 +174,7 @@ fun MapScreenSurface(
             uiState = uiState,
             mapView = mapView,
             textFieldState = searchTextFieldState,
-            onSearch = { },
+            onSearch = { }
         )
 
         when (uiState.screenStatus) {
@@ -212,7 +212,16 @@ fun getMapView(
             .textureMode(true)
 
         MapView(context, mode).apply { // mode are sent as argument here to fix the bug
-            ViewCompat.setOnApplyWindowInsetsListener(this) { _, _ -> WindowInsetsCompat.CONSUMED } //bottom gap fix
+//            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets -> //WindowInsetsCompat.CONSUMED } //bottom gap fix
+//                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//                view.setPadding(
+//                    view.paddingLeft,
+//                    view.paddingTop,
+//                    view.paddingRight,
+//                    0
+//                )
+//                insets
+//            }
             onCreate(null)
 
             getMapAsync { map ->

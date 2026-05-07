@@ -119,10 +119,11 @@ fun BottomNavigationBarPreview() {
     )
 }
 private fun parentTabRoute(route: String?): String? = when (route) {
-    MUSHROOM_LIST_SCREEN, MUSHROOM_INFO_SCREEN -> MUSHROOM_LIST_SCREEN
+    MUSHROOM_LIST_SCREEN, MUSHROOM_INFO_SCREEN,
+    SHROOMCONTROL_SCREEN                       -> MUSHROOM_LIST_SCREEN
     MAP_SCREEN                                 -> MAP_SCREEN
     MENU_SCREEN, INFO_SCREEN, POISON_CONTROL,
-    SCORE_INFO_SCREEN, SECURITY_SCREEN         -> MENU_SCREEN
-    SHROOMCONTROL_SCREEN                       -> MUSHROOM_LIST_SCREEN
+    SCORE_INFO_SCREEN, SECURITY_SCREEN,
+    ALGORITHM_SCREEN                           -> MENU_SCREEN
     else                                       -> route
 }

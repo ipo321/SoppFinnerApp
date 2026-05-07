@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.navigation
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -118,7 +119,8 @@ fun Navigation(
 
 
     Scaffold(
-        //contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
                 BottomNavigationBar(navController = navController)
@@ -145,9 +147,8 @@ fun Navigation(
             NavHost(
                 navController = navController,
                 startDestination = if (onboardingCompleted == true) MAP_SCREEN else ONBOARDING_SCREEN,
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxSize()
-                    //.padding(if (isMapVisible) PaddingValues(0.dp) else innerPadding)
             ) {
                 composable(ONBOARDING_SCREEN) {
                     OnboardingScreen(
