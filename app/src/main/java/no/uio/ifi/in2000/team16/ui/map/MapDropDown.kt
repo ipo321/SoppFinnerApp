@@ -37,7 +37,6 @@ Dropdown Menu for the map
 fun Dropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
     isSatelliteMode: Boolean = false,
@@ -53,7 +52,8 @@ fun Dropdown(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        offset = DpOffset(x = 0.dp, y = 10.dp)
+        offset = DpOffset(x = 0.dp, y = 10.dp),
+        containerColor = MaterialTheme.colorScheme.background
     ) {
 
 
@@ -125,19 +125,9 @@ fun Dropdown(
             )
         }
 
-        DropdownMenuItem(
-            text = { Text("Dev") },
-            leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-            onClick = {
-                onNavigateToDev()
-                onDismissRequest()
-            }
-        )
-
         HorizontalDivider()
 
         if (favoriteMushrooms.isNotEmpty()) {
-            //HorizontalDivider()
             Text(
                 text = "Velg sopp som vises på kartet:",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
@@ -176,7 +166,6 @@ fun DropdownPreview() {
     Dropdown(
         expanded = true,
         onDismissRequest = {},
-        onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
         isHeatmapEnabled = false,
         onToggleHistoricalFinds = {})
