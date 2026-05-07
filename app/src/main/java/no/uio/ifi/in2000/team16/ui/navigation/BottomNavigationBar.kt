@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 private val NavBarContentHeight = 64.dp //for the bottomBarSize
 @Composable
@@ -58,44 +60,50 @@ fun BottomNavigationBar(
     val activeRoute = parentTabRoute(currentRoute)
     val gestureInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()// Prevent bottom bar from overlapping system navigation
 
-    NavigationBar(
-       modifier = Modifier.height(NavBarContentHeight + gestureInset),
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 8.dp
+    Surface(
+        color = MaterialTheme.colorScheme.background,
+        shadowElevation = Team16Theme.padding.shadowElevationMedium
     ) {
-        navigationItems.forEachIndexed { index, item ->
-            NavigationBarItem(
-                selected = activeRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+        NavigationBar(
+            modifier = Modifier.height(NavBarContentHeight + gestureInset),
+            containerColor = MaterialTheme.colorScheme.background,
+            tonalElevation = 8.dp
+        ) {
+            navigationItems.forEach { item ->
+                NavigationBarItem(
+                    selected = activeRoute == item.route,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true }
-                },
-                icon = {
-                    Icon(
-                        painter = item.icon,
-                        contentDescription = item.title,
-                        modifier = Modifier.size(24.dp)
-                    )
-                },
-                label = {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    indicatorColor = MaterialTheme.colorScheme.surface,
+                    },
+                    icon = {
+                        Icon(
+                            painter = item.icon,
+                            contentDescription = item.title,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                        selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                        indicatorColor = MaterialTheme.colorScheme.surface,
 
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
-            )
+            }
         }
     }
 }
