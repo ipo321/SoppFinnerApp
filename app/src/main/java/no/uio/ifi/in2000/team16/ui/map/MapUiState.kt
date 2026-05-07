@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-import no.uio.ifi.in2000.team16.data.kartverket.Address
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
