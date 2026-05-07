@@ -110,9 +110,13 @@ fun isDarkMode(context: Context): Boolean {
     return darkModeFlag == Configuration.UI_MODE_NIGHT_YES
 }
 
-// Sets up the userPosition on the map.
-// Two stacked circle layers share a single source: a larger "pulse" ring
-// behind a smaller solid dot, giving the classic blue-dot look.
+/**
+ * Adds the user-location source and its two stacked circle layers to [style].
+ *
+ * The result is the classic blue dot: a larger pulse ring behind a smaller solid dot.
+ * The source starts empty — the actual coordinate is pushed in later as the
+ * location updates.
+ */
 fun setupUserLocationLayer(style: Style){
     val source = GeoJsonSource("user-location-source")
     style.addSource(source)
@@ -139,8 +143,14 @@ fun setupUserLocationLayer(style: Style){
     style.addLayer(dotLayer)
 }
 
-// Adds an empty source + symbol layer used to show the pin where the user has clicked.
-// The actual pin position is updated later by feeding GeoJSON into "clicked-source".
+/**
+ * Adds an empty source plus a [SymbolLayer] that renders the "pin-icon" image.
+ *
+ * Used to show where the user has tapped on the map. The pin's position is
+ * updated by feeding GeoJSON into the `clicked-source` source.
+ *
+ * @see addPinImage which must be called first to register the icon bitmap.
+ */
 fun setupPinIcon(style: Style) {
     val source = GeoJsonSource("clicked-source")
     style.addSource(source)
@@ -170,9 +180,14 @@ fun addPinImage(style: Style, context: Context) {
     style.addImage("pin-icon", bitmap)
 }
 
-// Adds the NIBIO "Satskog" forest WMS as a semi-transparent raster overlay.
-// The {bbox-epsg-3857} placeholder is filled in by MapLibre per tile request.
-// `isVisible` controls initial visibility so the layer can be toggled from the UI.
+/**
+ * Adds the NIBIO "Satskog" dominant-tree-species WMS as a semi-transparent raster overlay.
+ *
+ * The `{bbox-epsg-3857}` placeholder in the URL is filled in by MapLibre per tile request.
+ *
+ * @param isVisible initial visibility — lets the layer be toggled from the UI without
+ * re-adding it to the style.
+ */
 fun setupForestLayer(style: Style, isVisible: Boolean) {
     val satskogUrl = "https://wms.nibio.no/cgi-bin/satskog" +
             "?SERVICE=WMS" +
