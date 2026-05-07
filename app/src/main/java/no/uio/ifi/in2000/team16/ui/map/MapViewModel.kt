@@ -62,7 +62,7 @@ class MapViewModel @Inject constructor(
                     ) //Warmup to get scorer quicker
                     val scorer = scorerProvider.activeScorer
                     scorer.calculateScore(env, mushroom.profile)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
             }
         }
