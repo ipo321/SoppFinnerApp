@@ -35,6 +35,8 @@ import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
+import no.uio.ifi.in2000.team16.ui.menu.AlgorithmViewModel
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.AlgorithmScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
@@ -47,16 +49,11 @@ const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 const val ONBOARDING_SCREEN = "onboarding"
 const val MUSHROOM_LIST_SCREEN = "mushroomList"
 const val MENU_SCREEN = "menuScreen"
-const val SETTINGS_SCREEN = "menuScreen/settings"
-const val HISTORY_SCREEN = "menuScreen/history"
-const val SHROOMSPOT_SCREEN = "menuScreen/shroomSpots"
+const val ALGORITHM_SCREEN = "menuScreen/algorithm"
 const val INFO_SCREEN = "InfoScreen"
 const val SHROOMCONTROL_SCREEN = "mushroomInfo/shroomControl"
-
 const val SECURITY_SCREEN = "Security"
-
 const val SCORE_INFO_SCREEN = "ScoreInfo"
-
 const val POISON_CONTROL = "PoisonControll"
 
 
@@ -90,6 +87,7 @@ fun Navigation(
     val currentRoute = currentBackStackEntry?.destination?.route
     val mapViewModel: MapViewModel = hiltViewModel()
     val mushroomInfoViewModel: MushroomInfoViewModel = hiltViewModel()
+    val algorithmViewModel: AlgorithmViewModel = hiltViewModel()
     val mapUiState by mapViewModel.uiState.collectAsState()
 
     // Determine if the app is ready to transition away from the loading screen
@@ -116,11 +114,9 @@ fun Navigation(
     if (showMapWarning) {
         DialogWithImage(
             onDismissRequest = { showMapWarning = false },
-            onConfirmation = { showMapWarning = false },
             painter = painterResource(id = R.drawable.dead_sprite),
             imageDescription = "Warning image"
         )
-
     }
 
 
@@ -238,6 +234,14 @@ fun Navigation(
             composable(SHROOMCONTROL_SCREEN) {
                 ShroomControlScreen(
                     navController = navController
+                )
+            }
+
+            composable(ALGORITHM_SCREEN) {
+                AlgorithmScreen(
+                    mapViewModel = mapViewModel,
+                    algorithmViewModel = algorithmViewModel,
+                    onNavigateBack = { navController.navigate(MENU_SCREEN) }
                 )
             }
 
