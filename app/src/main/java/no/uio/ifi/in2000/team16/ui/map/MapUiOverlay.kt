@@ -66,7 +66,6 @@ fun MapComponents(
     viewModel: MapViewModel,
     uiState: MapScreenState,
     mapView: MapView,
-    onNavigateToDev: () -> Unit,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -96,7 +95,6 @@ fun MapComponents(
                     viewModel.setSearchBarExpanded(false)
                 },
                 onDismissRequest = { menuExpanded = false },
-                onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
                 viewModel = viewModel,
@@ -163,7 +161,6 @@ fun MapMenu(
     menuExpanded: Boolean,
     onClick: () -> Unit,
     onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -185,7 +182,6 @@ fun MapMenu(
         Dropdown(
             expanded = menuExpanded,
             onDismissRequest = onDismissRequest,
-            onNavigateToDev = onNavigateToDev,
             isHeatmapEnabled = uiState.isHeatmapEnabled,
             isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
             onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },

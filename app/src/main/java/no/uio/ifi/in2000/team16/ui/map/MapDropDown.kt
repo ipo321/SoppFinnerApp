@@ -37,7 +37,6 @@ Dropdown Menu for the map
 fun Dropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
     isSatelliteMode: Boolean = false,
@@ -126,15 +125,6 @@ fun Dropdown(
             )
         }
 
-        DropdownMenuItem(
-            text = { Text("Dev") },
-            leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-            onClick = {
-                onNavigateToDev()
-                onDismissRequest()
-            }
-        )
-
         HorizontalDivider()
 
         if (favoriteMushrooms.isNotEmpty()) {
@@ -176,7 +166,6 @@ fun DropdownPreview() {
     Dropdown(
         expanded = true,
         onDismissRequest = {},
-        onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
         isHeatmapEnabled = false,
         onToggleHistoricalFinds = {})

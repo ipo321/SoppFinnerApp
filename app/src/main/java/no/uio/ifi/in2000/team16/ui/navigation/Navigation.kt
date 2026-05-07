@@ -4,47 +4,44 @@ import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
-import kotlinx.coroutines.delay
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.currentBackStackEntryAsState
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
-import no.uio.ifi.in2000.team16.ui.dev.DevScreen
+import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.delay
+import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
-import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
-import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
-import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
-import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
-import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
 import no.uio.ifi.in2000.team16.ui.menu.AlgorithmViewModel
+import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.AlgorithmScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
+import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
+import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
+import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 
 const val MAP_SCREEN = "map"
-const val DEV_SCREEN = "dev"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
 const val ONBOARDING_SCREEN = "onboarding"
 const val MUSHROOM_LIST_SCREEN = "mushroomList"
@@ -138,7 +135,6 @@ fun Navigation(
 
             if (onboardingCompleted == true && currentRoute != ONBOARDING_SCREEN) {
                 MapScreen(
-                    onNavigateToDev = { navController.navigate(DEV_SCREEN) },
                     mapViewModel = mapViewModel,
                     isVisible = isMapVisible,
                     onMapLoaded = { isMapLoaded = true },
@@ -199,15 +195,6 @@ fun Navigation(
                     onNavigateBack = {
                         navController.popBackStack()
                     })
-            }
-            composable(DEV_SCREEN) {
-                val devViewModel: DevViewModel = hiltViewModel()
-                DevScreen(
-                    mapViewModel = mapViewModel,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
             }
 
             composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
