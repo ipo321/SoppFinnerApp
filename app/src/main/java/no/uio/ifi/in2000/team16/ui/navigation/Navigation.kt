@@ -3,8 +3,11 @@ package no.uio.ifi.in2000.team16.ui.navigation
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +44,7 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 const val MAP_SCREEN = "map"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
@@ -120,7 +124,8 @@ fun Navigation(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = WindowInsets.systemBars
+            .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal), // Makes sure there is no extra padding over the bottom bar
         bottomBar = {
             if(currentRoute!=ONBOARDING_SCREEN) {       //Hides the bottom bar when onboarding happens
                 BottomNavigationBar(navController = navController)
