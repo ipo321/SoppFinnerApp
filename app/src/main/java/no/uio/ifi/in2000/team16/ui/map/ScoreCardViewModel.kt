@@ -1,6 +1,5 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-import android.os.Environment
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import kotlin.Int
 
@@ -42,7 +41,7 @@ fun EnvironmentContext.toUiState(score: Int, description: String): ScoreCardUiSt
         currentTemp = w?.temp?.let { "${it.toInt()}°C" } ?: "--",
         rain =w?.rain?.let {"$it mm"} ?: "--",
         humidity = w?.humidity?.let {"%.2f%%".format(it)} ?: "--",
-        windSpeed = w?.windSpeed.let{"$it m/s"} ?: "--",
+        windSpeed = w?.windSpeed.let{"$it m/s"},
         minTemp = h?.minTempPast14Days?.let { "%.1f°C".format(it) } ?: "--",
         maxTemp = h?.maxTempPast14Days?.let { "%.1f°C".format(it) } ?: "--",
         sprucePercent = "${f?.sprucePercentage ?: "--"}%",
