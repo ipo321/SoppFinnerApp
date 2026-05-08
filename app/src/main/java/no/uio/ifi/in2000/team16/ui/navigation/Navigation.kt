@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,12 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
 import kotlinx.coroutines.delay
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.currentBackStackEntryAsState
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
-import no.uio.ifi.in2000.team16.ui.dev.DevScreen
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
 import no.uio.ifi.in2000.team16.ui.map.MapScreen
@@ -48,26 +48,13 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ProfileScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
-import no.uio.ifi.in2000.team16.ui.loading.LoadingScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.SettingsScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.minSide.ShroomSpotScreen
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
-import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.ui.dev.DevViewModel
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.InfoScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.HelpScreen
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.PoisonControl
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.minSide.dropDownOptions.ScoreInfo
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
+
 
 const val MAP_SCREEN = "map"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
