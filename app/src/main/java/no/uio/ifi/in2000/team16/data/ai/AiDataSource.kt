@@ -6,6 +6,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
@@ -45,13 +46,15 @@ class AiDataSource @Inject constructor(
             temperature = 0.2
         )
         return try{
-            val response: ChatResponse = client.post(azureEndpoint) {
+            val raw = client.post(azureEndpoint) {
                 contentType(ContentType.Application.Json)
                 header("api-key", azureKey)
                 header("Authorization", "Bearer $azureKey")
                 setBody(request)
-            }.body()
+            }.bodyAsText()
 
+            Log.d("T16_Ai_DataSource", "AI raw: $raw")
+            val response: ChatResponse = jsonParser.decodeFromString(raw)
             val aiResponseString = response.output[0].content[0].text
             Log.d("T16_Ai_DataSource", "Answer from AI: $aiResponseString")
 

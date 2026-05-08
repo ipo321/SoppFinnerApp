@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.navigation
 
 import android.content.Context
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,6 +37,7 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
@@ -47,7 +45,6 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
 import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 const val MAP_SCREEN = "map"
 const val MUSHROOM_INFO_SCREEN = "mushroomInfo"
@@ -60,6 +57,7 @@ const val SHROOMCONTROL_SCREEN = "mushroomInfo/shroomControl"
 const val SECURITY_SCREEN = "Security"
 const val SCORE_INFO_SCREEN = "ScoreInfo"
 const val POISON_CONTROL = "PoisonControll"
+const val HELP_SCREEN = "menuScreen/helpScreen"
 
 
 @Composable
@@ -237,6 +235,12 @@ fun Navigation(
                 AlgorithmScreen(
                     mapViewModel = mapViewModel,
                     algorithmViewModel = algorithmViewModel,
+                    onNavigateBack = { navController.navigate(MENU_SCREEN) }
+                )
+            }
+
+            composable(HELP_SCREEN) {
+                HelpScreen(
                     onNavigateBack = { navController.navigate(MENU_SCREEN) }
                 )
             }
