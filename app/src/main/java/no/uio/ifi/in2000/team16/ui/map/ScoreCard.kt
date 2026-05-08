@@ -163,7 +163,7 @@ fun ScoreCard(
 
                         //Rows intended for extra info like humidity exct :
 
-                        DisplayInfoItem("Snitt-temp", uiState.avgTemp,
+                        DisplayInfoItem("Snitt-temp (14d)", uiState.avgTemp,
                             "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
@@ -290,7 +290,7 @@ fun ScoreCard(
                         Spacer(Modifier.height(16.dp))
 
                         DisplayInfoItem(
-                            "Snitt-temp",uiState.avgTemp,
+                            "Snitt-temp (14d)",uiState.avgTemp,
                             "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
