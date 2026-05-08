@@ -259,6 +259,10 @@ class MapViewModel @Inject constructor(
         fetchHeatmapData(expanded)
     }
 
+    fun onInitialCenterDone() {
+        _uiState.update { it.copy(hasCenteredInitially = true) }
+    }
+
     fun toggleSatellite() {
         _uiState.update { it.copy(isSatelliteMode = !it.isSatelliteMode) }
     }

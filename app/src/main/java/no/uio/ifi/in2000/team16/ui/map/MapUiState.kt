@@ -30,7 +30,8 @@ data class MapScreenState(
     val searchSuggestions: List<SearchableLocation> = emptyList(),
     val isSearchBarExpanded: Boolean = false,
     val userLocation: LatLng? = null,
-    val moveCameraToUser: Boolean = false
+    val moveCameraToUser: Boolean = false,
+    val hasCenteredInitially: Boolean = false,
 )
 
 
