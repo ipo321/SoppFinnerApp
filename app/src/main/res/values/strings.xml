@@ -42,4 +42,16 @@
     <string name="soppkontroll_visit_button">Besøk Soppkontroll.no</string>
     <string name="warning_not_for_identification">OBS: Dette er ikke en app for identifikasjon av sopp</string>
     <string name="laster_inn_data">Laster inn data...</string>
+    <string name="back_button">Tilbake</string>
+    <string name="checkBox_description">Velg til kart</string>
+    <string name="kart_big_k">Kart</string>
+
+    <string name="mushroom_info_warning_text">Aldri spis sopp du er usikker på.</string>
+    <string name="mushroom_info_warning_link">Se Soppkontroll.no for informasjon</string>
+    <string name="mushroom_info_in_season">I sesong</string>
+    <string name="mushroom_info_not_in_season">Ikke i sesong</string>
+    <string name="mushroom_info_remove_favorite">Fjern fra favoritter</string>
+    <string name="mushroom_info_add_favorite">Legg til i favoritter</string>
+    <string name="mushroom_info_select_on_map">Velg i kart</string>
+    <string name="mushroom_info_about_header">Om soppen</string>
 </resources>

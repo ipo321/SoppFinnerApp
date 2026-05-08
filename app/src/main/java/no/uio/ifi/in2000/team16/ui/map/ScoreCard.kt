@@ -1,14 +1,17 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-//Version-3.5
-
-import androidx.compose.animation.AnimatedVisibility
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,55 +23,53 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import no.uio.ifi.in2000.team16.ui.theme.*
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import no.uio.ifi.in2000.team16.R
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import no.uio.ifi.in2000.team16.ui.dev.GridRow
-import no.uio.ifi.in2000.team16.ui.dev.SectionHeader
-import no.uio.ifi.in2000.team16.ui.theme.SurfaceCream
+import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
+import no.uio.ifi.in2000.team16.ui.theme.ScoreHigh
+import no.uio.ifi.in2000.team16.ui.theme.ScoreLow
+import no.uio.ifi.in2000.team16.ui.theme.ScoreMediumHigh
+import no.uio.ifi.in2000.team16.ui.theme.ScoreMediumLow
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
-//Initialize it with the arguments from the logic/MushroomScorer data.
+/**
+ *  View-component that shows the scorecard in the app.
+ *  Initialized with the arguments uiState from ScoreCardViewModel.
+*/
 
 @Composable
 fun BoxScope.InfoPopUp(
@@ -78,12 +79,12 @@ fun BoxScope.InfoPopUp(
     contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
+    val uiState = contextData?.toUiState(score, msg) ?: return
+
     ScoreCard(
-        score = score,
-        description = msg,
-        contextData = contextData,
+        uiState = uiState,
         onDismiss = onDismiss,
-        modifier = Modifier
+        modifier = modifier
             .align(Alignment.BottomCenter)
             .fillMaxWidth()
             .padding(
@@ -95,29 +96,22 @@ fun BoxScope.InfoPopUp(
     )
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 fun ScoreCard(
+    uiState: ScoreCardUiState,
     modifier: Modifier = Modifier,
-    description: String,
-    score: Int,
     onDismiss: (() -> Unit)? = null,
-    contextData: EnvironmentContext?
 ) {
     val context = LocalContext.current
-    //controls weather the card is extended or not
+    //controls whether the card is extended or not
     var isExpanded by remember {mutableStateOf(false)}
-
-    val w = contextData?.currentWeather
-    val h = contextData?.weatherHistory
-    val f = contextData?.forestData
-    val t = contextData?.terrainData
-
 
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Team16Theme.padding.shadowElevationMedium)
     ) {
         Box(modifier = Modifier.fillMaxWidth()){
 
@@ -137,15 +131,15 @@ fun ScoreCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
-                            .padding(top = 8.dp),
+                            .padding(Team16Theme.padding.outer)
+                            .padding(top = Team16Theme.padding.inner),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacing))
 
-                        //The Score Cirlce itself:
+                        //The Score Circle itself:
                         Box(contentAlignment = Alignment.Center) {
-                            ScoreCircle(score = score)
+                            ScoreCircle(score = uiState.score)
                             InfoCapsule(
                                 infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
                                         " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
@@ -156,27 +150,21 @@ fun ScoreCard(
                             )
                         }
 
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacingMinimum))
 
                         Text(
-                            text = description,
+                            text = uiState.description,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
-                        Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(Team16Theme.padding.spacingSmall))
 
                         //Rows intended for extra info like humidity exct :
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+
+                        DisplayInfoItem("Snitt-temp", uiState.avgTemp,
+                            "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
 
@@ -185,12 +173,11 @@ fun ScoreCard(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val rain = contextData?.weatherHistory?.totalRainPast14Days
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
-                                    label = "Nedbør (14 dgr)",
-                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
+                                    label = "Dominant tre-art",
+                                    value = uiState.dominantTreeSpecies
                                 )
                             }
 
@@ -201,14 +188,13 @@ fun ScoreCard(
                                     Text(
                                         text = "Været nå",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Row(verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center) {
-                                        val symbolCode = contextData?.currentWeather?.symbolCode
-                                        if (symbolCode != null) {
+                                        if (uiState.symbolCode != null) {
                                             val imageRes = context.resources.getIdentifier(
-                                                symbolCode,
+                                                uiState.symbolCode,
                                                 "drawable",
                                                 context.packageName
                                             )
@@ -223,11 +209,11 @@ fun ScoreCard(
                                         }
 
 
-                                        val currentTemp = contextData?.currentWeather?.temp
                                         Text(
-                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            text = uiState.currentTemp,
                                             style = MaterialTheme.typography.bodySmall,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
@@ -237,63 +223,32 @@ fun ScoreCard(
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Temp", "${w?.temp?.toInt() ?: "--"}°C")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Regn", "${w?.rain ?: "--"} mm")
-                            }
-                        }
+
+                        DisplayInfoItem(
+                            "Temp", uiState.currentTemp,
+                            "Regn", uiState.rain
+                        )
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Fukt",
-                                    w?.humidity?.let {"%.2f%%".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Vind", "${w?.windSpeed ?: "--"} m/s")
-                            }
-                        }
+                        DisplayInfoItem("Fukt", uiState.humidity,
+                            "Vind", uiState.windSpeed)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Minste temp",
-                                    h?.minTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
-
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Max temp",
-                                    h?.maxTempPast14Days?.let { "%.1f°C".format(it) } ?: "--")
-
-                            }
-                        }
+                        DisplayInfoItem("Minste temp",uiState.minTemp,
+                            "Max temp", uiState.maxTemp)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Gran", "${f?.sprucePercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Furu", "${f?.pinePercentage ?: "--"}%")
-                            }
-                        }
+
+                        DisplayInfoItem("Gran", uiState.sprucePercent,
+                            "Furu", uiState.pinePercent)
 
                         Spacer(Modifier.height(20.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Lauv", "${f?.broadleafPercentage ?: "--"}%")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Bonitet", f?.fertilityCategory ?: "--")
-                            }
-                        }
+                        DisplayInfoItem("Lauv", uiState.broadleafPercent,
+                            "Bonitet", uiState.fertility)
 
                         Spacer(Modifier.height(20.dp))
                     }
@@ -312,7 +267,7 @@ fun ScoreCard(
 
                         //The Score Cirlce itself:
                         Box(contentAlignment = Alignment.Center) {
-                            ScoreCircle(score = score)
+                            ScoreCircle(score = uiState.score)
                             InfoCapsule(
                                 infoText = "Scoren viser hvor godt egnet punktet pin-en er satt på er for " +
                                         " å finne sopp på en skala fra 0-100. Den baserer seg på værhistorikk og " +
@@ -326,23 +281,17 @@ fun ScoreCard(
                         Spacer(Modifier.height(10.dp))
 
                         Text(
-                            text = description,
+                            text = uiState.description,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
 
                         Spacer(Modifier.height(16.dp))
 
-                        Row(modifier = Modifier.fillMaxWidth()){
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Snitt-temp",
-                                    h?.avgTempPast14Days.let {"%.1f°C".format(it)} ?: "--")
-                            }
-                            Box(Modifier.weight(1f), contentAlignment = Alignment.Center){
-                                InfoItem("Nedbør (14d)",
-                                    h?.totalRainPast14Days?.let { "%.1f mm".format(it) } ?: "--")
-                            }
-                        }
+                        DisplayInfoItem(
+                            "Snitt-temp",uiState.avgTemp,
+                            "Nedbør (14d)", uiState.totalRain)
 
                         Spacer(Modifier.height(20.dp))
 
@@ -351,12 +300,11 @@ fun ScoreCard(
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val rain = contextData?.weatherHistory?.totalRainPast14Days
                             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
 
                                 InfoItem(
-                                    label = "Nedbør (14 dgr)",
-                                    value = if (rain != null) "%.1f mm".format(rain) else "--"
+                                    label = "Dominant tre-art",
+                                    value = uiState.dominantTreeSpecies
                                 )
                             }
 
@@ -367,16 +315,15 @@ fun ScoreCard(
                                     Text(
                                         text = "Været nå",
                                         style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        val symbolCode = contextData?.currentWeather?.symbolCode
-                                        if (symbolCode != null) {
+                                        if (uiState.symbolCode != null) {
                                             val imageRes = context.resources.getIdentifier(
-                                                symbolCode,
+                                                uiState.symbolCode,
                                                 "drawable",
                                                 context.packageName
                                             )
@@ -391,9 +338,8 @@ fun ScoreCard(
                                         }
 
 
-                                        val currentTemp = contextData?.currentWeather?.temp
                                         Text(
-                                            text = if (currentTemp != null) "${currentTemp.toInt()}°C" else "--",
+                                            text = uiState.currentTemp,
                                             style = MaterialTheme.typography.bodySmall,
                                             fontWeight = FontWeight.Bold
                                         )
@@ -405,7 +351,7 @@ fun ScoreCard(
                 }
             }
 
-            //Always visibles in same spaces:
+            //Always visible in same spaces:
 
             // Close button up in the corner
             if(onDismiss != null){
@@ -415,11 +361,12 @@ fun ScoreCard(
                         .align(Alignment.TopEnd)
                         .padding(4.dp)
                         .size(32.dp)
+                        .zIndex(1f)
                 ){
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Lukk",
-                        tint = MaterialTheme.colorScheme.primaryContainer
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -430,14 +377,16 @@ fun ScoreCard(
                     .align(Alignment.TopStart)
                     .padding(4.dp)
                     .size(32.dp)
+                    .zIndex(1f)
             ){
                 Icon(
+                    modifier = Modifier.scale(scaleX = -1f, scaleY = 1f), // mirrors the icon
                     painter = painterResource(
                         id = if(isExpanded)R.drawable.close_fullscreen_24px
                         else R.drawable.open_in_full_24px
                     ),
                     contentDescription = if(isExpanded) "Krymp" else "Utvid",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -449,8 +398,8 @@ fun ScoreCard(
 @Composable
 fun InfoItem(label: String, value: String){
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
@@ -523,7 +472,7 @@ fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
                 Text(
                     text = score.toString(),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.surface
+                    color = MaterialTheme.colorScheme.background
                 )
             }
 
@@ -548,12 +497,12 @@ fun InfoCapsule(
         Surface(
             onClick = { isExpanded = !isExpanded },
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            color = MaterialTheme.colorScheme.background
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_info_outline_24),
                 contentDescription = "Info",
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .padding(6.dp)
                     .size(18.dp)
@@ -585,3 +534,14 @@ fun InfoCapsule(
     }
 }
 
+@Composable
+fun DisplayInfoItem(
+    label1: String, value1: String,
+    label2: String, value2: String,
+    modifier: Modifier = Modifier
+){
+    Row(modifier = modifier.fillMaxWidth()){
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label1, value1)}
+        Box(Modifier.weight(1f), contentAlignment = Alignment.Center){InfoItem(label2, value2)}
+    }
+}

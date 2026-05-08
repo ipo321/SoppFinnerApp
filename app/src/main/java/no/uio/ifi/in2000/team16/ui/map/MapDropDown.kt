@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.map
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Check
@@ -19,11 +20,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /*
 Dropdown Menu for the map
@@ -33,7 +37,6 @@ Dropdown Menu for the map
 fun Dropdown(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit = {},
     onToggleHeatMap: () -> Unit = {},
     isHeatmapEnabled: Boolean = false,
     isSatelliteMode: Boolean = false,
@@ -49,7 +52,8 @@ fun Dropdown(
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        offset = DpOffset(x = 0.dp, y = 10.dp)
+        offset = DpOffset(x = 0.dp, y = 10.dp),
+        containerColor = MaterialTheme.colorScheme.background
     ) {
 
 
@@ -81,8 +85,14 @@ fun Dropdown(
         }
 
         DropdownMenuItem(
-            text = { Text(if (isHistoricalFindsEnabled) "Skru av historiske funn" else "Skru på historiske funn") },
-            leadingIcon = { Icon(Icons.Outlined.Book, contentDescription = null) },
+            text = { Text(if (isHistoricalFindsEnabled) "Skjul funn fra Artsdatabanken" else "Vis funn fra Artsdatabanken") },
+            leadingIcon = { Icon(
+                painter = painterResource(R.drawable.black_mushroom),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(start = 4.dp)
+            ) },
             onClick = {
                 onToggleHistoricalFinds()
                 onDismissRequest()
@@ -115,19 +125,9 @@ fun Dropdown(
             )
         }
 
-        DropdownMenuItem(
-            text = { Text("Dev") },
-            leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-            onClick = {
-                onNavigateToDev()
-                onDismissRequest()
-            }
-        )
-
         HorizontalDivider()
 
         if (favoriteMushrooms.isNotEmpty()) {
-            //HorizontalDivider()
             Text(
                 text = "Velg sopp som vises på kartet:",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
@@ -166,7 +166,6 @@ fun DropdownPreview() {
     Dropdown(
         expanded = true,
         onDismissRequest = {},
-        onNavigateToDev = {},
         isHistoricalFindsEnabled = false,
         isHeatmapEnabled = false,
         onToggleHistoricalFinds = {})

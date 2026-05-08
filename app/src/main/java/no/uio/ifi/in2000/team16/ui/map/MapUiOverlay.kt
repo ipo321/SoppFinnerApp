@@ -1,13 +1,11 @@
 package no.uio.ifi.in2000.team16.ui.map
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -18,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Navigation
@@ -28,8 +27,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -39,29 +40,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 
-/*
-Smaller elements on hte map like the center button, loading indicators and so on
-
+/**
+    Smaller elements on the map like the center button, loading indicators and so on
  */
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,23 +67,22 @@ fun MapComponents(
     viewModel: MapViewModel,
     uiState: MapScreenState,
     mapView: MapView,
-    onNavigateToDev: () -> Unit,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var menuExpanded by rememberSaveable { mutableStateOf(false) }
 
-    Column() {
+    Column {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.outer),
+            horizontalArrangement = Arrangement.spacedBy(padding.outer),
             verticalAlignment = Alignment.Top,
             modifier = modifier
                 .fillMaxWidth()
                 .padding(
-                    top = Team16Theme.padding.outer,
-                    start = Team16Theme.padding.outer,
-                    end = Team16Theme.padding.outer
+                    top = padding.outer,
+                    start = padding.outer,
+                    end = padding.outer
                 )
                 .semantics { isTraversalGroup = true }
         ) {
@@ -100,7 +96,6 @@ fun MapComponents(
                     viewModel.setSearchBarExpanded(false)
                 },
                 onDismissRequest = { menuExpanded = false },
-                onNavigateToDev = onNavigateToDev
             )
             MapSearchBar(
                 viewModel = viewModel,
@@ -124,8 +119,8 @@ fun MapComponents(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(
-                    top = Team16Theme.padding.outer,
-                    end = Team16Theme.padding.outer
+                    top = padding.outer,
+                    end = padding.outer
                 )
         ) {
             MushroomIcon(
@@ -137,7 +132,7 @@ fun MapComponents(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(end = Team16Theme.padding.outer)
+                .padding(end = padding.outer)
         ) {
             CentralizeMap(
                 onClick = {
@@ -167,14 +162,18 @@ fun MapMenu(
     menuExpanded: Boolean,
     onClick: () -> Unit,
     onDismissRequest: () -> Unit,
-    onNavigateToDev: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .size(Team16Theme.padding.mapButtonsSize)
+            .size(padding.mapButtonsSize)
+            .shadow(
+                elevation = padding.shadowElevationSmall,
+                shape = CircleShape,
+                clip = false
+            )
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
         contentAlignment = Alignment.Center
@@ -189,7 +188,6 @@ fun MapMenu(
         Dropdown(
             expanded = menuExpanded,
             onDismissRequest = onDismissRequest,
-            onNavigateToDev = onNavigateToDev,
             isHeatmapEnabled = uiState.isHeatmapEnabled,
             isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
             onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
@@ -237,9 +235,9 @@ fun MapSearchBar(
             .fillMaxWidth()
             .semantics { traversalIndex = 0f },
         colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
-        shape = if (searchExpanded) RoundedCornerShape(8.dp) else CircleShape,
+        shape = if (searchExpanded) RoundedCornerShape(padding.inner) else CircleShape,
         inputField = {
             SearchBarDefaults.InputField(
                 modifier = Modifier.fillMaxWidth(),
@@ -269,13 +267,12 @@ fun MapSearchBar(
                             onClick = {
                                 textFieldState.edit { replace(0, length, "") }
                                 viewModel.onSearchQueryChanged("")
-                                //onExpandedChange(false)
                             }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.tom_sok),
-                                tint = MaterialTheme.colorScheme.primaryContainer
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -295,19 +292,20 @@ fun MapSearchBar(
         },
         expanded = searchExpanded,
         onExpandedChange = onExpandedChange,
-        shadowElevation = Team16Theme.padding.noPadding,
-        tonalElevation = Team16Theme.padding.noPadding
+        shadowElevation = padding.shadowElevationSmall,
+        tonalElevation = padding.noPadding
     ) {
         // Displays search results in a scrollable column
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = Team16Theme.padding.searchResultHeight) // Max height of search result list
+                .heightIn(max = padding.searchResultHeight) // Max height of search result list
         ) {
             items(uiState.searchSuggestions) { suggestion ->
                 ListItem(
                     headlineContent = { Text(suggestion.title) },
                     supportingContent = { Text(suggestion.subtitle) },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { // each item is clickable
@@ -339,43 +337,57 @@ fun MushroomIcon(
 ) {
     val selected = mushroom ?: return
     var expanded by rememberSaveable { mutableStateOf(true) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .clip(MaterialTheme.shapes.large)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
-            .padding(Team16Theme.padding.inner)
-            .clickable {
-                expanded = !expanded
-            }
-    ) {
-        if (expanded) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .padding(Team16Theme.padding.inner)
-            ) {
-                Text(
-                    text = stringResource(R.string.viser_resultater_for),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    text = selected.commonName,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.labelSmall
-                )
-            }
-        }
 
-        Column() {
-            MushroomImage(
-                selected = selected,
-                size = Team16Theme.padding.mapButtonsSize,
-                background = MaterialTheme.colorScheme.surfaceContainerHighest
-            )
+    Surface(
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.background,
+        shadowElevation = padding.shadowElevationSmall,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .clickable {
+                    expanded = !expanded
+                }
+                .padding(padding.inner)
+        ) {
+            if (expanded) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                        contentDescription = "Pil fremover",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(padding.inner)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.viser_resultater_for),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = selected.commonName,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Column {
+                MushroomImage(
+                    selected = selected,
+                    size = padding.mapButtonsSize,
+                    background = MaterialTheme.colorScheme.background
+                )
+            }
         }
     }
 }
@@ -387,10 +399,15 @@ fun CentralizeMap(
 ) {
     Box(
         modifier = modifier
-            .padding(top = Team16Theme.padding.outer)
-            .size(Team16Theme.padding.mapButtonsSize)
+            .padding(top = padding.outer)
+            .size(padding.mapButtonsSize)
+            .shadow(
+                elevation = padding.shadowElevationSmall,
+                shape = CircleShape,
+                clip = false
+            )
             .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                color = MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
         contentAlignment = Alignment.Center
@@ -414,25 +431,26 @@ fun ColorRow(
     text: List<String>,
     modifier: Modifier = Modifier
 ) {
-    Column() {
+    Column {
         repeat(numberOfRows) { index ->
             Row(
-                horizontalArrangement = Arrangement.spacedBy(Team16Theme.padding.inner),
+                horizontalArrangement = Arrangement.spacedBy(padding.inner),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(
-                        start = Team16Theme.padding.outer,
+                        start = padding.outer,
                     )
             ) {
                 Box(
                     modifier = Modifier
-                        .size(Team16Theme.padding.colorExplanationSize)
+                        .size(padding.colorExplanationSize)
                         .background(colors[index])
                 )
                 Text(
                     text = text[index],
-                    style = MaterialTheme.typography.labelSmall
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

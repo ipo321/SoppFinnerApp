@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
+import android.view.ViewGroup
 import org.maplibre.android.camera.CameraPosition
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -60,10 +62,11 @@ import kotlin.math.abs
 
 @Composable
 fun MapScreen(
-    onNavigateToDev: () -> Unit,
     mapViewModel: MapViewModel,
     isVisible: Boolean,
-    onMapLoaded: () -> Unit
+    onMapLoaded: () -> Unit,
+    isNetConnected: Boolean,
+    isDarkMode: Boolean
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember {mutableStateOf(
@@ -85,6 +88,21 @@ fun MapScreen(
     // The map is made with MapView and remember to save state
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
+    //Reload Map on internet reconect
+    var hadDisconnection by remember {mutableStateOf(false)}
+
+    LaunchedEffect(isNetConnected) {
+        Log.d("T16_Net", "isNetConnected changed: $isNetConnected " +
+                "hadDisconnection changed: $hadDisconnection")
+        if(!isNetConnected){
+            hadDisconnection = true
+        }else if(hadDisconnection){
+            hadDisconnection = false
+            mapViewModel.retryLastClick()
+        }
+    }
+
+
     LaunchEffects(
         viewModel = mapViewModel,
         uiState = uiState,
@@ -94,7 +112,8 @@ fun MapScreen(
         locationPermissionGranted = locationPermissionGranted,
         hasCenteredInitially = hasCenteredInitially,
         onHasCenteredInitiallyChange = { },
-        onMapLoaded = onMapLoaded
+        onMapLoaded = onMapLoaded,
+        isDarkMode = isDarkMode
     )
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
@@ -120,7 +139,6 @@ fun MapScreen(
         onDispose{locationManager.removeUpdates(listener)}
     }
     MapScreenSurface(
-        onNavigateToDev = onNavigateToDev,
         searchTextFieldState = searchTextFieldState,
         mapView = mapView,
         mapViewModel = mapViewModel,
@@ -130,7 +148,6 @@ fun MapScreen(
 
 @Composable
 fun MapScreenSurface(
-    onNavigateToDev: () -> Unit,
     searchTextFieldState: TextFieldState,
     mapView: MapView,
     mapViewModel: MapViewModel,
@@ -138,11 +155,39 @@ fun MapScreenSurface(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .onGloballyPositioned { parentBounds ->
+                val parentHeightPx = parentBounds.size.height
+
+                mapView.post {
+                    // post runs after layout calculations are done
+                    // Makes sure the layout parameters are the same as the parent's.
+                    // This fixes the recurring bug we have with the gap between map and nav-bar
+                    val lp = mapView.layoutParams
+                    if (lp != null && lp.height != parentHeightPx) {
+                        lp.height = parentHeightPx
+                        mapView.layoutParams = lp
+                        mapView.requestLayout()
+                    }
+                }
+            }
     ) {
         AndroidView(
-            modifier = Modifier.matchParentSize(),
-            factory = { mapView }
+            modifier = Modifier.fillMaxSize(), //matchParentSize(),
+            factory = { mapView },
+            update = { view ->
+                val lp = view.layoutParams
+                if (lp == null ||
+                    lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
+                    lp.height != ViewGroup.LayoutParams.MATCH_PARENT
+                ) {
+                    view.layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                }
+            }
         )
         if (uiState.isFetchingHeatmap) {
             LinearProgressIndicator(
@@ -156,9 +201,8 @@ fun MapScreenSurface(
             viewModel = mapViewModel,
             uiState = uiState,
             mapView = mapView,
-            onNavigateToDev = onNavigateToDev,
             textFieldState = searchTextFieldState,
-            onSearch = { },
+            onSearch = { }
         )
 
         when (uiState.screenStatus) {
@@ -196,6 +240,16 @@ fun getMapView(
             .textureMode(true)
 
         MapView(context, mode).apply { // mode are sent as argument here to fix the bug
+//            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets -> //WindowInsetsCompat.CONSUMED } //bottom gap fix
+//                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//                view.setPadding(
+//                    view.paddingLeft,
+//                    view.paddingTop,
+//                    view.paddingRight,
+//                    0
+//                )
+//                insets
+//            }
             onCreate(null)
 
             getMapAsync { map ->
@@ -268,17 +322,18 @@ fun LaunchEffects(
     locationPermissionGranted: Boolean,
     hasCenteredInitially: Boolean,
     onHasCenteredInitiallyChange: (Boolean) -> Unit,
-    onMapLoaded: () -> Unit
+    onMapLoaded: () -> Unit,
+    isDarkMode: Boolean
 ) {
     val zoom = 12.0 // The zoom distance used for each zoom() call
     // Satellite mode
-    LaunchedEffect(uiState.isSatelliteMode, mapRef) {
+    LaunchedEffect(uiState.isSatelliteMode, mapRef, isDarkMode) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
         val styleUrl = if (uiState.isSatelliteMode)
             "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
         else
-            if(isDarkMode(context))
+            if(isDarkMode)
                 "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
                 "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
@@ -286,7 +341,7 @@ fun LaunchEffects(
         currentMap.setStyle(styleUrl) { style ->
             Log.d("T16_MAP", "Style loaded: ${style.uri}")
             setupHeatmapLayer(style)
-            setupHistoricalFindsLayer(style)
+            setupHistoricalFindsLayer(style, context)
             setupForestLayer(style, uiState.showWmsForest)
             addPinImage(style, context)
             setupPinIcon(style)
@@ -295,7 +350,7 @@ fun LaunchEffects(
         }
     }
     // WMS Forest Layer
-    LaunchedEffect(uiState.showWmsForest, mapRef) {
+    LaunchedEffect(uiState.showWmsForest, mapRef,  isDarkMode, uiState.isSatelliteMode) {
         mapRef?.getStyle { style ->
             style.getLayer("satskog-layer")?.setProperties(
                 visibility(if (uiState.showWmsForest) VISIBLE else NONE)
@@ -306,7 +361,9 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.lastClickedLat,
         uiState.lastClickedLon,
-        mapRef
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val lat = uiState.lastClickedLat ?: return@LaunchedEffect
@@ -319,7 +376,7 @@ fun LaunchEffects(
         }
     }
     //Drawing the users position dot
-    LaunchedEffect(uiState.userLocation, mapRef){
+    LaunchedEffect(uiState.userLocation, mapRef, isDarkMode, uiState.isSatelliteMode){
         val currentMap = mapRef ?: return@LaunchedEffect
         val location = uiState.userLocation ?: return@LaunchedEffect
         currentMap.getStyle{ style ->
@@ -334,7 +391,9 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.currentContext?.historicalFinds,
         uiState.isHistoricalFindsEnabled,
-        mapRef
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val finds = uiState.currentContext?.historicalFinds ?: emptyList()
@@ -362,7 +421,10 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.heatmapTiles,
         uiState.isHeatmapEnabled,
-        mapRef) {
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
+    ) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
 
@@ -422,7 +484,7 @@ fun LaunchEffects(
     LaunchedEffect(uiState.selectedMushroom) {
         val lat = uiState.lastClickedLat ?: return@LaunchedEffect
         val lon = uiState.lastClickedLon ?: return@LaunchedEffect
-        viewModel.onMapClicked(lat, lon)
+        viewModel.refreshCurrentLocation()
     }
     // Actually runs the popup and makes sure it doesn't rerun
     LaunchedEffect(Unit){

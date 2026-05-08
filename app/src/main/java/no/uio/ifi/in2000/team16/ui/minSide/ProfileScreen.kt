@@ -60,8 +60,8 @@ fun ProfileScreen(
         MenuItemData("Hvordan beregnes scoren?", Icons.Default.HelpOutline, SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, SECURITY_SCREEN),
         MenuItemData("Ring giftsentralen",Icons.Default.Call,POISON_CONTROLL),
-        MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN),
         MenuItemData("Informasjon", Icons.Default.Book, HELP_SCREEN),
+        MenuItemData("Om appen", Icons.Default.Info, INFO_SCREEN)
         )
 
     Column(

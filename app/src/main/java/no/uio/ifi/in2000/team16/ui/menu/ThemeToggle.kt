@@ -13,12 +13,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 /*
 A toggle switch that changes between light mode and dark mode .
@@ -31,20 +27,16 @@ fun Toggle(
 ) {
     //Animates the toggle movement
     val animateSize by animateDpAsState(
-        targetValue = if (checked) 30.dp else 0.dp,
+        targetValue = if (checked) 24.dp else 0.dp, // Moves the button when toggled
         label = "toggleAnimation"
     )
 
     Row(
         modifier = Modifier
             .clip(CircleShape)
-            .width(80.dp)
-            .height(50.dp)
-            .background(
-                //The toggle background changes when it is pressed or not
-                if (checked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline
-            )
+            .width(60.dp)
+            .height(24.dp)
+            .background(MaterialTheme.colorScheme.primary)
             .clickable { onCheckedChange() }
     ) {
         Box(
@@ -59,8 +51,8 @@ The small circle inside the toggle switch
             modifier = Modifier
                 .padding(5.dp)
                 .clip(CircleShape)
-                .width(40.dp)
-                .height(40.dp)
+                .width(24.dp)
+                .height(24.dp)
                 .background(MaterialTheme.colorScheme.surface)
         )
     }

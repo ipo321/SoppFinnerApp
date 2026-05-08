@@ -22,7 +22,7 @@ private val DarkColorScheme = darkColorScheme(
 
     //Secondary
     secondary = DarkSecondary,
-    secondaryContainer = DarkPrimary,
+    secondaryContainer = DarkSurfaceContainerHigh,
     onSecondaryContainer = DarkBackground,
 
     // The base layer of the app
@@ -60,7 +60,7 @@ private val LightColorScheme = lightColorScheme(
 
     //Secondary   Elements not need immediate attention,
     secondary = PrimaryFixed,
-    secondaryContainer = PrimaryFixed,
+    secondaryContainer = DarkSurfaceContainerHigh,
     onSecondaryContainer = OnSurfaceDark,
 
     // The base layer of the app
