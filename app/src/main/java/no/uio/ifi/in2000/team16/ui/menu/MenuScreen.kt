@@ -59,11 +59,10 @@ fun MenuScreen(
 ) {
     val menuItems = listOf(
         MenuItemData("Mørkemodus", Icons.Default.Lightbulb, "Lyspære", MENU_SCREEN),
-        MenuItemData("Velg beregningsalgoritme", Icons.Default.LineAxis, "Stigende graf", ALGORITHM_SCREEN),
-        MenuItemData("Hvordan beregnes scoren?", Icons.AutoMirrored.Filled.HelpOutline, "Spørsmålstegn", SCORE_INFO_SCREEN),
-        MenuItemData("Personvernerklæring", Icons.Default.Lock, "Lås", SECURITY_SCREEN),
         MenuItemData("Ring Giftinformasjonen",Icons.Default.Call, "Telefon", POISON_CONTROL),
-        MenuItemData("Informasjon", Icons.Default.Book, "Bok", HELP_SCREEN),
+        MenuItemData("Velg beregningsalgoritme", Icons.Default.LineAxis, "Stigende graf", ALGORITHM_SCREEN),
+        MenuItemData("Guide til appen", Icons.Default.Book, "Bok", HELP_SCREEN),
+        MenuItemData("Personvernerklæring", Icons.Filled.Lock, "Lås", SECURITY_SCREEN),
         MenuItemData("Om appen", Icons.Default.Info, "Informasjonssymbol", INFO_SCREEN)
     )
 
@@ -110,7 +109,7 @@ fun MenuScreen(
                 )
             }
             // Adds the image of the cute mushroom to the menu screen
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(padding.spacingSmall))
             Image(
                 painter = painterResource(R.drawable.cute_mushroom),
                 contentDescription = "Søt sopp",
