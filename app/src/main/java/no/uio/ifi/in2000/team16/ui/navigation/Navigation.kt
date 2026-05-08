@@ -38,6 +38,7 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SummaryScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
@@ -58,6 +59,7 @@ const val SECURITY_SCREEN = "Security"
 const val SCORE_INFO_SCREEN = "ScoreInfo"
 const val POISON_CONTROL = "PoisonControll"
 const val HELP_SCREEN = "menuScreen/helpScreen"
+const val SUMMARY_SCREEN = "SummaryScreen"
 
 
 @Composable
@@ -203,7 +205,14 @@ fun Navigation(
                         navController.popBackStack()
                     })
             }
-
+                composable(SUMMARY_SCREEN) {
+                    SummaryScreen(
+                        navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
                 MushroomListScreen(
                     navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },

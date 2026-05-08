@@ -43,6 +43,7 @@ import no.uio.ifi.in2000.team16.ui.navigation.MENU_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.POISON_CONTROL
 import no.uio.ifi.in2000.team16.ui.navigation.SCORE_INFO_SCREEN
 import no.uio.ifi.in2000.team16.ui.navigation.SECURITY_SCREEN
+import no.uio.ifi.in2000.team16.ui.navigation.SUMMARY_SCREEN
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
 
 data class MenuItemData(
@@ -63,7 +64,7 @@ fun MenuScreen(
         MenuItemData("Hvordan beregnes scoren?", Icons.AutoMirrored.Filled.HelpOutline, "Spørsmålstegn", SCORE_INFO_SCREEN),
         MenuItemData("Personvernerklæring", Icons.Default.Lock, "Lås", SECURITY_SCREEN),
         MenuItemData("Ring Giftinformasjonen",Icons.Default.Call, "Telefon", POISON_CONTROL),
-        MenuItemData("Informasjon", Icons.Default.Book, "Bok", HELP_SCREEN),
+        MenuItemData("Informasjon", Icons.Default.Book, "Bok", SUMMARY_SCREEN),
         MenuItemData("Om appen", Icons.Default.Info, "Informasjonssymbol", INFO_SCREEN)
     )
 
