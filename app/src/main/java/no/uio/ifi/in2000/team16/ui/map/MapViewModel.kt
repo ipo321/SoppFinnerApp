@@ -43,8 +43,10 @@ class MapViewModel @Inject constructor(
 
     private var heatmapJob: Job? = null // cancel old calculations
 
+    // Last fetch position — used to skip near-duplicate fetches when the camera barely moved.
     private var lastIdleTarget: LatLng? = null
     private var lastIdleZoom = 0.0
+    private var lastVisibleBounds: BoundingBox? = null// Latest viewport, kept fresh so toggleHeatmap can fetch on its own
     private var searchJob: Job? = null // cancel old searches
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
     private var debounceJob: Job? = null
@@ -66,6 +68,7 @@ class MapViewModel @Inject constructor(
                     val scorer = scorerProvider.activeScorer
                     scorer.calculateScore(env, mushroom.profile)
                 } catch (_: Exception) {
+                    // Warmup is best-effort; failure here is fine, the real call will surface errors.
                 }
             }
         }
@@ -84,7 +87,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(screenStatus = ScreenStatus.Loading) }
             try {
-                val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)  // Have to add species selection here as well, but needs to update usecase and
+                val context = getEnvironmentContextUseCase(lat, lon, currentMushroom.profile)
                 val scorer = scorerProvider.activeScorer
                 val evaluation = scorer.calculateScore(context, currentMushroom.profile)
 
@@ -163,18 +166,16 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun toggleHeatmap(currentBounds: BoundingBox?) {
-        val newState = !_uiState.value.isHeatmapEnabled
-        _uiState.update { it.copy(isHeatmapEnabled = newState) }
+  fun toggleHeatmap() {
+      val newState = !_uiState.value.isHeatmapEnabled
+      _uiState.update { it.copy(isHeatmapEnabled = newState) }
 
-        if (!newState) {
-            _uiState.update { it.copy(heatmapTiles = emptyList()) }
-        } else if (currentBounds != null) {
-            fetchHeatmapData(currentBounds)
-            savedBounds = currentBounds
-        }
-    }
-
+      if (!newState) {
+          _uiState.update { it.copy(heatmapTiles = emptyList()) }
+      } else {
+          lastVisibleBounds?.let { fetchHeatmapData(it) }
+      }
+  }
 
 
 
@@ -202,24 +203,32 @@ class MapViewModel @Inject constructor(
             _uiState.update { it.copy(searchSuggestions = results) }
         }
     }
-    
-    // Method for finding address from the query, used when user is still searching
-    fun searchAddressByText(query: String, onLocationFound: (Double, Double) -> Unit) {
+
+    fun searchAddressByText(query: String) {
         viewModelScope.launch {
             val location = locationRepository.getLocationCoordinates(query)
-            if (location != null && location.latitude != null && location.longitude != null) {
-                onLocationFound(location.latitude!!, location.longitude!!)
+            val lat = location?.latitude
+            val lon = location?.longitude
+            if (lat != null && lon != null) {
+                _uiState.update {
+                    it.copy(pendingCameraTarget = PendingCameraTarget(lat, lon, zoom = 15.0))
+                }
             }
         }
     }
 
-    // Method for getting location for address chosen from search, used when search completes
-    fun searchLocation(location: SearchableLocation, onLocationFound: (lat: Double, lon: Double) -> Unit) {
+    fun searchLocation(location: SearchableLocation) {
         val lat = location.latitude
         val lon = location.longitude
         if (lat != null && lon != null) {
-            onLocationFound(lat, lon)
+            _uiState.update {
+                it.copy(pendingCameraTarget = PendingCameraTarget(lat, lon, zoom = 13.0))
+            }
         }
+    }
+
+    fun onPendingCameraTargetConsumed() {
+        _uiState.update { it.copy(pendingCameraTarget = null) }
     }
 
     //Updates the users position
@@ -231,7 +240,19 @@ class MapViewModel @Inject constructor(
             _uiState.update {it.copy(moveCameraToUser = true)}
         }
     }
-
+    fun centerOnUser() {
+        val location = _uiState.value.userLocation ?: return
+        _uiState.update {
+            it.copy(
+                pendingCameraTarget = PendingCameraTarget(
+                    lat = location.latitude,
+                    lon = location.longitude,
+                    zoom = 13.0
+                ),
+                isSearchBarExpanded = false
+            )
+        }
+    }
     fun onCameraMoved(){
         _uiState.update{it.copy(moveCameraToUser = false)}
     }
@@ -241,8 +262,9 @@ class MapViewModel @Inject constructor(
     * so the fetched area is slightly larger than what's on screen.
      */
     fun onCameraIdle(target: LatLng?, zoom: Double, visibleBounds: BoundingBox) {
-        // Heatmap is only computed at zoom 15 or closer when panning.
-        if (!_uiState.value.isHeatmapEnabled || zoom < 15.0) return
+        lastVisibleBounds = visibleBounds
+        // Heatmap is only computed at zoom 10 or closer when panning.
+        if (!_uiState.value.isHeatmapEnabled || zoom < 10) return
 
         val last = lastIdleTarget
         if (last != null && target != null) {
@@ -288,7 +310,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(screenStatus = ScreenStatus.Idle, evaluation = null) }
     }
 
-    internal fun refreshCurrentLocation(){
+    fun refreshCurrentLocation(){
         val lat = _uiState.value.lastClickedLat ?: return
         val lon = _uiState.value.lastClickedLon ?: return
         val currentMushroom = _uiState.value.selectedMushroom ?: return

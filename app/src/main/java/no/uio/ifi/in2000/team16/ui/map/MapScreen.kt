@@ -200,7 +200,6 @@ fun MapScreenSurface(
         MapComponents(
             viewModel = mapViewModel,
             uiState = uiState,
-            mapView = mapView,
             textFieldState = searchTextFieldState,
             onSearch = { }
         )
@@ -392,6 +391,17 @@ fun LaunchEffects(
             }
         }
     }
+
+    // Reacts to a search result by animating the camera, then clears the request.
+    LaunchedEffect(uiState.pendingCameraTarget, mapRef) {
+        val target = uiState.pendingCameraTarget ?: return@LaunchedEffect
+        val map = mapRef ?: return@LaunchedEffect
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(LatLng(target.lat, target.lon), target.zoom)
+        )
+        viewModel.onPendingCameraTargetConsumed()
+    }
+
     // Updating the heatMapTiles each time they change
     LaunchedEffect(
         uiState.heatmapTiles,

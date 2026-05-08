@@ -32,8 +32,10 @@ data class MapScreenState(
     val userLocation: LatLng? = null,
     val moveCameraToUser: Boolean = false,
     val hasCenteredInitially: Boolean = false,
+    val pendingCameraTarget: PendingCameraTarget? = null
 )
 
+data class PendingCameraTarget(val lat: Double, val lon: Double, val zoom: Double)
 
 sealed class ScreenStatus{
     object Idle : ScreenStatus()
