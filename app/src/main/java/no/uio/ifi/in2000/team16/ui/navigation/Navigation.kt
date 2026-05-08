@@ -58,7 +58,6 @@ const val SHROOMCONTROL_SCREEN = "mushroomInfo/shroomControl"
 const val SECURITY_SCREEN = "Security"
 const val SCORE_INFO_SCREEN = "ScoreInfo"
 const val POISON_CONTROL = "PoisonControll"
-const val HELP_SCREEN = "menuScreen/helpScreen"
 const val SUMMARY_SCREEN = "SummaryScreen"
 
 
@@ -247,13 +246,6 @@ fun Navigation(
                     onNavigateBack = { navController.navigate(MENU_SCREEN) }
                 )
             }
-
-            composable(HELP_SCREEN) {
-                HelpScreen(
-                    onNavigateBack = { navController.navigate(MENU_SCREEN) }
-                )
-            }
-
         }
 
 //            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {

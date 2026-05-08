@@ -124,6 +124,6 @@ private fun parentTabRoute(route: String?): String? = when (route) {
     MAP_SCREEN                                 -> MAP_SCREEN
     MENU_SCREEN, INFO_SCREEN, POISON_CONTROL,
     SCORE_INFO_SCREEN, SECURITY_SCREEN,
-    ALGORITHM_SCREEN, HELP_SCREEN              -> MENU_SCREEN
+    ALGORITHM_SCREEN, SUMMARY_SCREEN           -> MENU_SCREEN
     else                                       -> route
 }
