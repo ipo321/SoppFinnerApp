@@ -155,7 +155,7 @@ fun ScoreCard(
                 Spacer(Modifier.height(Team16Theme.padding.scoreCardSpacing))
 
                 DisplayInfoItem(
-                    "Snitt-temp", uiState.avgTemp,
+                    "Snitt-temp (14d)", uiState.avgTemp,
                     "Nedbør (14d)", uiState.totalRain
                 )
 
