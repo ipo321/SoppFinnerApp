@@ -162,7 +162,7 @@ class MapViewModelTest {
         fakeSpeciesRepository.selectedMushroom.value = mushroom
         advanceUntilIdle()
 
-        viewModel.toggleHeatmap(null)
+        viewModel.toggleHeatmap()
         coEvery { mockHeatMapArea(any(), any()) } returns tiles
         viewModel.fetchHeatmapData(bounds)
         advanceUntilIdle()

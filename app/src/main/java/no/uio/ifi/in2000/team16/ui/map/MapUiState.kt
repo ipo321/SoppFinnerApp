@@ -30,9 +30,12 @@ data class MapScreenState(
     val searchSuggestions: List<SearchableLocation> = emptyList(),
     val isSearchBarExpanded: Boolean = false,
     val userLocation: LatLng? = null,
-    val moveCameraToUser: Boolean = false
+    val moveCameraToUser: Boolean = false,
+    val hasCenteredInitially: Boolean = false,
+    val pendingCameraTarget: PendingCameraTarget? = null
 )
 
+data class PendingCameraTarget(val lat: Double, val lon: Double, val zoom: Double)
 
 sealed class ScreenStatus{
     object Idle : ScreenStatus()
