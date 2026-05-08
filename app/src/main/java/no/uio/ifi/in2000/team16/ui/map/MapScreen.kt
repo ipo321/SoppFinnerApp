@@ -7,7 +7,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
 import android.view.ViewGroup
-import org.maplibre.android.camera.CameraPosition
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +35,7 @@ import androidx.core.content.ContextCompat
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.ui.common.ErrorScreen
+import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -49,7 +49,6 @@ import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import org.maplibre.geojson.Polygon
-import kotlin.math.abs
 
 /*
     The Map Screen is the main screen in the app.
@@ -69,10 +68,11 @@ fun MapScreen(
     isDarkMode: Boolean
 ) {
     val context = LocalContext.current
-    var locationPermissionGranted by remember {mutableStateOf(
-        ContextCompat.checkSelfPermission(
-            context, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    var locationPermissionGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         )
     }
     //Shows the "Allow Location" popup and remembers the response
@@ -88,14 +88,16 @@ fun MapScreen(
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
     //Reload Map on internet reconect
-    var hadDisconnection by remember {mutableStateOf(false)}
+    var hadDisconnection by remember { mutableStateOf(false) }
 
     LaunchedEffect(isNetConnected) {
-        Log.d("T16_Net", "isNetConnected changed: $isNetConnected " +
-                "hadDisconnection changed: $hadDisconnection")
-        if(!isNetConnected){
+        Log.d(
+            "T16_Net", "isNetConnected changed: $isNetConnected " +
+                    "hadDisconnection changed: $hadDisconnection"
+        )
+        if (!isNetConnected) {
             hadDisconnection = true
-        }else if(hadDisconnection){
+        } else if (hadDisconnection) {
             hadDisconnection = false
             mapViewModel.retryLastClick()
         }
@@ -115,11 +117,12 @@ fun MapScreen(
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
     // Sets up the GPS listener
-    DisposableEffect(locationPermissionGranted){
-        if(!locationPermissionGranted) return@DisposableEffect onDispose{}
+    DisposableEffect(locationPermissionGranted) {
+        if (!locationPermissionGranted) return@DisposableEffect onDispose {}
 
         val locationManager = context.getSystemService(
-            Context.LOCATION_SERVICE) as LocationManager
+            Context.LOCATION_SERVICE
+        ) as LocationManager
 
         //fires every time we want to update the user position from the GPS
         //pushes the coordinates to the viewmodel
@@ -133,7 +136,7 @@ fun MapScreen(
             listener
         )
         //disposes of the GPS listener(to avoid leaks)
-        onDispose{locationManager.removeUpdates(listener)}
+        onDispose { locationManager.removeUpdates(listener) }
     }
     MapScreenSurface(
         searchTextFieldState = searchTextFieldState,
@@ -213,12 +216,14 @@ fun MapScreenSurface(
                     )
                 }
             }
+
             is ScreenStatus.Loading -> InfoPopUp(
                 msg = stringResource(R.string.laster_inn_data),
                 score = 0,
                 contextData = null,
                 onDismiss = null
             )
+
             is ScreenStatus.Error -> ErrorScreen("Feil: ${uiState.screenStatus.message}")
             is ScreenStatus.Idle -> {}
         }
@@ -262,6 +267,8 @@ fun getMapView(
                     true
                 }
                 map.addOnCameraIdleListener {
+                    // Forward raw camera state to the VM; gating, throttling and
+                    // bounds-expansion live there so this callback stays UDF-clean.
                     val pos = map.cameraPosition
                     val region = map.projection.visibleRegion.latLngBounds
                     mapViewModel.onCameraIdle(
@@ -270,8 +277,8 @@ fun getMapView(
                         visibleBounds = BoundingBox(
                             north = region.northEast.latitude,
                             south = region.southWest.latitude,
-                            east  = region.northEast.longitude,
-                            west  = region.southWest.longitude,
+                            east = region.northEast.longitude,
+                            west = region.southWest.longitude,
                         )
                     )
                 }
@@ -453,8 +460,6 @@ fun LaunchEffects(
     }
     // this updates the scorecard when someone changes selected mushroom in Soppsiden
     LaunchedEffect(uiState.selectedMushroom) {
-        val lat = uiState.lastClickedLat ?: return@LaunchedEffect
-        val lon = uiState.lastClickedLon ?: return@LaunchedEffect
         viewModel.refreshCurrentLocation()
     }
     // Actually runs the popup and makes sure it doesn't rerun
@@ -467,6 +472,10 @@ fun LaunchEffects(
         )
     }
 
+
+    // Centers the map on the user the first time we know where they are
+    // (or on Oslo if location permission is denied). Guarded by the VM-owned
+    // `hasCenteredInitially` flag so it survives recomposition and rotation.
     LaunchedEffect(
         uiState.userLocation,
         locationPermissionGranted,
@@ -488,11 +497,12 @@ fun LaunchEffects(
                     .build()
                 onMapLoaded()
             }
-
+            // No permission — fall back to a default location instead of
+            // waiting indefinitely for a fix that will never arrive.
             !locationPermissionGranted -> {
                 viewModel.onInitialCenterDone()
                 map.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(59.91, 10.75))
+                    .target(LatLng(59.91, 10.75))//Oslo
                     .zoom(zoom)
                     .build()
                 onMapLoaded()

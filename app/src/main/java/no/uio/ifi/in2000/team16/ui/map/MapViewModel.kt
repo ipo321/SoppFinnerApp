@@ -236,8 +236,13 @@ class MapViewModel @Inject constructor(
         _uiState.update{it.copy(moveCameraToUser = false)}
     }
 
+    /**
+    * Expands the visible bounds before requesting heatmap data
+    * so the fetched area is slightly larger than what's on screen.
+     */
     fun onCameraIdle(target: LatLng?, zoom: Double, visibleBounds: BoundingBox) {
-        if (!_uiState.value.isHeatmapEnabled || zoom < 10.0) return
+        // Heatmap is only computed at zoom 15 or closer when panning.
+        if (!_uiState.value.isHeatmapEnabled || zoom < 15.0) return
 
         val last = lastIdleTarget
         if (last != null && target != null) {
