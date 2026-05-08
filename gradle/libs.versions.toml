@@ -46,6 +46,7 @@ foundationLayoutVersion = "1.11.0"
 foundationVersion = "1.11.0"
 sprite = "1.1.0"
 gamesActivity = "4.4.1"
+navigationRuntimeKtx = "2.9.8"
 
 [libraries]
 android-sdk = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
@@ -104,6 +105,7 @@ osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "os
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 sprite = { module = "com.stevdza-san:sprite", version.ref = "sprite" }
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
