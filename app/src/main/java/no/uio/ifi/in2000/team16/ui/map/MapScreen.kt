@@ -264,47 +264,19 @@ fun getMapView(
                     )
                     true
                 }
-                var lastTarget: LatLng? = null
-                var lastZoom = 0.0
-
-                // Checks if map is still
                 map.addOnCameraIdleListener {
-                    val currentZoom = map.cameraPosition.zoom
-
-                    if (!mapViewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
-
-                    val currentTarget = map.cameraPosition.target
-
-                    if (currentTarget != null && lastTarget != null) {
-                        val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                        val zoomDiff = abs(currentZoom - lastZoom)
-
-                        if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
-                            return@addOnCameraIdleListener
-                        }
-                    }
-
-                    lastTarget = currentTarget
-                    lastZoom = currentZoom
-
-                    val visibleBounds = map.projection.visibleRegion.latLngBounds
-
-                    val north = visibleBounds.northEast.latitude
-                    val south = visibleBounds.southWest.latitude
-                    val east = visibleBounds.northEast.longitude
-                    val west = visibleBounds.southWest.longitude
-
-                    val latDiff = north - south
-                    val lonDiff = east - west
-
-                    val expandedBounds = BoundingBox(
-                        north = north + (latDiff * 0.2),
-                        south = south - (latDiff * 0.2),
-                        east = east + (lonDiff * 0.4),
-                        west = west - (lonDiff * 0.4)
+                    val pos = map.cameraPosition
+                    val region = map.projection.visibleRegion.latLngBounds
+                    mapViewModel.onCameraIdle(
+                        target = pos.target,
+                        zoom = pos.zoom,
+                        visibleBounds = BoundingBox(
+                            north = region.northEast.latitude,
+                            south = region.southWest.latitude,
+                            east  = region.northEast.longitude,
+                            west  = region.southWest.longitude,
+                        )
                     )
-
-                    mapViewModel.fetchHeatmapData(expandedBounds)
                 }
             }
         }

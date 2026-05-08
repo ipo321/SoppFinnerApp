@@ -42,6 +42,9 @@ class MapViewModel @Inject constructor(
     val uiState : StateFlow<MapScreenState> = _uiState.asStateFlow()
 
     private var heatmapJob: Job? = null // cancel old calculations
+
+    private var lastIdleTarget: LatLng? = null
+    private var lastIdleZoom = 0.0
     private var searchJob: Job? = null // cancel old searches
     private var savedBounds: BoundingBox? = null // makes it easy for mushroom change to update heatmap
     private var debounceJob: Job? = null
@@ -231,6 +234,29 @@ class MapViewModel @Inject constructor(
 
     fun onCameraMoved(){
         _uiState.update{it.copy(moveCameraToUser = false)}
+    }
+
+    fun onCameraIdle(target: LatLng?, zoom: Double, visibleBounds: BoundingBox) {
+        if (!_uiState.value.isHeatmapEnabled || zoom < 10.0) return
+
+        val last = lastIdleTarget
+        if (last != null && target != null) {
+            val distance = target.distanceTo(last)
+            val zoomDiff = kotlin.math.abs(zoom - lastIdleZoom)
+            if (distance < 200.0 && zoomDiff < 0.5) return
+        }
+        lastIdleTarget = target
+        lastIdleZoom = zoom
+
+        val latDiff = visibleBounds.north - visibleBounds.south
+        val lonDiff = visibleBounds.east - visibleBounds.west
+        val expanded = BoundingBox(
+            north = visibleBounds.north + latDiff * 0.2,
+            south = visibleBounds.south - latDiff * 0.2,
+            east  = visibleBounds.east  + lonDiff * 0.4,
+            west  = visibleBounds.west  - lonDiff * 0.4,
+        )
+        fetchHeatmapData(expanded)
     }
 
     fun toggleSatellite() {
