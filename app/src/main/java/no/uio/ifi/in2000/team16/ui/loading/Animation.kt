@@ -20,21 +20,29 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import no.uio.ifi.in2000.team16.R
 
+/*
+Loading screen animation
+ Multiple images are switched quickly to create
+ a simple animated loading effect.
+ */
 @Composable
 fun ImageAnimation(
     modifier: Modifier = Modifier,
     images: List<Int>,
     frameDuration: Long = 200L
 ) {
+//Keeps trach of which image frame is shown, starts with zero
     var currentFrame by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(images) {
+    // Repeats "forever" and changes image after a delay
+        LaunchedEffect(images) {
         while (true) {
             delay(frameDuration)
+            //loops through the images
             currentFrame = (currentFrame + 1) % images.size
         }
     }
-
+    // Displays the current animation frame
     Image(
         painter = painterResource(id = images[currentFrame]),
         contentDescription = null,
@@ -44,6 +52,7 @@ fun ImageAnimation(
 
 @Composable
 fun LoadingScreen() {
+    //List of images used for the animation.
     val animationImages = listOf(
         R.drawable.sprite02,
         R.drawable.sprite03,
@@ -53,11 +62,13 @@ fun LoadingScreen() {
 
     MaterialTheme {
         Column(
+            //centers the animation on the screen
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ImageAnimation(
+                //starts the animation image sequence
                 images = animationImages,
                 modifier = Modifier.size(200.dp),
                 frameDuration = 150L

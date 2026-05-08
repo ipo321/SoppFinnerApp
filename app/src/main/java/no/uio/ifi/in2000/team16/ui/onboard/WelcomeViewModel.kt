@@ -12,6 +12,12 @@ import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.data.onBoard.DataStoreRepositoryInterface
 import javax.inject.Inject
 
+
+/*
+ This ViewModel manages the onboarding state of the app.
+ It checks if onboarding has already been completed
+ and saves the result using DataStore.
+*/
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
     private val repository: DataStoreRepositoryInterface

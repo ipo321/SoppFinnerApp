@@ -20,7 +20,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
+/*
+Determines how the onboarding pages will be displayed.
+ */
 @Composable
 fun OnBoardItem(page: OnBoardModel) {
     Column(

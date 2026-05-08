@@ -19,13 +19,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.R
-
+/*
+The onboardins screen shown when the user first opens the app.
+It explains the main features of the app through multiple swipeable pages.
+ */
 @Composable
 fun OnboardingScreen(
     modifier: Modifier = Modifier,
     onFinished: () -> Unit
 ) {
-//Just an example, need more sprites
+/*
+The pages for the onboardingscreen, uses the OnBoardModel class with a title, desctiption and
+Imageres, can add more if needed.
+ */
     val pages = listOf(
         OnBoardModel(
             title = "Velkommen",
@@ -59,21 +65,21 @@ fun OnboardingScreen(
         ),
         OnBoardModel(
             title = "Skoglag",
-            description = "...",
+            description = "Her kan du velge om du vil se på skoglagene i kartet eller ikke, fargene symboliserer hvilke tretype som dominerer området",
             imageRes = R.drawable.sprite01
         ),
         OnBoardModel(
             title = "Soppsiden",
-            description = "Soppsiden er en generell oversikt over de ulike soppene du kan finne ute." +
-                    "Her ",
+            description = "Soppsiden er en generell oversikt over de ulike soppene du kan finne, om de er giftige og om de er en god matsopp." ,
             imageRes = R.drawable.sprite01
         )
 
     )
-
+    //Keeps track of the current onboarding page
     val pagerState = rememberPagerState(pageCount = { pages.size })
+    //Used to start the page animation when pressing Next
     val coroutineScope = rememberCoroutineScope()
-
+    // Checks if the user is on the last page
     val isLastPage = pagerState.currentPage == pages.lastIndex
 
     Column(
@@ -99,22 +105,8 @@ fun OnboardingScreen(
                 .padding(10.dp)
         ) {
 
-            /*🔹 Skip (skjules på siste side)
-            Text(
-                text = if (isLastPage) "" else "Skip",
-                style = TextStyle(
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                ),
-                modifier = Modifier.clickable {
-                    onFinished()
-                }
-            )
 
-             */
-
-            // 🔹 Dots indikator
+            // Shows which page the user is currently on with a dot indikator
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(1f)
@@ -140,7 +132,7 @@ fun OnboardingScreen(
                 }
             }
 
-            // 🔹 Next / Finish
+            // Moves to the next page or finishes onboarding if its already on the last page
             Text(
                 text = if (isLastPage) "Finish" else "Next",
                 style = TextStyle(

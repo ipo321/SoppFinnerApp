@@ -20,12 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+/*
+A toggle switch that changes between light mode and dark mode .
+ */
 
 @Composable
 fun Toggle(
     checked: Boolean,
     onCheckedChange: () -> Unit
 ) {
+    //Animates the toggle movement
     val animateSize by animateDpAsState(
         targetValue = if (checked) 30.dp else 0.dp,
         label = "toggleAnimation"
@@ -37,6 +41,7 @@ fun Toggle(
             .width(80.dp)
             .height(50.dp)
             .background(
+                //The toggle background changes when it is pressed or not
                 if (checked) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.outline
             )
@@ -47,7 +52,9 @@ fun Toggle(
                 .fillMaxHeight()
                 .width(animateSize)
         )
-
+/*
+The small circle inside the toggle switch
+ */
         Box(
             modifier = Modifier
                 .padding(5.dp)

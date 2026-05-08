@@ -25,6 +25,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
+/*
+Contains the pop-up window that shows up everytime the user opens the app.
+
+ */
 @Composable
 fun DialogWithImage(
     onDismissRequest: () -> Unit,
@@ -32,6 +36,7 @@ fun DialogWithImage(
     painter: Painter,
     imageDescription: String,
 ) {
+    // Creates a small window that can be closed
     Dialog(onDismissRequest = { onDismissRequest() }) {
         // Draw a rectangle shape with rounded corners inside the dialog
         Card(
@@ -47,6 +52,7 @@ fun DialogWithImage(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                //Includes an image
                 Image(
                     painter = painter,
                     contentDescription = imageDescription,
@@ -54,23 +60,27 @@ fun DialogWithImage(
                     modifier = Modifier
                         .height(160.dp)
                 )
+                //Title
                 Text(
                     text = "Advarsel",
+
                 )
+                //Text
                 Text(
-                    text = "Ikke dø!",
-                    modifier = Modifier.padding(16.dp),
+                    text = "Ikke spis sopp du er usikker på! Sjekk Soppkontroll.no for å identifisere sopp",
+                    modifier = Modifier.padding(13.dp),
                 )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                 ) {
+                    // Button that closes the pop-up window
                     TextButton(
                         onClick = { onDismissRequest() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text("okay")
+                        Text("OK")
                     }
 
                 }
@@ -80,24 +90,3 @@ fun DialogWithImage(
 }
 
 
-/*
-HVORDAN MAN IMPLEMENTERER DET, MEN JEG SKJØNNER IKKE LOGIKKEN BRO
-REMEMBER? DIALOG? BRO IDK
-
-TEMP PLACEHOLDER, SIMPLIFIED THE POPUP, I WANT A CUTE PICTURE BUT THIS WILL HAVE TO DO
- */
-@Composable
-fun StartPopUp(
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("...advarsel") },
-        text = { Text("ikke dø") },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("okay")
-            }
-        }
-    )
-}
