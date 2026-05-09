@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team16.domain.logic.mushroom
 
-import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OnnxTensor
+import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.util.Log

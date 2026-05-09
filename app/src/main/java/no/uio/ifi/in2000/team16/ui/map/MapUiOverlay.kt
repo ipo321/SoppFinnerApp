@@ -49,13 +49,9 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
-import org.maplibre.android.camera.CameraUpdateFactory
-import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.maps.MapView
 
 /**
     Smaller elements on the map like the center button, loading indicators and so on

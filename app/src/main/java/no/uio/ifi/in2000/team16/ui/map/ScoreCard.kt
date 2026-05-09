@@ -1,14 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -105,7 +98,7 @@ fun ScoreCard(
     modifier: Modifier = Modifier,
     onDismiss: (() -> Unit)? = null,
 ) {
-    val context = LocalContext.current
+    LocalContext.current
 
     //controls whether the card is extended or not
     var isExpanded by remember {mutableStateOf(false)}
