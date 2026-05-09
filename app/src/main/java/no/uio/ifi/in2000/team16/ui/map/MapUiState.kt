@@ -32,7 +32,8 @@ data class MapScreenState(
     val userLocation: LatLng? = null,
     val moveCameraToUser: Boolean = false,
     val hasCenteredInitially: Boolean = false,
-    val pendingCameraTarget: PendingCameraTarget? = null
+    val pendingCameraTarget: PendingCameraTarget? = null,
+    val scoreCardUiState: ScoreCardUiState = ScoreCardUiState.empty()
 )
 
 data class PendingCameraTarget(val lat: Double, val lon: Double, val zoom: Double)

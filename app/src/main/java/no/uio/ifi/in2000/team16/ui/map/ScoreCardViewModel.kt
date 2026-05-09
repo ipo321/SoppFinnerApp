@@ -25,7 +25,30 @@ class ScoreCardUiState(
     val fertility: String,
     val dominantTreeSpecies: String,
     val symbolCode: String?
-)
+){
+
+    //Object for temporary scorecard information while it loads
+    companion object{
+        fun empty(score: Int = 0, description: String = "Laster inn data...") = ScoreCardUiState(
+            score = score,
+            description = description,
+            avgTemp = "Laster.." ,
+            totalRain = "Laster.." ,
+            currentTemp = "Laster..",
+            rain = "Laster..",
+            humidity = "Laster..",
+            windSpeed = "Laster..",
+            minTemp = "Laster..",
+            maxTemp = "Laster..",
+            sprucePercent =  "Laster..",
+            pinePercent = "Laster..",
+            broadleafPercent = "Laster..",
+            fertility = "Laster..",
+            dominantTreeSpecies = "Laster..",
+            symbolCode = null
+        )
+    }
+}
 
 fun EnvironmentContext.toUiState(score: Int, description: String): ScoreCardUiState{
     val h = weatherHistory

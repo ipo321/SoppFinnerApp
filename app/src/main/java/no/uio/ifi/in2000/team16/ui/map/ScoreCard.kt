@@ -74,7 +74,7 @@ fun BoxScope.InfoPopUp(
     contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
-    val uiState = contextData?.toUiState(score, msg) ?: return
+    val uiState = contextData?.toUiState(score, msg) ?: ScoreCardUiState.empty(score, msg)
 
     ScoreCard(
         uiState = uiState,
