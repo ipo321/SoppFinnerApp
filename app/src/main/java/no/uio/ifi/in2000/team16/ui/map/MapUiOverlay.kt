@@ -49,13 +49,9 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import no.uio.ifi.in2000.team16.R
-import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
 import no.uio.ifi.in2000.team16.ui.common.MushroomImage
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme.padding
-import org.maplibre.android.camera.CameraUpdateFactory
-import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.maps.MapView
 
 /**
     Smaller elements on the map like the center button, loading indicators and so on
@@ -66,7 +62,6 @@ import org.maplibre.android.maps.MapView
 fun MapComponents(
     viewModel: MapViewModel,
     uiState: MapScreenState,
-    mapView: MapView,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -89,7 +84,6 @@ fun MapComponents(
             MapMenu(
                 viewModel = viewModel,
                 uiState = uiState,
-                mapView = mapView,
                 menuExpanded = menuExpanded,
                 onClick = {
                     menuExpanded = !menuExpanded
@@ -107,7 +101,6 @@ fun MapComponents(
                         viewModel.dismissEvaluation()
                     }
                 },
-                mapView = mapView,
                 textFieldState = textFieldState,
                 onSearch = onSearch,
                 modifier = Modifier.weight(1f)
@@ -135,20 +128,7 @@ fun MapComponents(
                 .padding(end = padding.outer)
         ) {
             CentralizeMap(
-                onClick = {
-                    val userLocation = uiState.userLocation
-                    if (userLocation != null) {
-                        mapView.getMapAsync { map ->
-                            map.animateCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(userLocation.latitude, userLocation.longitude),
-                                    13.0
-                                )
-                            )
-                        }
-                    }
-                    viewModel.setSearchBarExpanded(false)
-                }
+                onClick = { viewModel.centerOnUser()}
             )
         }
     }
@@ -158,7 +138,6 @@ fun MapComponents(
 fun MapMenu(
     viewModel: MapViewModel,
     uiState: MapScreenState,
-    mapView: MapView,
     menuExpanded: Boolean,
     onClick: () -> Unit,
     onDismissRequest: () -> Unit,
@@ -202,18 +181,7 @@ fun MapMenu(
                     mushroom
                 )
             },
-            onToggleHeatMap = {
-                mapView.getMapAsync { map ->
-                    val bounds = map.projection.visibleRegion.latLngBounds
-                    val currentBox = BoundingBox(
-                        north = bounds.northEast.latitude,
-                        south = bounds.southWest.latitude,
-                        east = bounds.northEast.longitude,
-                        west = bounds.southWest.longitude
-                    )
-                    viewModel.toggleHeatmap(currentBox)
-                }
-            }
+            onToggleHeatMap = { viewModel.toggleHeatmap() }
         )
     }
 }
@@ -225,7 +193,6 @@ fun MapSearchBar(
     uiState: MapScreenState,
     searchExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    mapView: MapView,
     textFieldState: TextFieldState,
     onSearch: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -248,15 +215,9 @@ fun MapSearchBar(
                     onExpandedChange(it.isNotEmpty())
                 },
                 onSearch = { query ->
-                    viewModel.searchAddressByText(query) { lat, lon ->
-                        mapView.getMapAsync { map ->
-                            map.animateCamera(
-                                CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15.0)
-                            )
-                        }
-                    }
+                    viewModel.searchAddressByText(query)
                     onSearch(textFieldState.text.toString())
-                    onExpandedChange(false) // closes when search is entered/completed
+                    onExpandedChange(false)
                 },
                 expanded = searchExpanded,
                 onExpandedChange = onExpandedChange,
@@ -308,18 +269,8 @@ fun MapSearchBar(
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { // each item is clickable
-                            viewModel.searchLocation(suggestion) { lat, lon ->
-                                mapView.getMapAsync { map ->
-                                    map.animateCamera(
-                                        CameraUpdateFactory.newLatLngZoom(
-                                            LatLng(lat, lon),
-                                            13.0 // 13 is how close we want the zoom after searching
-                                        )
-                                    )
-                                }
-                            }
-                            // updates the searchbar text
+                        .clickable {
+                            viewModel.searchLocation(suggestion)
                             textFieldState.edit { replace(0, length, suggestion.title) }
                             onExpandedChange(false)
                         }

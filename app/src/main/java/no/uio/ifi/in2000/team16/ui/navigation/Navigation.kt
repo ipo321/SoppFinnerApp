@@ -37,7 +37,7 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpScreen
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SummaryScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
@@ -57,7 +57,7 @@ const val SHROOMCONTROL_SCREEN = "mushroomInfo/shroomControl"
 const val SECURITY_SCREEN = "Security"
 const val SCORE_INFO_SCREEN = "ScoreInfo"
 const val POISON_CONTROL = "PoisonControll"
-const val HELP_SCREEN = "menuScreen/helpScreen"
+const val SUMMARY_SCREEN = "SummaryScreen"
 
 
 @Composable
@@ -84,7 +84,7 @@ fun Navigation(
     val context = LocalContext.current
 
     var isMapLoaded by remember { mutableStateOf(false) }
-    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -203,7 +203,14 @@ fun Navigation(
                         navController.popBackStack()
                     })
             }
-
+                composable(SUMMARY_SCREEN) {
+                    SummaryScreen(
+                        navController = navController,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
             composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
                 MushroomListScreen(
                     navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
@@ -214,7 +221,7 @@ fun Navigation(
 
             composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
                 // Get the list screen's back stack entry to share its ViewModel
-                val listEntry = remember(backStackEntry) {
+                remember(backStackEntry) {
                     navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
                 }
                 MushroomInfoScreen(
@@ -238,13 +245,6 @@ fun Navigation(
                     onNavigateBack = { navController.navigate(MENU_SCREEN) }
                 )
             }
-
-            composable(HELP_SCREEN) {
-                HelpScreen(
-                    onNavigateBack = { navController.navigate(MENU_SCREEN) }
-                )
-            }
-
         }
 
 //            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {

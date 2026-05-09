@@ -1,9 +1,15 @@
 package no.uio.ifi.in2000.team16.data.di
 
+import android.content.Context
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -15,13 +21,6 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.plugin
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import javax.inject.Singleton
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
-import dagger.Binds
-import dagger.hilt.android.qualifiers.ApplicationContext
 import no.uio.ifi.in2000.team16.data.ai.AiDataSource
 import no.uio.ifi.in2000.team16.data.ai.AiDataSourceInterface
 import no.uio.ifi.in2000.team16.data.artsdatabasen.LocalMushroomDataSource
@@ -56,6 +55,7 @@ import no.uio.ifi.in2000.team16.data.species.SpeciesDataSource
 import no.uio.ifi.in2000.team16.data.species.SpeciesDataSourceInterface
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
+import javax.inject.Singleton
 
 /*
     Object creates an Http client and the Storage module

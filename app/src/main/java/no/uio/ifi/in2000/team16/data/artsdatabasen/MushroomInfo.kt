@@ -1,6 +1,6 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 /**

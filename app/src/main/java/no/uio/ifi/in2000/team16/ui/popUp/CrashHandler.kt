@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.team16.ui.popUp
 
 import android.content.Context
 import android.content.Intent
-import kotlin.jvm.java
 
 class CrashHandler(private val context: Context) : Thread.UncaughtExceptionHandler {
 

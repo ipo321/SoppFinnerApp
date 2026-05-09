@@ -6,33 +6,32 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.navigation.Navigation
 import no.uio.ifi.in2000.team16.ui.snackbar.observeConnectivity
+import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.MapLibre
-import androidx.compose.material3.Snackbar
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import no.uio.ifi.in2000.team16.ui.map.MapViewModel
-import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 
 
 @AndroidEntryPoint

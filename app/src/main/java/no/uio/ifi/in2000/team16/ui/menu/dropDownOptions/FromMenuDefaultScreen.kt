@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer

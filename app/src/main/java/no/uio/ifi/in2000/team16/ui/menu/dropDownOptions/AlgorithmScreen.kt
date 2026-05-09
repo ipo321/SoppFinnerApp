@@ -36,8 +36,9 @@ fun AlgorithmScreen(
     FromMenuDefaultScreen(
         header = "Velg algoritme for beregning",
         body = "Her kan du velge mellom tre ulike algoritmer for å beregne score for soppfunn. " +
-               "Standard-algoritmen er en lokal maskinlæringsmodell, men det er også mulig å velge " +
-               "en lokal forenklet algoritme, eller en KI-evaluering.",
+                "Alle de ulike metodene sjekker opp forholdene der du velger for å beregne hvor godt " +
+                "egnet et område er for å plukke sopp! Standard-algoritmen er den lokale maskinlæringsmodellen, " +
+                "men det er også mulig å velge en forenklet algoritme, eller en KI-evaluering.",
         onNavigateBack = onNavigateBack,
         content = { AlgorithmScreenContent(
             uiState = alUiState,
@@ -133,8 +134,8 @@ private fun Modifier.algorithmCard(isSelected: Boolean): Modifier {
 
 private fun getAlgorithmDescription(algorithm: String): String =
     when (algorithm) {
-        "Forenklet" -> "Den lokale forenklede algoritmen er beregnet sånn og sånn"
-        "ML"    -> "Den lokale maskinlæringsmodellen bruker noe greier"
-        "KI"    -> "Kunstig intelligens bruker noe greier for å beregne"
+        "Forenklet" -> "Bruker er algoritme bygget på biologisk forståelse av sopper. Hver sopp har også med maskinlæring fått bygget en \"ønskeliste\" over hvilke forhold den foretrekker, som sammen med algoritmen gir deg en score."
+        "ML"    -> "Bruker en algoritme som er lært opp på tusen tidligere soppfunn i Norge for å gjenkjenne mønstre i vær og skog."
+        "KI"    -> "Bruker en moderne, stor språkmodell for å vurdere forholdene. Den har fått beskjed om å være din egne sopp spesialist."
         else    -> ""
     }
