@@ -4,11 +4,11 @@ import android.util.Log
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import javax.inject.Inject
-import javax.inject.Singleton
 import no.uio.ifi.in2000.team16.domain.model.ForestData
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
 

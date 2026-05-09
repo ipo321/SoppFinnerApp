@@ -2,11 +2,10 @@ package no.uio.ifi.in2000.team16.ui.snackbar
 
 import android.content.Context
 import android.location.LocationManager
-import android.os.Build
+import androidx.core.location.LocationManagerCompat
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import androidx.core.location.LocationManagerCompat
 import kotlinx.coroutines.launch
 
 fun observeLocationAvailability(context: Context): Flow<Boolean> = callbackFlow {

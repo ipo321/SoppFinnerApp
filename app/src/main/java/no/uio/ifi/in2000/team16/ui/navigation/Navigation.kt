@@ -37,7 +37,6 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SummaryScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
@@ -85,7 +84,7 @@ fun Navigation(
     val context = LocalContext.current
 
     var isMapLoaded by remember { mutableStateOf(false) }
-    val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -222,7 +221,7 @@ fun Navigation(
 
             composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
                 // Get the list screen's back stack entry to share its ViewModel
-                val listEntry = remember(backStackEntry) {
+                remember(backStackEntry) {
                     navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
                 }
                 MushroomInfoScreen(

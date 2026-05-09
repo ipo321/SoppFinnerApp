@@ -2,7 +2,6 @@ package no.uio.ifi.in2000.team16.ui.onboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import no.uio.ifi.in2000.team16.data.onBoard.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
