@@ -50,7 +50,7 @@ fun OnboardingScreen(
         OnBoardModel(
             title = "Menyen",
             description = "Oppe til venstre er det en liten meny. Inni den kan du skru på heatmap" +
-                    "Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
+                    "  Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
                     "mye eller lite potensiale for sopp. Rødt betyr lite, grønt er mye og gult er litt ",
             imageRes = R.drawable.sprite01
         ),
