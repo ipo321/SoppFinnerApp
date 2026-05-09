@@ -410,6 +410,8 @@ private fun WeatherRow(uiState: ScoreCardUiState){
                     horizontalArrangement = Arrangement.Center
                 ){
                     if (uiState.symbolCode != null) {
+                        //Unavoidable because we get it from an API response, unless we hardcode
+                        //a table with all possible weathericons
                         val imageRes = context.resources.getIdentifier(
                             uiState.symbolCode,
                             "drawable",
