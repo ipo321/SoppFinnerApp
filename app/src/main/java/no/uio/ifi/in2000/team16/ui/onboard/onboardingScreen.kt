@@ -19,76 +19,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpSectionItem
+import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.helpSections
 
 @Composable
 fun OnboardingScreen(
     modifier: Modifier = Modifier,
     onFinished: () -> Unit
 ) {
-//Just an example, need more sprites
-    val pages = listOf(
-        OnBoardModel(
-            title = "Velkommen",
-            description = "Sopp sporer er ett verktøy for å beregne om ulike områder" +
-                    " har potensialet for sopp på en skala fra 1-100",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "",
-            description = "Når du først åpner appen vil du se kartet. Der kan du trykke på en" +
-                    " plass i karetet eller søke det opp og den vil automatisk beregne skoren",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "Menyen",
-            description = "Oppe til venstre er det en liten meny. Inni den kan du skru på heatmap" +
-                    "Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
-                    "mye eller lite potensiale for sopp. Rødt betyr lite, grønt er mye og gult er litt ",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "Historiske funn",
-            description = "Denne lar deg se hvor det tidligere har blitt funnet sopp." +
-                    "Denne informasjonen ble tatt fra artsdatabanken",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "Satelittmodus",
-            description = "Her kan du enkelt endre kartmodus mellom sattelitt og standard kartmodus",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "Skoglag",
-            description = "...",
-            imageRes = R.drawable.sprite01
-        ),
-        OnBoardModel(
-            title = "Soppsiden",
-            description = "Soppsiden er en generell oversikt over de ulike soppene du kan finne ute." +
-                    "Her ",
-            imageRes = R.drawable.sprite01
-        )
-
-    )
-
-    val pagerState = rememberPagerState(pageCount = { pages.size })
+    val pagerState = rememberPagerState(pageCount = { helpSections.size })
     val coroutineScope = rememberCoroutineScope()
 
-    val isLastPage = pagerState.currentPage == pages.lastIndex
+    val isLastPage = pagerState.currentPage == helpSections.lastIndex
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
         ) { page ->
-            OnBoardItem(pages[page])
+            HelpSectionItem(helpSections[page])
         }
 
         Row(
@@ -98,28 +53,11 @@ fun OnboardingScreen(
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
-
-            /*🔹 Skip (skjules på siste side)
-            Text(
-                text = if (isLastPage) "" else "Skip",
-                style = TextStyle(
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                ),
-                modifier = Modifier.clickable {
-                    onFinished()
-                }
-            )
-
-             */
-
-            // 🔹 Dots indikator
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.weight(1f)
             ) {
-                repeat(pages.size) { index ->
+                repeat(helpSections.size) { index ->
                     val isSelected = pagerState.currentPage == index
 
                     Box(
@@ -140,7 +78,6 @@ fun OnboardingScreen(
                 }
             }
 
-            // 🔹 Next / Finish
             Text(
                 text = if (isLastPage) "Finish" else "Next",
                 style = TextStyle(
@@ -150,9 +87,8 @@ fun OnboardingScreen(
                 ),
                 modifier = Modifier.clickable {
                     if (!isLastPage) {
-                        val nextPage = pagerState.currentPage + 1
                         coroutineScope.launch {
-                            pagerState.animateScrollToPage(nextPage)
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
                     } else {
                         onFinished()
