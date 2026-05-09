@@ -7,7 +7,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
 import android.view.ViewGroup
-import org.maplibre.android.camera.CameraPosition
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +35,7 @@ import androidx.core.content.ContextCompat
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.ui.common.ErrorScreen
+import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
@@ -49,7 +49,6 @@ import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
 import org.maplibre.geojson.Polygon
-import kotlin.math.abs
 
 /*
     The Map Screen is the main screen in the app.
@@ -69,10 +68,11 @@ fun MapScreen(
     isDarkMode: Boolean
 ) {
     val context = LocalContext.current
-    var locationPermissionGranted by remember {mutableStateOf(
-        ContextCompat.checkSelfPermission(
-            context, Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    var locationPermissionGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         )
     }
     //Shows the "Allow Location" popup and remembers the response
@@ -81,7 +81,6 @@ fun MapScreen(
     ) { permissions ->
         locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
     }
-    var hasCenteredInitially by remember { mutableStateOf(false) }
     val uiState by mapViewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
     val searchTextFieldState = rememberTextFieldState()
@@ -89,14 +88,16 @@ fun MapScreen(
     val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
     //Reload Map on internet reconect
-    var hadDisconnection by remember {mutableStateOf(false)}
+    var hadDisconnection by remember { mutableStateOf(false) }
 
     LaunchedEffect(isNetConnected) {
-        Log.d("T16_Net", "isNetConnected changed: $isNetConnected " +
-                "hadDisconnection changed: $hadDisconnection")
-        if(!isNetConnected){
+        Log.d(
+            "T16_Net", "isNetConnected changed: $isNetConnected " +
+                    "hadDisconnection changed: $hadDisconnection"
+        )
+        if (!isNetConnected) {
             hadDisconnection = true
-        }else if(hadDisconnection){
+        } else if (hadDisconnection) {
             hadDisconnection = false
             mapViewModel.retryLastClick()
         }
@@ -110,19 +111,18 @@ fun MapScreen(
         context = context,
         locationPermissionRequest = locationPermissionRequest,
         locationPermissionGranted = locationPermissionGranted,
-        hasCenteredInitially = hasCenteredInitially,
-        onHasCenteredInitiallyChange = { },
         onMapLoaded = onMapLoaded,
         isDarkMode = isDarkMode
     )
     // mapView is alerted when lifecycle changes
     MapLifecycle(mapView, isVisible)
     // Sets up the GPS listener
-    DisposableEffect(locationPermissionGranted){
-        if(!locationPermissionGranted) return@DisposableEffect onDispose{}
+    DisposableEffect(locationPermissionGranted) {
+        if (!locationPermissionGranted) return@DisposableEffect onDispose {}
 
         val locationManager = context.getSystemService(
-            Context.LOCATION_SERVICE) as LocationManager
+            Context.LOCATION_SERVICE
+        ) as LocationManager
 
         //fires every time we want to update the user position from the GPS
         //pushes the coordinates to the viewmodel
@@ -136,7 +136,7 @@ fun MapScreen(
             listener
         )
         //disposes of the GPS listener(to avoid leaks)
-        onDispose{locationManager.removeUpdates(listener)}
+        onDispose { locationManager.removeUpdates(listener) }
     }
     MapScreenSurface(
         searchTextFieldState = searchTextFieldState,
@@ -200,7 +200,6 @@ fun MapScreenSurface(
         MapComponents(
             viewModel = mapViewModel,
             uiState = uiState,
-            mapView = mapView,
             textFieldState = searchTextFieldState,
             onSearch = { }
         )
@@ -216,12 +215,14 @@ fun MapScreenSurface(
                     )
                 }
             }
+
             is ScreenStatus.Loading -> InfoPopUp(
                 msg = stringResource(R.string.laster_inn_data),
                 score = 0,
                 contextData = null,
                 onDismiss = null
             )
+
             is ScreenStatus.Error -> ErrorScreen("Feil: ${uiState.screenStatus.message}")
             is ScreenStatus.Idle -> {}
         }
@@ -264,47 +265,21 @@ fun getMapView(
                     )
                     true
                 }
-                var lastTarget: LatLng? = null
-                var lastZoom = 0.0
-
-                // Checks if map is still
                 map.addOnCameraIdleListener {
-                    val currentZoom = map.cameraPosition.zoom
-
-                    if (!mapViewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
-
-                    val currentTarget = map.cameraPosition.target
-
-                    if (currentTarget != null && lastTarget != null) {
-                        val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                        val zoomDiff = abs(currentZoom - lastZoom)
-
-                        if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
-                            return@addOnCameraIdleListener
-                        }
-                    }
-
-                    lastTarget = currentTarget
-                    lastZoom = currentZoom
-
-                    val visibleBounds = map.projection.visibleRegion.latLngBounds
-
-                    val north = visibleBounds.northEast.latitude
-                    val south = visibleBounds.southWest.latitude
-                    val east = visibleBounds.northEast.longitude
-                    val west = visibleBounds.southWest.longitude
-
-                    val latDiff = north - south
-                    val lonDiff = east - west
-
-                    val expandedBounds = BoundingBox(
-                        north = north + (latDiff * 0.2),
-                        south = south - (latDiff * 0.2),
-                        east = east + (lonDiff * 0.4),
-                        west = west - (lonDiff * 0.4)
+                    // Forward raw camera state to the VM; gating, throttling and
+                    // bounds-expansion live there so this callback stays UDF-clean.
+                    val pos = map.cameraPosition
+                    val region = map.projection.visibleRegion.latLngBounds
+                    mapViewModel.onCameraIdle(
+                        target = pos.target,
+                        zoom = pos.zoom,
+                        visibleBounds = BoundingBox(
+                            north = region.northEast.latitude,
+                            south = region.southWest.latitude,
+                            east = region.northEast.longitude,
+                            west = region.southWest.longitude,
+                        )
                     )
-
-                    mapViewModel.fetchHeatmapData(expandedBounds)
                 }
             }
         }
@@ -320,8 +295,6 @@ fun LaunchEffects(
     context: Context,
     locationPermissionRequest: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
     locationPermissionGranted: Boolean,
-    hasCenteredInitially: Boolean,
-    onHasCenteredInitiallyChange: (Boolean) -> Unit,
     onMapLoaded: () -> Unit,
     isDarkMode: Boolean
 ) {
@@ -333,7 +306,7 @@ fun LaunchEffects(
         val styleUrl = if (uiState.isSatelliteMode)
             "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
         else
-            if(isDarkMode)
+            if (isDarkMode)
                 "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
             else
                 "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
@@ -350,7 +323,7 @@ fun LaunchEffects(
         }
     }
     // WMS Forest Layer
-    LaunchedEffect(uiState.showWmsForest, mapRef,  isDarkMode, uiState.isSatelliteMode) {
+    LaunchedEffect(uiState.showWmsForest, mapRef, isDarkMode, uiState.isSatelliteMode) {
         mapRef?.getStyle { style ->
             style.getLayer("satskog-layer")?.setProperties(
                 visibility(if (uiState.showWmsForest) VISIBLE else NONE)
@@ -376,10 +349,10 @@ fun LaunchEffects(
         }
     }
     //Drawing the users position dot
-    LaunchedEffect(uiState.userLocation, mapRef, isDarkMode, uiState.isSatelliteMode){
+    LaunchedEffect(uiState.userLocation, mapRef, isDarkMode, uiState.isSatelliteMode) {
         val currentMap = mapRef ?: return@LaunchedEffect
         val location = uiState.userLocation ?: return@LaunchedEffect
-        currentMap.getStyle{ style ->
+        currentMap.getStyle { style ->
             val source = style.getSourceAs<GeoJsonSource>("user-location-source")
                 ?: return@getStyle
             val point = Point.fromLngLat(location.longitude, location.latitude)
@@ -408,7 +381,8 @@ fun LaunchEffects(
 
         currentMap.getStyle { style ->
             if (!style.isFullyLoaded) return@getStyle
-            val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
+            val locationSource =
+                style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
 
             if (uiState.isHistoricalFindsEnabled) {
                 locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
@@ -417,6 +391,17 @@ fun LaunchEffects(
             }
         }
     }
+
+    // Reacts to a search result by animating the camera, then clears the request.
+    LaunchedEffect(uiState.pendingCameraTarget, mapRef) {
+        val target = uiState.pendingCameraTarget ?: return@LaunchedEffect
+        val map = mapRef ?: return@LaunchedEffect
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(LatLng(target.lat, target.lon), target.zoom)
+        )
+        viewModel.onPendingCameraTargetConsumed()
+    }
+
     // Updating the heatMapTiles each time they change
     LaunchedEffect(
         uiState.heatmapTiles,
@@ -460,7 +445,10 @@ fun LaunchEffects(
 
                 val featureCollection = FeatureCollection.fromFeatures(features)
                 source.setGeoJson(featureCollection)
-                Log.d(context.getString(R.string.t16_map_heat), "Drew ${features.size} grid polygons natively.")
+                Log.d(
+                    context.getString(R.string.t16_map_heat),
+                    "Drew ${features.size} grid polygons natively."
+                )
 
             } else {
                 // Clear the map safely
@@ -470,7 +458,7 @@ fun LaunchEffects(
     }
     //For making the screen start on the user position
     LaunchedEffect(uiState.moveCameraToUser, mapRef) {
-        if(!uiState.moveCameraToUser) return@LaunchedEffect
+        if (!uiState.moveCameraToUser) return@LaunchedEffect
         val currentMap = mapRef ?: return@LaunchedEffect
         val location = uiState.userLocation ?: return@LaunchedEffect
 
@@ -482,53 +470,58 @@ fun LaunchEffects(
     }
     // this updates the scorecard when someone changes selected mushroom in Soppsiden
     LaunchedEffect(uiState.selectedMushroom) {
-        val lat = uiState.lastClickedLat ?: return@LaunchedEffect
-        val lon = uiState.lastClickedLon ?: return@LaunchedEffect
         viewModel.refreshCurrentLocation()
     }
     // Actually runs the popup and makes sure it doesn't rerun
-    LaunchedEffect(Unit){
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ))
+    LaunchedEffect(Unit) {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
     }
-    LaunchedEffect(uiState.userLocation, locationPermissionGranted, mapRef, hasCenteredInitially
+
+
+    // Centers the map on the user the first time we know where they are
+    // (or on Oslo if location permission is denied). Guarded by the VM-owned
+    // `hasCenteredInitially` flag so it survives recomposition and rotation.
+    LaunchedEffect(
+        uiState.userLocation,
+        locationPermissionGranted,
+        mapRef,
+        uiState.hasCenteredInitially
     ) {
         val map = mapRef ?: return@LaunchedEffect
-        if (hasCenteredInitially) return@LaunchedEffect
+        if (uiState.hasCenteredInitially) return@LaunchedEffect
 
         val userLat = uiState.userLocation?.latitude
         val userLon = uiState.userLocation?.longitude
 
         when {
-            // if user location permission is granted, then we can move map to that location
             userLat != null && userLon != null -> {
-                onHasCenteredInitiallyChange(true)
+                viewModel.onInitialCenterDone()
                 map.cameraPosition = CameraPosition.Builder()
                     .target(LatLng(userLat, userLon))
                     .zoom(zoom)
                     .build()
                 onMapLoaded()
             }
-
-            // if user location permission is not granted, we open at default Oslo
+            // No permission — fall back to a default location instead of
+            // waiting indefinitely for a fix that will never arrive.
             !locationPermissionGranted -> {
-                onHasCenteredInitiallyChange(true)
+                viewModel.onInitialCenterDone()
                 map.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(59.91, 10.75)) // Oslo
+                    .target(LatLng(59.91, 10.75))//Oslo
                     .zoom(zoom)
                     .build()
                 onMapLoaded()
             }
 
-            // if user location permission is granted, but we are waiting for lat and lon
             else -> {}
         }
     }
 }
-
-
 
 
 

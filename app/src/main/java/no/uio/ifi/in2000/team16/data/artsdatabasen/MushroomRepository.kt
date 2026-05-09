@@ -44,9 +44,10 @@ class MushroomRepository @Inject constructor(
     private val localMushroomDataSource: LocalMushroomDataSourceInterface
 ) : MushroomRepositoryInterface {
 
-    // Effectively "no radius limit" — returns finds across all of Norway and beyond.
-    //this is a shortcut we made since we did not have enough time to just return
-    //all occurrences of the specific mushroom.
+    // Effectively "no radius limit" (10000000.0) — returns finds across all of Norway and beyond.
+    // this is a shortcut we made since we did not have enough time to adjust it.
+    // can be reworked to use the size of the mapView so it only renders inn the points
+    // that are visible on screen.
     // This is a known quick fix; a proper default would be something like 100.0 km.
     override val defaultKmRadius = 10000000.0
 

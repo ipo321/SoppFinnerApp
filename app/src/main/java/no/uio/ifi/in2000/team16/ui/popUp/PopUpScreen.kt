@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -65,7 +66,8 @@ fun DialogWithImage(
                 Text(
                     text = "Noen sopparter kan være giftige. Vær sikker på at soppen er trygg før du spiser den. Ta kontakt med Giftinformasjonen dersom du mistenker å ha fått i deg giftig sopp.",
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
                 )
                 Row(
                     modifier = Modifier
