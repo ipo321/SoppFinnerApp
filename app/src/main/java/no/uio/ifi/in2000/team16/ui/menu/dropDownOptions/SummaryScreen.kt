@@ -11,14 +11,26 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import no.uio.ifi.in2000.team16.R
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun SummaryScreen(
@@ -54,7 +66,7 @@ fun HelpScreen(
             title = "Kart",
             text = "Når du først åpner appen vil du se kartet. Der kan du trykke på en" +
                     " plass i karetet eller søke det opp og den vil automatisk beregne skoren",
-            imageRes = R.drawable.sprite01
+            imageRes = R.drawable.map_screen
         ),
         HelpSection(
             title = "Heat map",
@@ -93,50 +105,60 @@ fun HelpScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//        item {
-////            OutlinedButton(
-////                onClick = onNavigateBack,
-////                modifier = Modifier.fillMaxWidth(),
-////                shape = MaterialTheme.shapes.extraLarge,
-////                colors = ButtonDefaults.outlinedButtonColors(
-////                    contentColor = MaterialTheme.colorScheme.onPrimary
-////                )
-////            ) {
-////                Text("Tilbake")
-////            }
-//
-//            Spacer(modifier = Modifier.height(24.dp))
-//        }
-
-//        items(helpSections) { section ->
-//            HelpSectionItem(section)
         helpSections.forEach { section ->
             HelpSectionItem(section)
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
-
 @Composable
 fun HelpSectionItem(section: HelpSection) {
+    var showImageDialog by remember { mutableStateOf(false) }
+
+    if (showImageDialog) {
+        ImageDialog(
+            imageRes = section.imageRes,
+            title = section.title,
+            onDismiss = { showImageDialog = false }
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = section.imageRes),
-            contentDescription = section.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Image(
+                painter = painterResource(id = section.imageRes),
+                contentDescription = section.title,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clickable { showImageDialog = true }
+            )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Trykk på bildet for å forstørre",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
             text = section.title,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -144,7 +166,41 @@ fun HelpSectionItem(section: HelpSection) {
         Text(
             text = section.text,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onPrimary,
+            
         )
     }
+}
+@Composable
+fun ImageDialog(
+    imageRes: Int,
+    title: String,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text("Lukk")
+                }
+            }
+        },
+        title = {
+            Text(title)
+        },
+        text = {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = title,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+            )
+        }
+    )
 }
