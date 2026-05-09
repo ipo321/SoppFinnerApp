@@ -4,13 +4,13 @@ import android.util.Log
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import no.uio.ifi.in2000.team16.domain.model.WeatherHistory
-import java.text.SimpleDateFormat
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import no.uio.ifi.in2000.team16.domain.model.WeatherHistory
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 
@@ -19,10 +19,18 @@ import kotlin.coroutines.cancellation.CancellationException
    Summarizes the data from the FROST Api
 */
 
+interface FrostRepositoryInterface {
+
+    suspend fun weatherHistory(
+        lat: Double,
+        lon: Double
+    ): WeatherHistory?
+}
+
 class FrostRepository @Inject constructor(
-    private val dataSource: FrostDataSource,
+    private val dataSource: FrostDataSourceInterface,
     private val stationLocator: StationLocator
-) {
+) : FrostRepositoryInterface {
     // In-memory cache, should be made into a room database in the future for better persistence
 
     private val cache = ConcurrentHashMap<String, Deferred<CacheEntry?>>()
@@ -33,7 +41,7 @@ class FrostRepository @Inject constructor(
         val timestamp: Long
     )
 
-    suspend fun weatherHistory(lat: Double, lon: Double): WeatherHistory? = coroutineScope{
+    override suspend fun weatherHistory(lat: Double, lon: Double): WeatherHistory? = coroutineScope{
         val currentTime = System.currentTimeMillis()
 
         //Find best station

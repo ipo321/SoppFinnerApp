@@ -47,7 +47,7 @@ C:.
         ├───popUp
         └───theme
 ```
-And here is a overview of the test files
+And here is an overview of the test files
 ```Text
     ExampleUnitTest.kt
     MapViewModelTest.kt

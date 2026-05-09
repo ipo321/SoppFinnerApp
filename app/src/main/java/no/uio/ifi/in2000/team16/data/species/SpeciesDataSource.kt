@@ -7,13 +7,21 @@ import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface SpeciesDataSourceInterface {
+    var amount: Int
+    val mushroomList: List<Mushroom>
+
+    fun getAllMushrooms(): List<Mushroom>
+
+    fun getAmountOfMushrooms(): Int
+}
 
 @Singleton
-class SpeciesDataSource @Inject constructor(){
+class SpeciesDataSource @Inject constructor() : SpeciesDataSourceInterface {
 
     //keeps track of how many mushrooms we have profiled easily,
-    //gets updated to actual value when getAllSpecies is called.
-    var amount: Int = 0
+    // gets updated to actual value when getAllSpecies is called.
+    override var amount: Int = 0
 
 
     val allSpeciesProfiles = listOf(
@@ -244,7 +252,7 @@ class SpeciesDataSource @Inject constructor(){
         )
     )
 
-    private val allMushrooms = listOf(
+    override val mushroomList = listOf(
         Mushroom(
             commonName = "Kantarell",
             latinName = "Cantharellus cibarius",
@@ -369,12 +377,12 @@ class SpeciesDataSource @Inject constructor(){
 
     )
 
-    fun getAllMushrooms(): List<Mushroom> {
-        amount = allMushrooms.size
-        return allMushrooms
+    override fun getAllMushrooms(): List<Mushroom> {
+        amount = mushroomList.size
+        return mushroomList
     }
 
-    fun getAmountOfMushrooms(): Int {
+    override fun getAmountOfMushrooms(): Int {
         return amount
     }
 }

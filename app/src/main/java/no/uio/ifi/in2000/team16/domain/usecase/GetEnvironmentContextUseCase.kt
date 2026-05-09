@@ -1,17 +1,17 @@
 package no.uio.ifi.in2000.team16.domain.usecase
 
 import android.util.Log
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.async
-import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
-import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
-import no.uio.ifi.in2000.team16.data.nibio.ForestRepository
-import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepository
+import kotlinx.coroutines.coroutineScope
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.frost.FrostRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.ForestRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepositoryInterface
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
-import javax.inject.Inject
 import java.util.Calendar
+import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
 
@@ -21,11 +21,11 @@ data repositories to fetch the data. Simplifies the Viewmodel. Returns the envir
 */
 
 class GetEnvironmentContextUseCase @Inject constructor(
-    private val locationForecastRepository: LocationForecastRepository,
-    private val mushroomRepository: MushroomRepository,
-    private val forestRepository: SatSkogRepository,
-    private val frostRepository: FrostRepository,
-    private val ar5Repository: ForestRepository
+    private val locationForecastRepository: LocationForecastRepositoryInterface,
+    private val mushroomRepository: MushroomRepositoryInterface,
+    private val forestRepository: SatSkogRepositoryInterface,
+    private val frostRepository: FrostRepositoryInterface,
+    private val ar5Repository: ForestRepositoryInterface
     //Add other repositories here
 ) {
     suspend operator fun invoke(lat: Double, lon: Double, profile: SpeciesProfile? = null): EnvironmentContext {
@@ -48,7 +48,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                             mushroomRepository.getMushroomsNearLocation(
                                 lat,
                                 lon,
-                                mushRoomType = profile.name
+                                mushroomType = profile.name
                             )
                         }
                     } else {

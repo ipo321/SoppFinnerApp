@@ -23,5 +23,35 @@
     <string name="rødskrubb_bio">Rødskrubb er en sopp i slekten skrubber, som igjen hører til rørsoppfamilien. Den er beslektet med brunskrubb. Rødskrubb er en god matsopp som vokser over hele Norge, men den må varmebehandles i minst 15 minutter for å være spiselig. Rødskrubb kan forårsake oppkast og diaré hvis den spises rå eller dårlig varmebehandlet. Rødskrubben har skrubbete stilk og en rød-oransje hatt med grå rørmunninger under hatten. Kjøttet skifter farge ved gjennomskjæring og blir blåsort.</string>
     <string name="brunskrubb_bio">Brunskrubb er en meget vanlig matsopp som vokser i hele landet. Den har beige til brun hatt, og gråhvit stilk med brune til svarte, små flekker (ser skrubbet ut). Brunskrubb er en rørsopp og er beslektet med rødskrubb. Den har ingen giftige dobbeltgjengere og gir i motsetning til rødskrubb ikke ubehag ved for kort oppvarming. Den danner sopprot (mykorrhiza) med bjørk. Enkelte lignende arter vokser under osp, hassel og andre løvtrær. De er alle spiselige.</string>
     <string name="matblekksopp">Matblekksopp er en sopp som hører til slekten skjellblekksopper. Den har en smal, eggformet til sylinderformet, grovskjellet hvit hatt. I toppen er skjellene lysbrune. Stilken har ring. Den vokser på gjødslete steder i kulturlandskapet; beitemark, parker og gravlunder, og den kan til og med bryte opp gjennom asfalt. Unge eksemplarer er spiselige og velsmakende. Den bør bare brukes som matsopp så lenge den er helt hvit. Det er verdt å merke seg at matblekksopp ikke har antabusvirkning lik grå blekksopp. Når fruktlegemene (selve soppen) vokser til, vil ofte hattkjøttet forslimes etter hvert som sporene modnes og henflyte som en svart, seig, blekkaktig væske, derav navnet.</string>
-    <string name="svart_trompetsopp_bio">Svart trompetsopp er en sopp som hører til slekten trompetsopper. Soppen er sort og hatten har form som en trompet eller trakt. Hatten er nesten glatt på undersiden eller har fine og grunne årer. Svart trompetsopp er en god matsopp. Svart trompetsopp vokser i noe næringsrik skog ofte på kalkgrunn. Svart trompetsopp er en svært god matsopp med en krydret smak. Den har et tynt fruktkjøtt, som gjør at den er egnet for tørking. Tørket trompetsopp kan holde lenge. Man kan knuse tørr sopp og bruke det i sauser og gryter. Man kan også legge den tørkede soppen i vann slik at den rehydreres, før man tilbereder den."</string>
+    <string name="svart_trompetsopp_bio">Svart trompetsopp er en sopp som hører til slekten trompetsopper. Soppen er sort og hatten har form som en trompet eller trakt. Hatten er nesten glatt på undersiden eller har fine og grunne årer. Svart trompetsopp er en god matsopp. Svart trompetsopp vokser i noe næringsrik skog ofte på kalkgrunn. Svart trompetsopp er en svært god matsopp med en krydret smak. Den har et tynt fruktkjøtt, som gjør at den er egnet for tørking. Tørket trompetsopp kan holde lenge. Man kan knuse tørr sopp og bruke det i sauser og gryter. Man kan også legge den tørkede soppen i vann slik at den rehydreres, før man tilbereder den.</string>
+    <string name="sentraliser_kartet">Sentraliser kartet</string>
+    <string name="viser_resultater_for">Viser resultater for:</string>
+    <string name="meny">Meny</string>
+    <string name="sok_i_kartet">Søk i kartet</string>
+    <string name="tom_sok">Tøm søk</string>
+    <string name="sok">Søk</string>
+    <string name="t16_map_heat">T16_Map_Heat</string>
+    <string name="t16_map">T16_Map</string>
+
+    <string name="mushroom_list_title">Soppsiden</string>
+    <string name="mushroom_list_favorites">Favoritter</string>
+    <string name="mushroom_list_others">Øvrige</string>
+    <string name="cd_soppkontroll_logo">Soppkontroll logo</string>
+    <string name="soppkontroll_brand">Soppkontroll.no</string>
+    <string name="soppkontroll_description">tilbyr digital soppkontroll som lar brukerne sjekke om soppen er spiselig eller ikke.</string>
+    <string name="soppkontroll_visit_button">Besøk Soppkontroll.no</string>
+    <string name="warning_not_for_identification">OBS: Dette er ikke en app for identifikasjon av sopp</string>
+    <string name="laster_inn_data">Laster inn data...</string>
+    <string name="back_button">Tilbake</string>
+    <string name="checkBox_description">Velg til kart</string>
+    <string name="kart_big_k">Kart</string>
+
+    <string name="mushroom_info_warning_text">Aldri spis sopp du er usikker på.</string>
+    <string name="mushroom_info_warning_link">Se Soppkontroll.no for informasjon</string>
+    <string name="mushroom_info_in_season">I sesong</string>
+    <string name="mushroom_info_not_in_season">Ikke i sesong</string>
+    <string name="mushroom_info_remove_favorite">Fjern fra favoritter</string>
+    <string name="mushroom_info_add_favorite">Legg til i favoritter</string>
+    <string name="mushroom_info_select_on_map">Velg i kart</string>
+    <string name="mushroom_info_about_header">Om soppen</string>
 </resources>

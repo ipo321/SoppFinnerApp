@@ -14,14 +14,28 @@ import javax.inject.Singleton
 /*
    API for Frost. SHOULD CHANGE FROM RANKED AND NEAREST in upcomming solution. this should take the loading time down from 8 seconds to 1
 */
+
+interface FrostDataSourceInterface {
+    suspend fun fetchWeather(
+        stationIds: String,
+        timeRange: String
+    ): FrostResponse?
+
+    suspend fun fetchWeatherFallback(
+        lat: Double,
+        lon: Double,
+        timeRange: String
+    ): FrostResponse?
+}
+
 @Singleton
 class FrostDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
+) : FrostDataSourceInterface {
     private val elements = "air_temperature,sum(precipitation_amount P1D),precipitation_amount"
     private val authUser = "d3b7c216-1329-47bb-b09e-c22b6353cc0b"
 
-    suspend fun fetchWeather(stationIds: String, timeRange: String): FrostResponse? {
+    override suspend fun fetchWeather(stationIds: String, timeRange: String): FrostResponse? {
         val url = "https://frost-rc.met.no/api/v1/obs/base/get"
 
         return try {
@@ -39,7 +53,7 @@ class FrostDataSource @Inject constructor(
             null
         }
     }
-    suspend fun fetchWeatherFallback(lat: Double, lon: Double, timeRange: String): FrostResponse? {
+    override suspend fun fetchWeatherFallback(lat: Double, lon: Double, timeRange: String): FrostResponse? {
         val url = "https://frost-rc.met.no/api/v1/obs/ranked/get"
         val nearestJson = """{"maxdist":10,"maxcount":5,"points":[{"lon":$lon,"lat":$lat}]}"""
 

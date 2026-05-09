@@ -4,35 +4,41 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.navigation.Navigation
 import no.uio.ifi.in2000.team16.ui.snackbar.observeConnectivity
+import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 import org.maplibre.android.MapLibre
-import androidx.compose.material3.Snackbar
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    //gets the mapviewmodel so score can be reloaded on internet reconnect
+    private val mapViewModel : MapViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -43,7 +49,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            var darkTheme by remember { mutableStateOf(false) }
+            val systemTheme = isSystemInDarkTheme()
+            var darkTheme by remember { mutableStateOf(systemTheme) }
                 Team16Theme (
                     darkTheme = darkTheme
 
@@ -74,7 +81,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    //LaunchEffect for snackBar that shows No internet
+                    //LaunchEffect for snackBar that shows No position
                     LaunchedEffect(isPosConnected) {
                         if (!isPosConnected) {
                             locationSnackbarState.showSnackbar(
@@ -93,7 +100,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier,
                             navController = navController,
                             darkTheme = darkTheme,
-                            onToggleTheme = { darkTheme = !darkTheme }
+                            onToggleTheme = { darkTheme = !darkTheme },
+                            isNetConnected = isNetConnected
                         )
 
                         //Internet

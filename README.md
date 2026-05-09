@@ -6,7 +6,7 @@ kurset. -->
 # IN2000 project team 16:
 ## About
 A app for finding mushroom in Norway. The app offers a simple map ui where users can pick a mushroom and spot and get
-a evaluation of its potentials. The app also offers heatmap to view the potential of a larger area.
+an evaluation of its potentials. The app also offers heatmap to view the potential of a larger area.
 
 To evaluate an area the app collects information on historical weather (MET-Frost), current weather (MET-LocationForecast),
 Mushroom findings (GBIF), biological data (NIBIO SAT-SKOG) and resource type data (NIBIO AR5). The Context is then as a default

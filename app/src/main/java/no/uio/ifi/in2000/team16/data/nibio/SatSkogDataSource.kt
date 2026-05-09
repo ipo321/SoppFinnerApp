@@ -13,11 +13,22 @@ import javax.inject.Singleton
     WMS returns images, but using GetFeatureInfo and GML we can get the data we need.
 */
 
+interface SatSkogDataSourceInterface {
+    suspend fun fetchForest(
+        lat: Double,
+        lon: Double
+    ): SatSkogResponse?
+
+    fun parseResponse(
+        gmlText: String
+    ): SatSkogResponse?
+}
+
 @Singleton
 class SatSkogDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
-    suspend fun fetchForest(lat: Double, lon: Double): SatSkogResponse? {
+) : SatSkogDataSourceInterface {
+    override suspend fun fetchForest(lat: Double, lon: Double): SatSkogResponse? {
 
         //Making a tiny square box around the location
         val offset = 0.0001
@@ -52,7 +63,7 @@ class SatSkogDataSource @Inject constructor(
         }
     }
 
-    private fun parseResponse(gmlText: String): SatSkogResponse? {
+    override fun parseResponse(gmlText: String): SatSkogResponse? {
 
         if (!gmlText.contains("<alder>")){
             Log.d("T16_NIBIO_DataSource", "No forest data found for this location")

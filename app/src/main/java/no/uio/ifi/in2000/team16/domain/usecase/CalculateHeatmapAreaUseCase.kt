@@ -1,33 +1,33 @@
 package no.uio.ifi.in2000.team16.domain.usecase
 
 import android.util.Log
-import kotlinx.coroutines.coroutineScope
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
-import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
-import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepository
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
-import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepository
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.frost.FrostRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepositoryInterface
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
-import javax.inject.Inject
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.GridPoint
 import no.uio.ifi.in2000.team16.domain.model.HeatmapTile
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
 import java.util.Calendar
-import kotlinx.coroutines.CancellationException
+import javax.inject.Inject
 import kotlin.system.measureTimeMillis
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.supervisorScope
 
 
 class CalculateHeatmapAreaUseCase @Inject constructor(
-    private val locationForecastRepository: LocationForecastRepository,
-    private val mushroomRepository: MushroomRepository,
-    private val forestRepository: SatSkogRepository,
-    private val frostRepository: FrostRepository,
+    private val locationForecastRepository: LocationForecastRepositoryInterface,
+    private val mushroomRepository: MushroomRepositoryInterface,
+    private val forestRepository: SatSkogRepositoryInterface,
+    private val frostRepository: FrostRepositoryInterface,
     private val scorerProvider: ScorerProvider,
 ){
     suspend operator fun invoke(
@@ -73,7 +73,7 @@ class CalculateHeatmapAreaUseCase @Inject constructor(
                                 south = bounds.south,
                                 east = bounds.east,
                                 west = bounds.west,
-                                mushRoomType = profile.name
+                                mushroomType = profile.name
                             )
                         }
                     }

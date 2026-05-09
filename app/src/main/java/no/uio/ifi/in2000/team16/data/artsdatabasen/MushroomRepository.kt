@@ -1,59 +1,81 @@
 package no.uio.ifi.in2000.team16.data.artsdatabasen
 
-
-
-import android.util.Log
 import javax.inject.Inject
 import kotlin.math.cos
+
 /*
-repository that can search for mushrooms and get information about them
-and the amount of mushrooms spotting in a certain area.
-use getSpeciesNearLocation with latitude, longitude and species profile.
-amount of mushroom results have a default limit that can be adjusted (limit)
-and a default radius that can be adjusted (radiusKm).
+ * Repository that provides mushroom occurrence data to the rest of the app.
+ *
+ * Acts as the single entry point for querying [LocalMushroomDataSource].
+ * Converts human-readable mushroom names and geographic inputs into the
+ * format the data source expects (species ID + bounding box coordinates).
+ */
 
-*/
+interface MushroomRepositoryInterface {
+    val defaultKmRadius: Double
 
-
-class MushroomRepository @Inject constructor(
-    private val mushroomDataSource: MushroomDataSource,
-    private val localMushroomDataSource: LocalMushroomDataSource
-) {
-
-    suspend fun searchMushrooms(query: String): List<MushroomInfo> {
-        Log.d("T16_Mushroom_Repository", "Searching for mushrooms with query: $query")
-        return mushroomDataSource.searchMushrooms(query).map { it.toMushroom() }
-    }
-
-
-    suspend fun getMushroomDetails(id: String): MushroomInfo? {
-        Log.d("T16_Mushroom_Repository", "Fetching details for mushroom ID: $id")
-        val result = mushroomDataSource.getMushroomById(id)
-        if (result == null){
-            Log.w("T16_Mushroom_Repository","Could not find mushroom details for ID: $id")
-            return null
-        }
-        return result.toMushroom()
-    }
-
-
-    //returns a OccurrenceResult object witch a list of the occurrences and a count inside a radius.
+    /**
+     * Returns occurrences of [mushroomType] within [radiusKm] kilometres of the given point.
+     *
+     * Converts the radius into a lat/lon bounding box, then delegates to the data source.
+     */
     suspend fun getMushroomsNearLocation(
         lat: Double,
         lon: Double,
-        radiusKm: Double = 3.0,
-        mushRoomType: String = "no Mushroom",
-        //limit: Int = 50
+        radiusKm: Double = defaultKmRadius,
+        mushroomType: String,
+    ): OccurrenceResult
+
+    /**
+     * Returns occurrences of [mushroomType] within an explicit bounding box.
+     *
+     * Use this when you already have the visible map bounds (e.g. for heatmap calculation).
+     */
+    suspend fun getMushroomInBoundingBox(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        mushroomType: String,
+    ): OccurrenceResult
+}
+
+class MushroomRepository @Inject constructor(
+    private val localMushroomDataSource: LocalMushroomDataSourceInterface
+) : MushroomRepositoryInterface {
+
+    // Effectively "no radius limit" (10000000.0) — returns finds across all of Norway and beyond.
+    // this is a shortcut we made since we did not have enough time to adjust it.
+    // can be reworked to use the size of the mapView so it only renders inn the points
+    // that are visible on screen.
+    // This is a known quick fix; a proper default would be something like 100.0 km.
+    override val defaultKmRadius = 10000000.0
+
+    // 1 degree of latitude ≈ 111 km anywhere on Earth (latitude lines are equally spaced)
+    private val kmPerDegreeLat = 111.0
+
+    override suspend fun getMushroomsNearLocation(
+        lat: Double,
+        lon: Double,
+        radiusKm: Double,
+        mushroomType: String,
     ): OccurrenceResult {
-        val latOffset = radiusKm / 111.0
-        val lonOffset = radiusKm / (111.0 * cos(Math.toRadians(lat)))
+        // Latitude offset: 1 degree = 111 km
+        val latOffset = radiusKm / kmPerDegreeLat
+
+        // Longitude degrees shrink towards the poles, so we correct with cos(lat).
+        // At 60°N (Norway), 1 degree of longitude ≈ 55 km instead of 111 km.
+        val lonOffset = radiusKm / (kmPerDegreeLat * cos(Math.toRadians(lat)))
 
         val latMin = lat - latOffset
         val latMax = lat + latOffset
         val lonMin = lon - lonOffset
         val lonMax = lon + lonOffset
-        //makes mushroomType into an int that can be used in the local data source
-        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushRoomType)
+
+        // Convert the mushroom name to the internal species ID used by the data source.
+        // Return an empty result immediately if the name is not recognised.
+        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushroomType)
+            ?: return OccurrenceResult()
 
         return localMushroomDataSource.getOccurrencesInBoundingBox(
             latMin = latMin,
@@ -64,34 +86,20 @@ class MushroomRepository @Inject constructor(
         )
     }
 
-
-    // Convert Species to MushroomInfo
-    private fun MushroomSearchResult.toMushroom(): MushroomInfo =
-        MushroomInfo(
-            id = key.toString(),
-            scientificName = scientificName,
-            commonName = vernacularNames
-                .firstOrNull { it.language == "nob" }?.vernacularName
-                ?: vernacularNames.firstOrNull { it.language == "nno" }?.vernacularName
-                ?: vernacularNames.firstOrNull()?.vernacularName,
-            kingdom = kingdom,
-            phylum = phylum,
-            klass = `class`,
-            order = order,
-            family = family,
-            genus = genus,
-            genusKey = genusKey,
-            species = species
-        )
-    suspend fun getMushroomInBoundingBox(
+    override suspend fun getMushroomInBoundingBox(
         north: Double,
         south: Double,
         east: Double,
         west: Double,
-        mushRoomType: String,
+        mushroomType: String,
     ): OccurrenceResult {
-        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushRoomType)
+        // Convert the mushroom name to the internal species ID used by the data source.
+        // Return an empty result immediately if the name is not recognised.
+        val localSpeciesId = LocalSpeciesIdMapper.fromName(mushroomType)
+            ?: return OccurrenceResult()
 
+        // Map compass directions to the lat/lon min/max the data source expects:
+        // north = latMax, south = latMin, east = lonMax, west = lonMin
         return localMushroomDataSource.getOccurrencesInBoundingBox(
             latMin = south,
             latMax = north,
@@ -100,8 +108,4 @@ class MushroomRepository @Inject constructor(
             localSpeciesId = localSpeciesId
         )
     }
-
-
-
-
 }

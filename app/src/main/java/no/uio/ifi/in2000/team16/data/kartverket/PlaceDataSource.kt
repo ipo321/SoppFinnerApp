@@ -7,15 +7,20 @@ import io.ktor.client.request.get
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface PlaceDataSourceInterface {
+
+    suspend fun suggest(
+        query: String
+    ): List<Place>
+}
 @Singleton
 class PlaceDataSource @Inject constructor(
     private val httpClient: HttpClient
-) {
+) : PlaceDataSourceInterface {
     private val baseUrl = "https://ws.geonorge.no/stedsnavn/v1"
 
     // Searches while user is writing
-    suspend fun suggest(query: String): List<Place> {
-        //if (query.length < 3) return emptyList()
+    override suspend fun suggest(query: String): List<Place> {
         return try {
             val response: PlaceSearchResponse = httpClient.get("$baseUrl/navn") {
                 url {

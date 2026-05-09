@@ -3,13 +3,21 @@ package no.uio.ifi.in2000.team16.ui.onboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +50,7 @@ fun OnboardingScreen(
         OnBoardModel(
             title = "Menyen",
             description = "Oppe til venstre er det en liten meny. Inni den kan du skru på heatmap" +
-                    "Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
+                    "  Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
                     "mye eller lite potensiale for sopp. Rødt betyr lite, grønt er mye og gult er litt ",
             imageRes = R.drawable.sprite01
         ),
