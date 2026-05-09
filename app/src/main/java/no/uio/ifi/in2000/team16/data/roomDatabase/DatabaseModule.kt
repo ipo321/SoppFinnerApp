@@ -6,10 +6,10 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Singleton
+import dagger.hilt.components.SingletonComponent
 import no.uio.ifi.in2000.team16.data.roomDatabase.userDatabase.UserDao
+import javax.inject.Singleton
 
 @Module
 //Makes one instance of the database for as long as the app lives.

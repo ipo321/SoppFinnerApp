@@ -20,7 +20,7 @@ interface SpeciesDataSourceInterface {
 class SpeciesDataSource @Inject constructor() : SpeciesDataSourceInterface {
 
     //keeps track of how many mushrooms we have profiled easily,
-    //gets updated to actual value when getAllSpecies is called.
+    // gets updated to actual value when getAllSpecies is called.
     override var amount: Int = 0
 
 

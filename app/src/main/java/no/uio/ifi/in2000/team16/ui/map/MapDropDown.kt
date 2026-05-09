@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.FlashlightOff
 import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Forest
 import androidx.compose.material.icons.outlined.Layers
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -27,7 +25,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.Mushroom
-import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 /*
 Dropdown Menu for the map

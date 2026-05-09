@@ -1,7 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import kotlin.Int
 
 /**
  *  ViewModel-component initialized with arguments from the

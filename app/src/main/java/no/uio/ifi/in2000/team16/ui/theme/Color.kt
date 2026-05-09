@@ -1,7 +1,7 @@
 package no.uio.ifi.in2000.team16.ui.theme
 
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 
 // Light Mode
 

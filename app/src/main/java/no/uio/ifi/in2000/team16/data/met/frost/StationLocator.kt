@@ -4,11 +4,15 @@ import android.content.Context
 import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import no.uio.ifi.in2000.team16.R
-import javax.inject.Inject
-import javax.inject.Singleton
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import kotlin.math.*
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 /*
