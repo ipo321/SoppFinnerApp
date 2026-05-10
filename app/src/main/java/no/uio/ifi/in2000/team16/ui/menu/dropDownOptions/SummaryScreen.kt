@@ -1,38 +1,35 @@
 package no.uio.ifi.in2000.team16.ui.menu.dropDownOptions
 
-import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import no.uio.ifi.in2000.team16.R
-import androidx.compose.runtime.*
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import no.uio.ifi.in2000.team16.R
 
 @Composable
 fun SummaryScreen(
-    navController: NavController,
     onNavigateBack: () -> Unit
 
 ){
@@ -40,11 +37,7 @@ fun SummaryScreen(
         header = "Guide",
         body = "",
         onNavigateBack = onNavigateBack,
-        content = {HelpScreen(
-            navController = navController,
-            onNavigateBack = onNavigateBack
-        )}
-
+        content = { HelpScreen() }
     )
 }
 
@@ -136,8 +129,6 @@ val helpSections = listOf(
     )
 @Composable
 fun HelpScreen(
-    navController: NavController,
-    onNavigateBack: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -155,13 +146,13 @@ fun HelpScreen(
 
 @Composable
 fun HelpSectionItem(section: HelpSection) {
-    var showImageDialog by remember { mutableStateOf(false) }
+    val showImageDialog = remember { mutableStateOf(false) }
 
-    if (showImageDialog) {
+    if (showImageDialog.value) {
         ImageDialog(
             imageRes = section.imageRes,
             title = section.title,
-            onDismiss = { showImageDialog = false }
+            onDismiss = { showImageDialog.value = false }
         )
     }
 
@@ -180,7 +171,7 @@ fun HelpSectionItem(section: HelpSection) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
-                    .clickable { showImageDialog = true }
+                    .clickable { showImageDialog.value = true }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -231,6 +222,7 @@ fun ImageDialog(
                 }
             }
         },
+        shape = MaterialTheme.shapes.medium,
         title = {
             Text(title)
         },

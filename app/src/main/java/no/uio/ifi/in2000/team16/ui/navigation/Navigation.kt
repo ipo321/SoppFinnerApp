@@ -35,7 +35,6 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.AlgorithmScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SummaryScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
@@ -185,12 +184,6 @@ fun Navigation(
                     })
             }
 
-            composable (SCORE_INFO_SCREEN ){
-                ScoreInfo(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    })
-            }
             composable(SECURITY_SCREEN){
                 Security(
                     onNavigateBack = {
@@ -205,7 +198,6 @@ fun Navigation(
             }
                 composable(SUMMARY_SCREEN) {
                     SummaryScreen(
-                        navController = navController,
                         onNavigateBack = {
                             navController.popBackStack()
                         }
