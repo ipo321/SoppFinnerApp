@@ -122,6 +122,7 @@ dependencies {
     implementation(libs.material.v1130)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.sprite)
+
     // Jsoup
     implementation(libs.jsoup)
 
@@ -129,9 +130,6 @@ dependencies {
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.navigation.compose)
 
-    //Room-database
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
 
     // Testing
     testImplementation(libs.mockk)
