@@ -21,6 +21,7 @@ data class Padding(
     val spacingMinimum: Dp = 10.dp,
     val spacingSmall: Dp = 16.dp,
     val spacing: Dp = 24.dp,
+    val spacingLarge: Dp = 42.dp,
     val scoreCardSpacing: Dp = 20.dp
 )
 

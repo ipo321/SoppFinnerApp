@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpSectionItem
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.helpSections
+import no.uio.ifi.in2000.team16.ui.theme.Team16Theme
 
 @Composable
 fun OnBoardingScreen(
@@ -77,7 +78,7 @@ fun OnBoardingScreen(
             }
 
             Text(
-                text = if (isLastPage) "Finish" else "Next",
+                text = if (isLastPage) "Ferdig" else "Neste",
                 style = TextStyle(
                     color = Color(0xFF333333),
                     fontSize = 14.sp,
@@ -94,5 +95,7 @@ fun OnBoardingScreen(
                 }
             )
         }
+        // Moves the bottom elements above the buttons that are on the touch screen of many devices
+        Spacer(modifier = Modifier.height(Team16Theme.padding.spacingLarge))
     }
 }

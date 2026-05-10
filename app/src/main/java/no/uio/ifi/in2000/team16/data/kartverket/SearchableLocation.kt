@@ -23,6 +23,7 @@ data class MetaData(
     val treffPerSide: Int? = null
 )
 
+@Suppress("NonAsciiCharacters", "PropertyName")
 @Serializable
 data class RepresentationPoint(
     val epsg: String? = null,
