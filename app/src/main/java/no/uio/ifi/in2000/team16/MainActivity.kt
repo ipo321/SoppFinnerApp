@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.navigation.Navigation
 import no.uio.ifi.in2000.team16.ui.snackbar.observeConnectivity
 import no.uio.ifi.in2000.team16.ui.snackbar.observeLocationAvailability
@@ -36,9 +34,6 @@ import org.maplibre.android.MapLibre
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    //gets the mapviewmodel so score can be reloaded on internet reconnect
-    private val mapViewModel : MapViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 

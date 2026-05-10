@@ -8,6 +8,7 @@ data class PlaceSearchResponse(
     val navn: List<Place> = emptyList()
 )
 
+@Suppress("NonAsciiCharacters", "PropertyName")
 @Serializable
 data class Place(
     val stedsnavnnummer: Long? = null,

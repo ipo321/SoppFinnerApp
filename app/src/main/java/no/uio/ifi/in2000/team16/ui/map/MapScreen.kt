@@ -520,7 +520,7 @@ fun LaunchEffects(
 
             else -> {
                 //Permission to location granted but no fix yet
-                //Shows norway temporarily
+                //Shows Oslo temporarily
                 map.cameraPosition = CameraPosition.Builder()
                     .target(LatLng(59.91, 10.75))
                     .zoom(zoom)

@@ -4,10 +4,8 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 import no.uio.ifi.in2000.team16.ui.popUp.CrashHandler
 
-/*
-    Denne klassen er nødvendig å ha når vi bruker HiltViewModel.
-
-    Når navnet endres, huske å endre navn i manifestet: android:name=".Team16App"
+/**
+    Necessary class for HiltViewModel.
  */
 
 @HiltAndroidApp
