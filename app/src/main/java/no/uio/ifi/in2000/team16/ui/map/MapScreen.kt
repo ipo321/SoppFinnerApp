@@ -498,27 +498,23 @@ fun LaunchEffects(
         val userLat = uiState.userLocation?.latitude
         val userLon = uiState.userLocation?.longitude
 
-        when {
-            userLat != null && userLon != null -> {
-                viewModel.onInitialCenterDone()
-                map.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(userLat, userLon))
-                    .zoom(zoom)
-                    .build()
-                onMapLoaded()
-            }
-            // No permission — fall back to a default location instead of
-            // waiting indefinitely for a fix that will never arrive.
-            !locationPermissionGranted -> {
-                viewModel.onInitialCenterDone()
-                map.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(59.91, 10.75))//Oslo
-                    .zoom(zoom)
-                    .build()
-                onMapLoaded()
-            }
-
-            else -> {}
+        if (locationPermissionGranted && userLat != null && userLon != null) {
+            viewModel.onInitialCenterDone()
+            map.cameraPosition = CameraPosition.Builder()
+                .target(LatLng(userLat, userLon))
+                .zoom(zoom)
+                .build()
+            onMapLoaded()
+        }
+        // No permission — fall back to a default location instead of
+        // waiting indefinitely for a fix that will never arrive.
+        else {
+            viewModel.onInitialCenterDone()
+            map.cameraPosition = CameraPosition.Builder()
+                .target(LatLng(59.91, 10.75))//Oslo
+                .zoom(zoom)
+                .build()
+            onMapLoaded()
         }
     }
 }

@@ -57,75 +57,75 @@ data class HelpSection(
 val helpSections = listOf(
     HelpSection(
         title= "Velkommen",
-        text="Sopp sporer er ett verktøy for å beregne om ulike områder har potensialet for sopp på en skala fra 1-100",
+        text="SoppSporer er et verktøy for å beregne om ulike områder har potensiale for sopp på en skala fra 1-100",
         imageRes = R.drawable.cute_mushroom
     ),
         HelpSection(
             title = "Kart",
-            text = "Når du først åpner appen vil du se kartet. Der kan du trykke på en" +
-                    " plass i karetet eller søke det opp og den vil automatisk beregne skoren",
+            text = "Når du først åpner appen vil du se kartet. Der kan du trykke på et" +
+                    " sted i kartet eller søke det opp, og scoren vil beregnes automatisk.",
             imageRes = R.drawable.map_screen
         ),
         HelpSection(
-            title = "Heat map",
-            text = "Oppe til venstre er det en liten meny. Inni den kan du skru på heatmap" +
+            title = "Heatmap",
+            text = "Oppe til venstre er det en liten meny. Inni den kan du skru på heatmap. " +
                     "Den vil markere hele kartet i rødt, grønt eller gult basert på om områdene har " +
-                    "mye eller lite potensiale for sopp. Rødt betyr lite, grønt er mye og gult er litt ",
+                    "mye eller lite potensiale for sopp. Rødt betyr lite, grønt mye og gult litt.",
             imageRes = R.drawable.heatmap
         ),
         HelpSection(
             title = "Historiske funn",
             text = "Under heatmap kan man skru på historiske funn. Denne lar deg se hvor det tidligere har blitt funnet sopp." +
-                    "Denne informasjonen ble tatt fra artsdatabanken",
+                    " Denne informasjonen ble tatt fra artsdatabanken",
             imageRes = R.drawable.historical
         ),
         HelpSection(
             title = "Satelittmodus",
-            text = "Her kan du enkelt endre kartmodus mellom sattelitt og standard kartmodus",
+            text = "Her kan du enkelt endre kartmodus mellom satelitt og standard kartmodus",
             imageRes = R.drawable.mapmode
         ),
         HelpSection(
             title = "Skoglag",
-            text = "Her kan du velge om du vil se på skoglagene i kartet eller ikke, fargene symboliserer hvilke tretype som dominerer området",
+            text = "Her kan du velge om du vil se på skoglagene i kartet eller ikke. Fargene symboliserer hvilken tretype som dominerer området",
             imageRes = R.drawable.forest
         ),
         HelpSection(
             title = "Score",
-            text = "Når du trykker på et punkt i kartet vil du då en evaluering av soppsanke-potensialer i en form av en" +
-                    "score fra 0-100. Når du første starter appen vil den automatisk være satt på kantarell, dette kan endres" +
-                    "Ved å utvide scorekortet kan du se mer detaljert informasjon om området, som temperatur, nedbør, vind, tresorter," +
+            text = "Når du trykker på et punkt i kartet vil du få en evaluering av soppsanke-potensialet i form av en" +
+                    " score fra 0-100. Når du først starter appen vil den automatisk være satt på kantarell. Dette kan endres fra soppsiden." +
+                    " Ved å utvide scorekortet kan du se mer detaljert informasjon om området, som temperatur, nedbør, vind, tresorter," +
                     " bonitet og andre faktorer som påvirker potensialet for sopp." ,
             imageRes = R.drawable.score
         ),
         HelpSection(
             title = "Soppsiden",
             text = "Soppsiden er en generell oversikt over de ulike soppene du kan finne, om de er giftige og om de er en god matsopp." +
-                    " Her finner du også en link til soppkontroll.no med en mer detaljert oversikt og mulighet til soppkontroll når det er soppsesong.",
+                    " Her finner du også en link til soppkontroll.no med en mer detaljert oversikt og mulighet for soppkontroll når det er soppsesong.",
             imageRes = R.drawable.soppsiden,
         ),
         HelpSection(
-            title = "Sopp profil",
-            text = "Inn i hver sopp profil kan du se hvis den er i sesong, giftig eller en god matsopp. " +
-                    "Du kan også legge den til i favoritter for raskere tilgang eller velge den i kart og bli sendt direkte til kartsiden.",
+            title = "Sopp-profil",
+            text = "Inn i hver sopp-profil kan du se om den er i sesong, giftig eller en god matsopp." +
+                    " Du kan også legge den til i favoritter for raskere tilgang eller velge den i kart og bli sendt direkte til kartsiden.",
             imageRes = R.drawable.profile,
         ),
         HelpSection(
-            title = "Mørkmodus",
-            text = "I menysiden kan du finne mørk modus knappen for å raskt bytte mellom lys modus og mørk modus",
+            title = "Mørkemodus",
+            text = "På menysiden kan du finne mørkemodus-knappen for å raskt bytte mellom lyst modus og mørkemodus",
             imageRes = R.drawable.darkmode,
         ),
         HelpSection(
             title = "Giftinformasjon",
-            text = "Ved mistanke om soppforgiftning kan du kontakte giftinformasjonen fra meny siden.",
+            text = "Ved mistanke om soppforgiftning kan du kontakte giftinformasjonen fra menysiden.",
             imageRes = R.drawable.poison,
         ),
         HelpSection(
-            title = "Beregningsalgoritme",
+            title = "Beregningsalgoritmer",
             text = "Under beregningsalgoritmer kan du selv velge hvordan appen skal beregne score i kartet. " +
-                    "Alle algoritmene evaluerer soppsanke-potensialet, men på ulike måter." +
+                    "Alle algoritmene evaluerer soppsanke-potensialet, men på ulike måter. " +
                     "\n ML: En algoritme som er trent på tidligere soppfunn og værdata i Norge. " +
                     "\n Forenklet modell: Bruker en enklere modell basert på kjente forhold som temperatur, fuktighet og skogstype." +
-                    "\n KI: Bruker en språkmodell til å vurdere forholdene som er programmert til å være din egne sopp spesialist. ",
+                    "\n KI: Bruker en språkmodell til å vurdere forholdene som er programmert til å være din egne sopp-spesialist. ",
             imageRes = R.drawable.algorithm,
         ),
         HelpSection(

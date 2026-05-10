@@ -42,7 +42,7 @@ import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import no.uio.ifi.in2000.team16.ui.onboard.OnBoardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 
@@ -157,7 +157,7 @@ fun Navigation(
                     .fillMaxSize()
             ) {
                 composable(ONBOARDING_SCREEN) {
-                    OnboardingScreen(
+                    OnBoardingScreen(
                         onFinished = {
                             welcomeViewModel.saveOnBoardingState(completed = true)
                             navController.navigate(MAP_SCREEN) {

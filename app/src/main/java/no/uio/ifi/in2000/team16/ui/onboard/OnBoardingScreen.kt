@@ -21,7 +21,7 @@ import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.HelpSectionItem
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.helpSections
 
 @Composable
-fun OnboardingScreen(
+fun OnBoardingScreen(
     modifier: Modifier = Modifier,
     onFinished: () -> Unit
 ) {
