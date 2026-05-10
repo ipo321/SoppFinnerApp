@@ -156,6 +156,8 @@ fun ScoreCard(
 
                 WeatherRow(uiState)
 
+                Spacer(Modifier.height(Team16Theme.padding.scoreCardSpacing))
+
                 //Extended view
                 AnimatedVisibility(visible = isExpanded) {
 
@@ -380,6 +382,7 @@ fun DisplayInfoItem(
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun WeatherRow(uiState: ScoreCardUiState){
     val context = LocalContext.current
