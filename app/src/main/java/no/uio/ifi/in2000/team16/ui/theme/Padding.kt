@@ -22,7 +22,6 @@ data class Padding(
     val spacingSmall: Dp = 16.dp,
     val spacing: Dp = 24.dp,
     val scoreCardSpacing: Dp = 20.dp
-    // Add more here when needed
 )
 
 val LocalPadding = staticCompositionLocalOf { Padding() }

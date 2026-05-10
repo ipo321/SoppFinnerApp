@@ -2,6 +2,7 @@ package no.uio.ifi.in2000.team16.ui.popUp
 
 import android.content.Context
 import android.content.Intent
+import kotlin.system.exitProcess
 
 class CrashHandler(private val context: Context) : Thread.UncaughtExceptionHandler {
 
@@ -18,7 +19,7 @@ class CrashHandler(private val context: Context) : Thread.UncaughtExceptionHandl
 
             //Killing the crashed process
             android.os.Process.killProcess(android.os.Process.myPid())
-            System.exit(1)
+            exitProcess(1)
 
         } catch (_: Exception){
             //Fallback to normal handler if this fails

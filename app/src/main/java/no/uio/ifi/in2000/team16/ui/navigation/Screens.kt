@@ -16,18 +16,3 @@ sealed class Screen(val route: String) {
 
 
 }
-
-/*
-@Composable
-fun MinSide(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ){
-        Text(
-            text = "Profile screen",
-            style = MaterialTheme.typography.headlineLarge
-        )
-    }
-}
-*/

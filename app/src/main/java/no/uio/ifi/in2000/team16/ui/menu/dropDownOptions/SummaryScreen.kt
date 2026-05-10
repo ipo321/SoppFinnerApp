@@ -179,7 +179,7 @@ fun HelpSectionItem(section: HelpSection) {
             Text(
                 text = "Trykk på bildet for å forstørre",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -189,7 +189,7 @@ fun HelpSectionItem(section: HelpSection) {
         Text(
             text = section.title,
             style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -199,7 +199,7 @@ fun HelpSectionItem(section: HelpSection) {
         Text(
             text = section.text,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             
         )
     }
