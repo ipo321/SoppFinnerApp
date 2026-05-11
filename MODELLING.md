@@ -213,3 +213,344 @@ Shape.kt
 Theme.kt
 Type.kt
 ```
+
+## Use case text
+
+### Use case 1
+
+**Name:** Calculation of mushroom score  
+**Primary actor:** Mushroom forager  
+**Secondary actor:** Proxy server  
+**Precondition:** The user has opened the map page and the map screen is loaded  
+**Postcondition:** The user has been presented with a score above 0  
+
+**Main flow:**  
+1. The user taps the map   
+2. The system retrieves the necessary information from the APIs MET (Frost and Location Forecast) and Nibio (SAT-skog and AR5)  
+3. The system checks whether the mushroom is in season  
+4. The mushroom is in season and the system calculates a score  
+5. The user is presented with a score card that contains the score and relevant information  
+
+**Alternative flow:**  
+3.1 The mushroom is not in season  
+3.2 The score card tells the user that the mushroom is not in season  
+3.3 The user selects a mushroom that is in season   
+
+### Use case 2  
+
+**Name:** Selecting mushrooms for the map   
+**Primary actor:** Mushroom forager  
+**Secondary actor:** -  
+**Precondition:** The user has opened the map screen and the map screen is loaded  
+**Postcondition:** The user has changed mushrooms  
+
+**Main flow:**  
+1. The user opens the drop-down menu in the map  
+2. The user has added a favorite mushroom, which is therefore displayed as a quick selection in the menu  
+3. The user taps on this mushroom and thus selects it  
+
+**Alternative flow 1:**  
+2.1 The user has not selected a favorite mushroom, and therefore has no quick selection in the menu  
+2.2 The user taps on a mushroom and selects it as a favorite  
+2.3 The user taps on the map screen again and opens the drop-down menu  
+
+**Alternative flow 2:**  
+2.1 The user taps on the Mushroom page   
+2.2 The user finds the desired mushroom  
+
+### Use case 3  
+
+**Name:** Navigation  
+**Primary actor:** Mushroom picker  
+**Secondary actor:** Proxy server    
+**Precondition:** The user has opened the map page and the map page is loaded  
+**Postcondition:** The user has navigated to the desired location on the map  
+
+**Main flow:**
+1. The user presses the search bar  
+2. The system opens the search bar  
+3. The user enters “Lillehammer”  
+4. The system retrieves the necessary information from the Addresses and Places APIs from the Norwegian Mapping Authority  
+5. The system displays the Lillehammer area on the map  
+
+**Alternative flow:**  
+4.1 The system fails to retrieve the necessary information  
+4.2 The user presses out of the search function  
+4.3 The user navigates to Lillehammer by dragging the map  
+
+## Use case diagrams  
+
+### Use case diagram 1  
+
+### Use case diagram 2  
+
+### Use case diagram 3  
+ 
+## Sequence diagrams  
+
+### Sequence diagram 1  
+
+```mermaid
+---
+config:
+  layout: elk
+---
+sequenceDiagram
+    actor F as Mushroom Forager
+    participant UI as MapScreen (System UI)
+    participant V as MapViewModel
+    participant P as Repositories
+    participant M as MET APIs (Frost, Location Forecast)
+    participant N as Nibio APIs (SAT-skog, AR5)
+
+
+    Note over UI: Precondition: Map screen loaded
+
+
+    F->>UI: Taps map
+    loop calculate score
+    UI->>V: Collects lat and lon
+    V->>P: onMapClicked(lat, lon)
+    P->>M: Get weather data
+    M-->>P: Return weather data
+    P->>N: Get forest and land data
+    N-->>P: Return forest data and land data
+    P->>P: Check if mushroom is in season
+
+
+    alt Mushroom in season
+        P->>P: Calculate mushroom score
+        P-->>UI: Provide score and relevant display information
+        UI-->>F: Displays the information in a score card
+        Note over UI,F: Postcondition: Score above 0 shown
+    else Mushroom not in season
+        P-->>UI: Provide score and relevant display information
+        UI-->>F: Show “Not in season” message
+        F->>UI: Selects another mushroom
+    end
+    end
+```
+
+### Sequence diagram 2  
+
+```mermaid
+---
+config:
+  layout: elk
+---
+sequenceDiagram
+
+
+    actor Forager as Mushroom Forager
+    participant MS as MapScreen
+    participant NH as NavHost
+    participant ML as MushroomListScreen
+    participant MI as MushroomInfoScreen
+    title Selecting Mushrooms for the Map
+
+
+    Note over Forager,MS: Precondition: Map screen is open and loaded
+    loop Selecting mushroom from dropdown menu
+        Forager->>MS: Opens drop-down menu
+        alt User has favorite mushroom
+            MS-->>Forager: Displays favorite in quick selection
+            Forager->>MS: Taps on favorite mushroom
+            MS-->>Forager: Shows selected mushroom
+            MS-->>Forager: No quick selection available
+            Forager->>MS: Taps "Soppsiden" on navBar
+            NH->>ML: Navigates to MushroomListScreen
+            ML-->>Forager: Displays MushroomListScreen
+            Forager->>ML: Selects desired mushroom
+            NH->>MI: Navigates to MushroomInfoScreen
+            MI-->>Forager: Displays MushroomInfoScreen
+
+
+            Forager->>MI: Taps a mushroom to mark as favorite
+            MI->>Forager: Indicates favorite being selected
+            Forager->>MI: Taps "Kart" on navBar
+            NH->>MS: Navigate to MapScreen
+            MS-->>Forager: Displays MapScreen
+
+
+            Forager->>MS: Reopens drop-down menu
+            Forager->>ML: Opens Mushroom page
+            Forager->>ML: Finds desired mushroom
+            ML->>MS: Sends selected mushroom
+        end
+    end
+    alt User does not have favo
+
+
+        Forager->>MS: Reopens drop-down menu
+            Forager->>ML: Opens Mushroom page
+            Forager->>ML: Finds desired mushroom
+            ML->>MS: Sends selected mushroom
+    end
+
+    Note over Forager,MS: Postcondition: User has changed mushrooms
+```
+
+### Sequence diagram 3  
+
+```mermaid
+---
+config:
+  layout: elk
+---
+sequenceDiagram
+    actor Forager 
+    participant MS as MapScreen
+    participant V as MapViewModel
+    participant R as LocationRepository
+    participant API as Norwegian Mapping Authority
+
+    Note over Forager,API: Precondition: Map screen loaded
+
+    Forager->>MS: Presses search bar
+    MS->>MS: Opens search bar
+    Forager->>MS: Enters "Lillehammer"
+    MS->>V: Collects query
+    V->>R: onSearchQueryChanged(query)
+    R->>API: Requests location data
+
+    alt Successful retrieval
+        API-->>R: Returns location data
+        R-->>V: Formats and forwards location data
+        V-->>MS: Forwards location data
+        MS-->>Forager: Displays Lillehammer option
+        Forager->>MS: Selects Lillehammer option
+        MS->>V: Pings location change
+        V->>V: Updates location
+        V-->>MS: Recenteres map view
+        MS-->>Forager: Shows updated map
+    else Retrieval fails
+        API-->>R: Fails to fetch data
+        R-->>V: Returns emptyList()
+        V-->>MS: Returns emptyList()
+        MS-->>Forager: Displays no options
+    
+        Forager->>MS: Presses out of search
+        MS->>MS: Closes search bar
+        Forager->>MS: Drags map to Lillehammer
+        MS-->>Forager: Displays dragged location
+    end
+
+    Note over Forager,API: Postcondition: User navigated to desired location
+```
+
+## Activity diagrams  
+
+### Activity diagram 1  
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart TD
+    title["Calculation of Mushroom Score"]
+
+
+    start((Start))
+
+
+    taps([User taps the map])
+    calculate([Score is calculated])
+    present([Score is presented])
+    message([Score card shows that the mushroom is not in season])
+    change([User chooses a mushroom that is in season])
+
+
+    inSeason{Mushroom in season?}
+
+
+    ending((End))
+
+
+    start --> taps
+    taps --> inSeason
+    inSeason --YES--> calculate
+    inSeason --NO--> message
+    message --> change
+    change --> calculate
+    calculate --> present
+    present --> ending
+```
+
+### Activity diagram 2   
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart TD
+    title["Selecting mushrooms for the app"]
+
+
+    start((Start))
+
+
+    dropdown([User opens dropdown menu])
+    taps([User taps and selects mushroom])
+    addFavorite([User adds a mushroom to favorites])
+    select([User selects mushroom directly from the list])
+    list([User navigates to mushroom screen])
+    map([User navigates to map screen])
+
+
+    hasFavorite{Favorites added?}
+    wantsFavorite{User wants to add favorite?}
+
+
+    ending((End))
+
+
+    start --> dropdown
+    dropdown --> hasFavorite
+    hasFavorite --YES--> taps
+    hasFavorite --NO--> list
+    list --> wantsFavorite
+    wantsFavorite --YES--> addFavorite
+    wantsFavorite --NO--> select
+    addFavorite --> map
+    map --> dropdown
+    select --> ending
+    taps --> ending
+```
+
+### Activity diagram 3   
+
+```mermaid
+flowchart TD
+    title["Navigation"]
+
+
+    start((Start))
+
+
+    bar([User presses and opens the search bar])
+    enter([User enters 'Lillehammer'])
+    display([Lillehammer area displays on screen])
+    out([User closes the search bar])
+    nav([User navigates to Lillehammer by dragging the map])
+
+
+    success{API retrieving successful?}
+
+
+    ending((End))
+
+
+    start --> bar
+    bar --> enter
+    enter --> success
+    success --YES--> display
+    success --NO--> out
+    out --> nav
+    nav --> display
+    display --> ending
+```
+
+
+
