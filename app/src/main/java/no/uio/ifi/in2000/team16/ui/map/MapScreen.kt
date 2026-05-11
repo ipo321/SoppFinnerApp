@@ -255,7 +255,7 @@ fun getMapView(
 
             getMapAsync { map ->
                 onMapReady(map)
-                setMapLayout(map, context)
+                setMapLayout(map)
                 map.addOnMapClickListener { coordinate ->
                     Log.d(context.getString(R.string.t16_map), "Map clicked at: $coordinate")
 
@@ -359,38 +359,6 @@ fun LaunchEffects(
             source.setGeoJson(Feature.fromGeometry(point))
         }
     }
-    // Mushroom finding pins
-    // Updating the pins each time they change
-    LaunchedEffect(
-        uiState.currentContext?.historicalFinds,
-        uiState.isHistoricalFindsEnabled,
-        mapRef,
-        isDarkMode,
-        uiState.isSatelliteMode
-    ) {
-        val currentMap = mapRef ?: return@LaunchedEffect
-        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-
-        val features = finds
-            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
-            .map { occ ->
-                Feature.fromGeometry(
-                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
-                )
-            }
-
-        currentMap.getStyle { style ->
-            if (!style.isFullyLoaded) return@getStyle
-            val locationSource =
-                style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
-
-            if (uiState.isHistoricalFindsEnabled) {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
-            } else {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-            }
-        }
-    }
 
     // Reacts to a search result by animating the camera, then clears the request.
     LaunchedEffect(uiState.pendingCameraTarget, mapRef) {
@@ -482,6 +450,23 @@ fun LaunchEffects(
         )
     }
 
+    //Showing mushrooms in the map
+    LaunchedEffect(
+        uiState.historicalFindMarkers,
+        uiState.isHistoricalFindsEnabled,
+        mapRef
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        currentMap.getStyle { style ->
+            if (style.isFullyLoaded) {
+                style.updateHistoricalFindsPins(
+                    markers = uiState.historicalFindMarkers,
+                    isEnabled = uiState.isHistoricalFindsEnabled
+                )
+            }
+        }
+    }
 
     // Centers the map on the user the first time we know where they are
     // (or on Oslo if location permission is denied). Guarded by the VM-owned
