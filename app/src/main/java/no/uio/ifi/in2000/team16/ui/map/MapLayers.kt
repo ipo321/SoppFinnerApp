@@ -1,12 +1,12 @@
 package no.uio.ifi.in2000.team16.ui.map
 
 import android.content.Context
-import android.content.res.Configuration
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.graphics.drawable.toBitmap
 import no.uio.ifi.in2000.team16.R
+import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.expressions.Expression
@@ -51,6 +51,9 @@ import org.maplibre.android.style.sources.GeoJsonOptions
 import org.maplibre.android.style.sources.GeoJsonSource
 import org.maplibre.android.style.sources.RasterSource
 import org.maplibre.android.style.sources.TileSet
+import org.maplibre.geojson.Feature
+import org.maplibre.geojson.FeatureCollection
+import org.maplibre.geojson.Point
 
 /*
  * MapLayers.kt
@@ -97,18 +100,6 @@ private const val CLUSTER_RADIUS_DP = 30
 private const val CLUSTER_BREAKPOINT_MEDIUM = 10
 private const val CLUSTER_BREAKPOINT_LARGE = 50
 
-
-
-
-/**
- * Returns `true` if the device is currently in dark mode.
- *
- * Used to choose between the light and dark map style.
- */
-fun isDarkMode(context: Context): Boolean {
-    val darkModeFlag = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-    return darkModeFlag == Configuration.UI_MODE_NIGHT_YES
-}
 
 /**
  * Adds the user-location source and its two stacked circle layers to [style].
@@ -365,7 +356,7 @@ fun setupHeatmapLayer(style: Style) {
     }
 }
 
-fun setMapLayout(map: MapLibreMap, context: Context) {
+fun setMapLayout(map: MapLibreMap) {
     map.setMinZoomPreference(2.0) // Minimum zoom
     map.setMaxZoomPreference(25.0) // Maximum zoom
     val ui = map.uiSettings
@@ -378,3 +369,25 @@ fun setMapLayout(map: MapLibreMap, context: Context) {
     ui.isDoubleTapGesturesEnabled = true
     ui.isHorizontalScrollGesturesEnabled = true
 }
+
+/**
+ * Takes the global list of mushroom from the ViewModel and updates the map.
+ * MapLibre automatically does most of the things.
+ */
+
+fun Style.updateHistoricalFindsPins(markers: List<Occurrence>, isEnabled: Boolean) {
+    val source = getSourceAs<GeoJsonSource>(HISTORICAL_FINDS_SOURCE_ID) ?: return
+    if (!isEnabled || markers.isEmpty()) {
+        source.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
+        return
+    }
+    val features = markers
+        .filter { it.decimalLatitude != null && it.decimalLongitude != null }
+        .map { occ ->
+            Feature.fromGeometry(
+                Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
+            )
+        }
+    source.setGeoJson(FeatureCollection.fromFeatures(features))
+}
+

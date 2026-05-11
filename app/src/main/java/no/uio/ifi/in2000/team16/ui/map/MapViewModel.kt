@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
 import no.uio.ifi.in2000.team16.data.kartverket.LocationRepositoryInterface
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
@@ -33,6 +34,7 @@ Viewmodel for the Map screen
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepositoryInterface,
+    private val mushroomRepository: MushroomRepository,
     private val locationRepository: LocationRepositoryInterface,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
@@ -70,6 +72,7 @@ class MapViewModel @Inject constructor(
                 } catch (_: Exception) {
                     // Warmup is best-effort; failure here is fine, the real call will surface errors.
                 }
+                fetchMushroomMarkers()
             }
         }
 
@@ -187,6 +190,7 @@ class MapViewModel @Inject constructor(
             savedBounds?.let { fetchHeatmapData(it) }
 
             refreshCurrentLocation()
+            fetchMushroomMarkers()
         }
     }
     
@@ -337,5 +341,18 @@ class MapViewModel @Inject constructor(
     fun retryLastClick(){
         Log.d("T16_retry", "Retrying click at lat: ${_uiState.value.lastClickedLat}, lon: ${_uiState.value.lastClickedLon}")
         refreshCurrentLocation()
+    }
+
+
+    fun fetchMushroomMarkers() {
+        val mushroom = uiState.value.selectedMushroom ?: return
+        viewModelScope.launch {
+            val result = mushroomRepository.getMushroomsNearLocation(
+                lat = 60.0, lon = 10.0,
+                radiusKm = 20000.0,
+                mushroomType = mushroom.profile.name
+            )
+            _uiState.update { it.copy(historicalFindMarkers = result.results) }
+        }
     }
 }

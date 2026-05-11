@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.EvaluationResult
@@ -14,6 +15,7 @@ import org.maplibre.android.geometry.LatLng
 data class MapScreenState(
     val screenStatus: ScreenStatus = ScreenStatus.Idle,
     val selectedMushroom: Mushroom? = null,
+    val historicalFindMarkers: List<Occurrence> = emptyList(),
     val currentContext: EnvironmentContext? = null,
     val evaluation: EvaluationResult? = null,
     val favoriteMushrooms: List<Mushroom> = emptyList(),
