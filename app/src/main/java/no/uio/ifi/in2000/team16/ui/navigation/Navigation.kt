@@ -76,7 +76,7 @@ fun Navigation(
     //A slights delay to show the loading screen before the app starts
     //Not good code practice
     LaunchedEffect(Unit) {
-        delay(4000) // 4 seconds delay
+        delay(2000) // 2 seconds delay
         isTimerFinished = true
 
     }

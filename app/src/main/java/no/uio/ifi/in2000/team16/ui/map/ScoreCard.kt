@@ -434,7 +434,8 @@ private fun WeatherRow(uiState: ScoreCardUiState){
                     Text(
                         text = uiState.currentTemp,
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

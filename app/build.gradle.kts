@@ -23,6 +23,7 @@ android {
     defaultConfig {
         applicationId = "no.uio.ifi.in2000.team16"
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -103,9 +104,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
 
-
-    implementation(libs.osmdroid.android)
-    implementation(libs.play.services.maps)
     implementation(libs.android.sdk)
     implementation(libs.androidx.constraintlayout.v221)
 

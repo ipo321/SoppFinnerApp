@@ -241,16 +241,6 @@ fun getMapView(
             .textureMode(true)
 
         MapView(context, mode).apply { // mode are sent as argument here to fix the bug
-//            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets -> //WindowInsetsCompat.CONSUMED } //bottom gap fix
-//                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//                view.setPadding(
-//                    view.paddingLeft,
-//                    view.paddingTop,
-//                    view.paddingRight,
-//                    0
-//                )
-//                insets
-//            }
             onCreate(null)
 
             getMapAsync { map ->
@@ -454,7 +444,8 @@ fun LaunchEffects(
     LaunchedEffect(
         uiState.historicalFindMarkers,
         uiState.isHistoricalFindsEnabled,
-        mapRef
+        mapRef,
+        isDarkMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
