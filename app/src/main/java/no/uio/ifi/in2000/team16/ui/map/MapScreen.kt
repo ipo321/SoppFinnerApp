@@ -174,9 +174,12 @@ fun MapScreenSurface(
             }
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(), //matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             factory = { mapView },
             update = { view ->
+                // Trying to minimalize the bug that sometimes happen, which results in a gap between
+                // the mapview and the bottom navigation bar. Here we try to make sure that the mapview
+                // follows its parents width and height.
                 val lp = view.layoutParams
                 if (lp == null ||
                     lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
