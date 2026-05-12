@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
 import no.uio.ifi.in2000.team16.data.kartverket.LocationRepositoryInterface
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
@@ -34,7 +34,7 @@ Viewmodel for the Map screen
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val speciesRepository: SpeciesRepositoryInterface,
-    private val mushroomRepository: MushroomRepository,
+    private val mushroomRepository: MushroomRepositoryInterface,
     private val locationRepository: LocationRepositoryInterface,
     private val getEnvironmentContextUseCase: GetEnvironmentContextUseCase,
     private val calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase,
