@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -102,13 +102,13 @@ fun AlgorithmCard(
                     .weight(1f)
                     .padding(start = 8.dp, end = 8.dp)
             )
-            // Checkbox selects this algorithm for the calculation
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = { onClick(algorithm) },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    checkmarkColor = MaterialTheme.colorScheme.secondary
+            // RadioButton selects this algorithm for the calculation
+            RadioButton(
+                selected = isSelected,
+                onClick = { onClick(algorithm) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary,
+                    unselectedColor = MaterialTheme.colorScheme.outline
                 ),
                 modifier = Modifier.padding(end = 4.dp)
             )
