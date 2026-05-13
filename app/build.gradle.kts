@@ -23,6 +23,7 @@ android {
     defaultConfig {
         applicationId = "no.uio.ifi.in2000.team16"
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -75,14 +76,11 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.ads.mobile.sdk)
-    implementation(libs.androidx.foundation.layout)
-    implementation(libs.androidx.foundation)
     implementation(libs.androidx.games.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -103,9 +101,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
 
-
-    implementation(libs.osmdroid.android)
-    implementation(libs.play.services.maps)
     implementation(libs.android.sdk)
     implementation(libs.androidx.constraintlayout.v221)
 
@@ -122,6 +117,7 @@ dependencies {
     implementation(libs.material.v1130)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.sprite)
+
     // Jsoup
     implementation(libs.jsoup)
 
@@ -129,9 +125,6 @@ dependencies {
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.navigation.compose)
 
-    //Room-database
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
 
     // Testing
     testImplementation(libs.mockk)

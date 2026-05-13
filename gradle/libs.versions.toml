@@ -29,18 +29,12 @@ materialVersion = "1.13.0"
 mockk = "1.14.9"
 navigationCompose = "2.9.8"
 onnxruntimeAndroid = "1.26.0"
-osmdroidAndroid = "6.1.20"
-playServicesMaps = "20.0.0"
-roomVersion = "2.8.4"
 runtime = "1.11.1"
-roomKtx = "2.8.4"
 datastoreCore = "1.2.1"
 datastorePreferencesCore = "1.2.1"
 material3 = "1.4.0"
 foundation = "1.11.1"
 adsMobileSdk = "1.0.1"
-foundationLayoutVersion = "1.11.1"
-foundationVersion = "1.11.1"
 sprite = "1.1.0"
 gamesActivity = "4.4.2"
 navigationRuntimeKtx = "2.9.8"
@@ -56,8 +50,6 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-drawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "drawerlayout" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomVersion" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomVersion" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
@@ -87,19 +79,14 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
-androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 ads-mobile-sdk = { group = "com.google.android.libraries.ads.mobile.sdk", name = "ads-mobile-sdk", version.ref = "adsMobileSdk" }
-androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayoutVersion" }
-androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
 material-v1130 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntimeAndroid" }
-osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 sprite = { module = "com.stevdza-san:sprite", version.ref = "sprite" }
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "gamesActivity" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }

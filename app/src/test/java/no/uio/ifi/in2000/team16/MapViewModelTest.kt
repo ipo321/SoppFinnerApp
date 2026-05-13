@@ -51,6 +51,8 @@ class MapViewModelTest {
     private lateinit var fakeSpeciesRepository: FakeSpeciesRepository
     private lateinit var fakeLocationRepository: FakeLocationRepository
 
+    private lateinit var fakeMushroomRepository: FakeMushroomRepository
+
     private val lat = 59.0
     private val lon = 10.0
 
@@ -61,9 +63,11 @@ class MapViewModelTest {
         Dispatchers.setMain(testDispatcher)
         fakeSpeciesRepository = FakeSpeciesRepository()
         fakeLocationRepository = FakeLocationRepository()
+        fakeMushroomRepository = FakeMushroomRepository()
         every { mockScorerProvider.activeScorer } returns mockMushroomScorer
         viewModel = MapViewModel(
             fakeSpeciesRepository,
+            fakeMushroomRepository,
             fakeLocationRepository,
             mockEnvironmentContext,
             mockHeatMapArea,

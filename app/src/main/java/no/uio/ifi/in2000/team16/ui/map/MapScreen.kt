@@ -174,9 +174,12 @@ fun MapScreenSurface(
             }
     ) {
         AndroidView(
-            modifier = Modifier.fillMaxSize(), //matchParentSize(),
+            modifier = Modifier.fillMaxSize(),
             factory = { mapView },
             update = { view ->
+                // Trying to minimalize the bug that sometimes happen, which results in a gap between
+                // the mapview and the bottom navigation bar. Here we try to make sure that the mapview
+                // follows its parents width and height.
                 val lp = view.layoutParams
                 if (lp == null ||
                     lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
@@ -241,21 +244,11 @@ fun getMapView(
             .textureMode(true)
 
         MapView(context, mode).apply { // mode are sent as argument here to fix the bug
-//            ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets -> //WindowInsetsCompat.CONSUMED } //bottom gap fix
-//                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//                view.setPadding(
-//                    view.paddingLeft,
-//                    view.paddingTop,
-//                    view.paddingRight,
-//                    0
-//                )
-//                insets
-//            }
             onCreate(null)
 
             getMapAsync { map ->
                 onMapReady(map)
-                setMapLayout(map, context)
+                setMapLayout(map)
                 map.addOnMapClickListener { coordinate ->
                     Log.d(context.getString(R.string.t16_map), "Map clicked at: $coordinate")
 
@@ -359,38 +352,6 @@ fun LaunchEffects(
             source.setGeoJson(Feature.fromGeometry(point))
         }
     }
-    // Mushroom finding pins
-    // Updating the pins each time they change
-    LaunchedEffect(
-        uiState.currentContext?.historicalFinds,
-        uiState.isHistoricalFindsEnabled,
-        mapRef,
-        isDarkMode,
-        uiState.isSatelliteMode
-    ) {
-        val currentMap = mapRef ?: return@LaunchedEffect
-        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-
-        val features = finds
-            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
-            .map { occ ->
-                Feature.fromGeometry(
-                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
-                )
-            }
-
-        currentMap.getStyle { style ->
-            if (!style.isFullyLoaded) return@getStyle
-            val locationSource =
-                style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
-
-            if (uiState.isHistoricalFindsEnabled) {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
-            } else {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-            }
-        }
-    }
 
     // Reacts to a search result by animating the camera, then clears the request.
     LaunchedEffect(uiState.pendingCameraTarget, mapRef) {
@@ -482,6 +443,24 @@ fun LaunchEffects(
         )
     }
 
+    //Showing mushrooms in the map
+    LaunchedEffect(
+        uiState.historicalFindMarkers,
+        uiState.isHistoricalFindsEnabled,
+        mapRef,
+        isDarkMode
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        currentMap.getStyle { style ->
+            if (style.isFullyLoaded) {
+                style.updateHistoricalFindsPins(
+                    markers = uiState.historicalFindMarkers,
+                    isEnabled = uiState.isHistoricalFindsEnabled
+                )
+            }
+        }
+    }
 
     // Centers the map on the user the first time we know where they are
     // (or on Oslo if location permission is denied). Guarded by the VM-owned
@@ -518,7 +497,14 @@ fun LaunchEffects(
                 onMapLoaded()
             }
 
-            else -> {}
+            else -> {
+                //Permission to location granted but no fix yet
+                //Shows Oslo temporarily
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(59.91, 10.75))
+                    .zoom(zoom)
+                    .build()
+            }
         }
     }
 }

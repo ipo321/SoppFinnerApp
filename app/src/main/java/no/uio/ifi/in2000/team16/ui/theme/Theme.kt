@@ -38,7 +38,7 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainerHighest = DarkSurfaceContainerHighest, // Top-level headers or input fields
 
     // Editorial accents and descriptive hierarchies
-    surfaceVariant = DarkSurfaceContainerHigh, // Used for glass effects (apply opacity in UI)
+    surfaceVariant = Black,
     onSurfaceVariant = DarkOnSurface,
 
     // Outlines and accessibility
@@ -47,7 +47,8 @@ private val DarkColorScheme = darkColorScheme(
     //toxic/hazardous warnings
     error = DangerError,
     errorContainer = ErrorContainer,
-    onErrorContainer = OnErrorContainer
+    onErrorContainer = OnErrorContainer,
+
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -76,7 +77,7 @@ private val LightColorScheme = lightColorScheme(
     surfaceContainerHighest = SurfaceContainerHighest,
 
     // Editorial accents and descriptive hierarchies
-    surfaceVariant = SurfaceContainerHigh,
+    surfaceVariant = Black,
     onSurfaceVariant = OnSurfaceDark,
 
     // Outlines and accessibility

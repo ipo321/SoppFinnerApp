@@ -110,6 +110,7 @@ object DataModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
+@Suppress("unused")
 abstract class BindModule {
 
     @Binds

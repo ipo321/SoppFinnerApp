@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import no.uio.ifi.in2000.team16.ui.map.MapViewModel
 import no.uio.ifi.in2000.team16.ui.menu.AlgorithmUiState
@@ -40,13 +41,15 @@ fun AlgorithmScreen(
                 "egnet et område er for å plukke sopp! Standard-algoritmen er den lokale maskinlæringsmodellen, " +
                 "men det er også mulig å velge en forenklet algoritme, eller en KI-evaluering.",
         onNavigateBack = onNavigateBack,
-        content = { AlgorithmScreenContent(
-            uiState = alUiState,
-            onClick = {
-                algorithmViewModel.onAlgorithmSelected(it)
-                if (lat != null && lon != null) mapViewModel.onMapClicked(lat, lon)
-            },
-        ) }
+        content = {
+            AlgorithmScreenContent(
+                uiState = alUiState,
+                onClick = {
+                    algorithmViewModel.onAlgorithmSelected(it)
+                    if (lat != null && lon != null) mapViewModel.onMapClicked(lat, lon)
+                },
+            )
+        }
     )
 }
 
@@ -102,15 +105,17 @@ fun AlgorithmCard(
                     .weight(1f)
                     .padding(start = 8.dp, end = 8.dp)
             )
-            // Checkbox selects this algorithm for the calculation
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = { onClick(algorithm) },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    checkmarkColor = MaterialTheme.colorScheme.secondary
+            // RadioButton selects this algorithm for the calculation
+            RadioButton(
+                selected = isSelected,
+                onClick = { onClick(algorithm) },
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colorScheme.primary,
+                    unselectedColor = MaterialTheme.colorScheme.outline
                 ),
-                modifier = Modifier.padding(end = 4.dp)
+                modifier = Modifier
+                    .scale(1.5f)
+                    .padding(end = 4.dp)
             )
         }
     }
@@ -135,7 +140,7 @@ private fun Modifier.algorithmCard(isSelected: Boolean): Modifier {
 private fun getAlgorithmDescription(algorithm: String): String =
     when (algorithm) {
         "Forenklet" -> "Bruker er algoritme bygget på biologisk forståelse av sopper. Hver sopp har også med maskinlæring fått bygget en \"ønskeliste\" over hvilke forhold den foretrekker, som sammen med algoritmen gir deg en score."
-        "ML"    -> "Bruker en algoritme som er lært opp på tusen tidligere soppfunn i Norge for å gjenkjenne mønstre i vær og skog."
-        "KI"    -> "Bruker en moderne, stor språkmodell for å vurdere forholdene. Den har fått beskjed om å være din egne sopp spesialist."
-        else    -> ""
+        "ML" -> "Bruker en algoritme som er lært opp på tusen tidligere soppfunn i Norge for å gjenkjenne mønstre i vær og skog."
+        "KI" -> "Bruker en moderne, stor språkmodell for å vurdere forholdene. Den har fått beskjed om å være din egne sopp spesialist."
+        else -> ""
     }

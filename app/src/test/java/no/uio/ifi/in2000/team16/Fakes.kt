@@ -2,6 +2,8 @@ package no.uio.ifi.in2000.team16
 
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
+import no.uio.ifi.in2000.team16.data.artsdatabasen.OccurrenceResult
 import no.uio.ifi.in2000.team16.data.kartverket.LocationRepositoryInterface
 import no.uio.ifi.in2000.team16.data.kartverket.SearchableLocation
 import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
@@ -40,5 +42,29 @@ class FakeLocationRepository : LocationRepositoryInterface {
 
     override suspend fun search(query: String): List<SearchableLocation> = searchResults[query] ?: emptyList()
     override suspend fun getLocationCoordinates(query: String): SearchableLocation? = coordinatesResults[query]
+}
+
+/**
+ * A fake MushroomRepository used for unit tests.
+ */
+class FakeMushroomRepository : MushroomRepositoryInterface {
+    val occurrence = mockk<OccurrenceResult>(relaxed = true)
+
+    override val defaultKmRadius: Double = 10000000.0
+
+    override suspend fun getMushroomsNearLocation(
+        lat: Double,
+        lon: Double,
+        radiusKm: Double,
+        mushroomType: String,
+    ): OccurrenceResult = occurrence
+
+    override suspend fun getMushroomInBoundingBox(
+        north: Double,
+        south: Double,
+        east: Double,
+        west: Double,
+        mushroomType: String,
+    ): OccurrenceResult = occurrence
 }
 

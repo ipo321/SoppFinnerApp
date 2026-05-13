@@ -107,12 +107,12 @@ fun MushroomInfoScreen(
         Text(
             text = selected.commonName,
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = selected.latinName,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(padding.outer))
 
@@ -187,7 +187,7 @@ fun MushroomInfoScreen(
         Text(
             text = stringResource(R.string.mushroom_info_about_header),
             style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(padding.inner))
         Text(

@@ -74,7 +74,7 @@ fun BoxScope.InfoPopUp(
     contextData: EnvironmentContext?,
     modifier: Modifier = Modifier
 ) {
-    val uiState = contextData?.toUiState(score, msg) ?: return
+    val uiState = contextData?.toUiState(score, msg) ?: ScoreCardUiState.empty(score, msg)
 
     ScoreCard(
         uiState = uiState,
@@ -155,6 +155,8 @@ fun ScoreCard(
                 Spacer(Modifier.height(Team16Theme.padding.scoreCardSpacing))
 
                 WeatherRow(uiState)
+
+                Spacer(Modifier.height(Team16Theme.padding.scoreCardSpacing))
 
                 //Extended view
                 AnimatedVisibility(visible = isExpanded) {
@@ -380,6 +382,7 @@ fun DisplayInfoItem(
     }
 }
 
+@SuppressLint("LocalContextResourcesRead", "DiscouragedApi")
 @Composable
 private fun WeatherRow(uiState: ScoreCardUiState){
     val context = LocalContext.current
@@ -410,6 +413,8 @@ private fun WeatherRow(uiState: ScoreCardUiState){
                     horizontalArrangement = Arrangement.Center
                 ){
                     if (uiState.symbolCode != null) {
+                        //Unavoidable because we get it from an API response, unless we hardcode
+                        //a table with all possible weathericons
                         val imageRes = context.resources.getIdentifier(
                             uiState.symbolCode,
                             "drawable",
@@ -429,7 +434,8 @@ private fun WeatherRow(uiState: ScoreCardUiState){
                     Text(
                         text = uiState.currentTemp,
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

@@ -61,7 +61,6 @@ class GetEnvironmentContextUseCase @Inject constructor(
 
                     val occurrenceResult = speciesLocations?.await()
                     val historicalFindCount = occurrenceResult?.count ?: 0
-                    val historicalFinds = occurrenceResult?.results ?: emptyList()
 
                     val forestAR5 = arealresourcetype.await()
                     val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
@@ -73,7 +72,6 @@ class GetEnvironmentContextUseCase @Inject constructor(
                         ar5 = forestAR5,
                         forestData = forestData,
                         historicalFindCount = historicalFindCount,
-                        historicalFinds = historicalFinds,
                         currentMonth = currentMonth
                     )
                 }

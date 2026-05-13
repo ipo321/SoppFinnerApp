@@ -9,7 +9,8 @@ fun Security(
 ){
     FromMenuDefaultScreen(
         header = "Personvernerklæring",
-        body = "Noe tekst",
+        body = "Vi samler ikke inn personopplysninger i appen vår." +
+                " Når du deler posisjon og velger favorittsopper, behandles dette lokalt på din enhet.",
         onNavigateBack = onNavigateBack
     )
 }

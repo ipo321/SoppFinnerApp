@@ -24,6 +24,6 @@ class SpeciesDataSourceTest {
         assertEquals(listAllSpecies.count(),speciesDS.amount)
         //!! Says we guarantee the value returned won't be null, and if it is, crash the program
         assertEquals(listAllSpecies.find{it.name == "Kantarell"}!!.optimalAvgTemp, 14.5)
-        assertEquals(listAllSpecies.find{it.name == "Steinsopp"}!!.activeMonths, listOf(6, 7, 8, 9, 10, 11),)
+        assertEquals(listAllSpecies.find{it.name == "Steinsopp"}!!.activeMonths, listOf(6, 7, 8, 9, 10, 11))
     }
 }

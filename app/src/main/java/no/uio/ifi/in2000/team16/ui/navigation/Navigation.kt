@@ -35,14 +35,13 @@ import no.uio.ifi.in2000.team16.ui.menu.MenuScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.AlgorithmScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.InfoScreen
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.PoisonControl
-import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.ScoreInfo
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.Security
 import no.uio.ifi.in2000.team16.ui.menu.dropDownOptions.SummaryScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomInfoViewModel
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.MushroomListScreen
 import no.uio.ifi.in2000.team16.ui.mushroomInfo.ShroomControlScreen
-import no.uio.ifi.in2000.team16.ui.onboard.OnboardingScreen
+import no.uio.ifi.in2000.team16.ui.onboard.OnBoardingScreen
 import no.uio.ifi.in2000.team16.ui.onboard.WelcomeViewModel
 import no.uio.ifi.in2000.team16.ui.popUp.DialogWithImage
 
@@ -77,13 +76,13 @@ fun Navigation(
     //A slights delay to show the loading screen before the app starts
     //Not good code practice
     LaunchedEffect(Unit) {
-        delay(4000) // 4 seconds delay
+        delay(2000) // 2 seconds delay
         isTimerFinished = true
 
     }
     val context = LocalContext.current
 
-    var isMapLoaded by remember { mutableStateOf(false) }
+    val isMapLoaded = remember { mutableStateOf(false) }
     context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -100,11 +99,11 @@ fun Navigation(
     val isMapReady = onboardingCompleted == false || mapUiState.selectedMushroom != null
 
     // State to control the visibility of the warning dialog
-    var showMapWarning by remember { mutableStateOf(false) }
+    val showMapWarning = remember { mutableStateOf(false) }
 
     LaunchedEffect(isAppReady) {
         if (isAppReady) {
-            showMapWarning = true
+            showMapWarning.value = true
         }
     }
 
@@ -114,9 +113,9 @@ fun Navigation(
     }
 
     // Display the dialog over the UI if showMapWarning is true
-    if (showMapWarning) {
+    if (showMapWarning.value) {
         DialogWithImage(
-            onDismissRequest = { showMapWarning = false },
+            onDismissRequest = { showMapWarning.value = false },
             painter = painterResource(id = R.drawable.dead_sprite),
             imageDescription = "Warning image"
         )
@@ -145,7 +144,7 @@ fun Navigation(
                 MapScreen(
                     mapViewModel = mapViewModel,
                     isVisible = isMapVisible,
-                    onMapLoaded = { isMapLoaded = true },
+                    onMapLoaded = { isMapLoaded.value = true },
                     isNetConnected = isNetConnected,
                     isDarkMode = darkTheme
                 )
@@ -157,7 +156,7 @@ fun Navigation(
                     .fillMaxSize()
             ) {
                 composable(ONBOARDING_SCREEN) {
-                    OnboardingScreen(
+                    OnBoardingScreen(
                         onFinished = {
                             welcomeViewModel.saveOnBoardingState(completed = true)
                             navController.navigate(MAP_SCREEN) {
@@ -167,109 +166,84 @@ fun Navigation(
                     )
                 }
 
-            composable(MAP_SCREEN) {
-            }
+                composable(MAP_SCREEN) {}
 
-            composable(MENU_SCREEN) {
-                MenuScreen(
-                    navController = navController,
-                    darkTheme = darkTheme,
-                    onToggleTheme = onToggleTheme
-                )
-            }
-            //UNDER-ITEMS for Menu-screen
-            composable(INFO_SCREEN) {
-                InfoScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    })
-            }
-
-            composable (SCORE_INFO_SCREEN ){
-                ScoreInfo(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    })
-            }
-            composable(SECURITY_SCREEN){
-                Security(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    })
-            }
-            composable (POISON_CONTROL){
-                PoisonControl(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    })
-            }
-                composable(SUMMARY_SCREEN) {
-                    SummaryScreen(
+                composable(MENU_SCREEN) {
+                    MenuScreen(
                         navController = navController,
+                        darkTheme = darkTheme,
+                        onToggleTheme = onToggleTheme
+                    )
+                }
+
+                //UNDER-ITEMS for Menu-screen
+                composable(INFO_SCREEN) {
+                    InfoScreen(
                         onNavigateBack = {
                             navController.popBackStack()
                         }
                     )
                 }
-            composable(MUSHROOM_LIST_SCREEN) { backStackEntry ->
-                MushroomListScreen(
-                    navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
-                    onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
-                    viewModel = mushroomInfoViewModel
-                )
-            }
 
-            composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
-                // Get the list screen's back stack entry to share its ViewModel
-                remember(backStackEntry) {
-                    navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
+                composable(SECURITY_SCREEN){
+                    Security(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
-                MushroomInfoScreen(
-                    onNavigateBack = { navController.popBackStack() },
-                    onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
-                    onNavigateToMap = { navController.navigate(MAP_SCREEN) },
-                    viewModel = mushroomInfoViewModel
-                )
-            }
 
-            composable(SHROOMCONTROL_SCREEN) {
-                ShroomControlScreen(
-                    navController = navController
-                )
-            }
+                composable (POISON_CONTROL){
+                    PoisonControl(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
 
-            composable(ALGORITHM_SCREEN) {
-                AlgorithmScreen(
-                    mapViewModel = mapViewModel,
-                    algorithmViewModel = algorithmViewModel,
-                    onNavigateBack = { navController.navigate(MENU_SCREEN) }
-                )
-            }
-        }
+                composable(SUMMARY_SCREEN) {
+                    SummaryScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
 
-//            if (onboardingCompleted == true && !isMapLoaded && currentRoute != ONBOARDING_SCREEN) {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .background(MaterialTheme.colorScheme.background),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                        Image(
-//                            painter = painterResource(id = R.drawable.cute_mushroom),
-//                            contentDescription = "Laster kart",
-//                            modifier = Modifier.size(120.dp)
-//                        )
-//                        Spacer(modifier = Modifier.height(16.dp))
-//                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-//                        Spacer(modifier = Modifier.height(8.dp))
-//                        Text(
-//                            "Laster inn kartdata...",
-//                            color = MaterialTheme.colorScheme.onBackground
-//                        )
-//                    }
-//                }
-//            }
+                composable(MUSHROOM_LIST_SCREEN) {
+                    MushroomListScreen(
+                        navigateToMushroom = { navController.navigate(MUSHROOM_INFO_SCREEN) },
+                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                        viewModel = mushroomInfoViewModel
+                    )
+                }
+
+                composable(MUSHROOM_INFO_SCREEN) { backStackEntry ->
+                    // Get the list screen's back stack entry to share its ViewModel
+                    remember(backStackEntry) {
+                        navController.getBackStackEntry(MUSHROOM_LIST_SCREEN)
+                    }
+                    MushroomInfoScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onMushroomControl = { navController.navigate(SHROOMCONTROL_SCREEN) },
+                        onNavigateToMap = { navController.navigate(MAP_SCREEN) },
+                        viewModel = mushroomInfoViewModel
+                    )
+                }
+
+                composable(SHROOMCONTROL_SCREEN) {
+                    ShroomControlScreen(
+                        navController = navController
+                    )
+                }
+
+                composable(ALGORITHM_SCREEN) {
+                    AlgorithmScreen(
+                        mapViewModel = mapViewModel,
+                        algorithmViewModel = algorithmViewModel,
+                        onNavigateBack = { navController.navigate(MENU_SCREEN) }
+                    )
+                }
+            }
         }
     }
 }
