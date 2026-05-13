@@ -555,5 +555,141 @@ flowchart TD
     display --> ending
 ```
 
+## Statediagram
 
+```mermaid
+stateDiagram
+  direction TB
+  state MapScreen {
+    direction TB
+    MS --> Scorecard:Tap on map
+    Scorecard --> MS:Exit scorecard
+    MS --> Centered:Press centering arrow
+    Centered --> MS:Displays map
+    MS --> Searched:Searched for location
+    Searched --> MS:Displays on map
+    MS --> NetworkError:Lose internet connection
+    MS --> LocationError:Lose location
+    NetworkError --> MS:Connection restored
+    LocationError --> MS:Location found
+    MS --> Dropdown:Open dropdown menu
+    Dropdown --> SpeciesDatabase:Select species database
+    SpeciesDatabase --> MS:Displayed on map
+    Dropdown --> Heatmap:Enable heatmap
+    Heatmap --> MS:Displayed on map
+    Dropdown --> ForestLayer:Enable forest layer
+    ForestLayer --> MS:Displayed on map
+    Dropdown --> Satellite:Enable satellite mode
+    Satellite --> MS:Displayed on map
+    MS
+    Scorecard
+    Centered
+    Searched
+    NetworkError
+    LocationError
+    Dropdown
+    SpeciesDatabase
+    Heatmap
+    ForestLayer
+    Satellite
+  }
+  state MushroomPageScreen {
+    direction TB
+    MPS --> MushroomSelected:Select checkbox
+    MPS --> InfoPage:Tap on mushroom
+    MPS --> Portal:Visit Soppkontroll.no
+    InfoPage --> Favorite:Mark as favorite
+    MPS
+    MushroomSelected
+    InfoPage
+    Portal
+    Favorite
+  }
+  state MenuScreen {
+    direction TB
+    MENU --> DarkMode:Press dark mode
+    MENU --> LightMode:Press light mode
+    MENU --> ML:Select ML algorithm
+    MENU --> Simplified:Select simplified algorithm
+    MENU --> AI:Select AI algorithm
+    MENU
+    DarkMode
+    LightMode
+    ML
+    Simplified
+    AI
+  }
+  [*] --> MapScreen:Pressed map icon
+  MushroomPageScreen --> MapScreen:Pressed map icon
+  MenuScreen --> MapScreen:Pressed map icon
+  MapScreen --> MushroomPageScreen:Pressed mushroom icon
+  MenuScreen --> MushroomPageScreen:Pressed mushroom icon
+  MapScreen --> MenuScreen:Pressed menu icon
+  MushroomPageScreen --> MenuScreen:Pressed menu icon
+  MS:Map screen
+MS:do/ Show map
+
+  Scorecard:Scorecard popup
+Scorecard:do/ Show scorecard
+
+  Centered:Centered map
+Centered:do/ Center map on User
+
+  Searched:Searched location
+Searched:do/ Display selected location
+
+  NetworkError:Network connection lost
+NetworkError:do/ Network error popup
+
+  LocationError:User GPS signal lost
+LocationError:do/ Position error popup
+
+  Dropdown:DropdownMenu opened
+Dropdown:do/ Show dropdown menu options
+
+  SpeciesDatabase:Findings from "Artsdatabanken" displayed
+SpeciesDatabase:do/ Show nodes of species findings on map
+
+  Heatmap:Heatmap enabled
+Heatmap:do/ Show heatmap
+
+  ForestLayer:Forest layer enabled
+ForestLayer:do/ Show forest layer
+
+  Satellite:Satellite mode
+Satellite:do/ Show satellite map
+
+  MPS:Mushroom page screen
+MPS:do/ Show mushroom list
+
+  MushroomSelected:Mushroom selected
+MushroomSelected:do/ Highlight selected mushroom
+
+  InfoPage:Mushroom info page screen
+InfoPage:do/ Show mushroom information
+
+  Portal:Inside the Soppkontroll portal
+Portal:do/ Open Soppkontroll.no
+
+  Favorite:Favorite mushroom selected
+Favorite:do/ Save as favorite mushroom
+
+  MENU:Menu screen
+MENU:do/ Show settings
+
+  DarkMode:Dark mode
+DarkMode:do/ Enable dark mode, Disable Lightmode
+
+  LightMode:Light mode
+LightMode:do/ Enable light mode, Disable Darkmode
+
+  ML:Machine learning algorithm in use
+ML:do/ Use ML calculation
+
+  Simplified:Simplified algorithm in use
+Simplified:do/ Use simplified calculation
+
+  AI:AI algorithm in use
+AI:do/ Use AI calculation
+```
 
