@@ -294,11 +294,15 @@ private fun MushroomSelectionSection(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text = title, style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
         if (trailingLabel != null) {
-            Text(text = trailingLabel, style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = trailingLabel, style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
     if (isFavorites && mushrooms.isEmpty()) {
