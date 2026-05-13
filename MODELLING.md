@@ -280,11 +280,23 @@ Type.kt
 
 ## Use case diagrams  
 
-### Use case diagram 1  
+### Use case diagram 1 
+
+<p align="center">
+  <img src="docs/use_case_1.png" width="600">
+</p>
 
 ### Use case diagram 2  
 
+<p align="center">
+  <img src="docs/use_case_2.png" width="600">
+</p>
+
 ### Use case diagram 3  
+
+<p align="center">
+  <img src="docs/use_case_3.png" width="600">
+</p>
  
 ## Sequence diagrams  
 
