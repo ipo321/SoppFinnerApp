@@ -18,7 +18,7 @@ val OnErrorContainer = Color(0xFF93000A)
 val SurfaceContainerLowest = Color(0xFFFFFFFF)
 val SurfaceContainerLow = Color(0xFFF6F4E8)
 val SurfaceContainerNormal = Color(0xFFF0EEE2)
-val SurfaceContainerHigh = Color(0xFFEAE8DD)
+val SurfaceContainerHigh = Color(0xFF3A3625)
 val SurfaceContainerHighest = Color(0xFFE5E3D7)
 
 val OutlineVariantLight = Color(0xFFC5C8B9).copy(alpha = 0.15f)
@@ -43,3 +43,6 @@ val ScoreHigh = Color(0xFF4ADE80) //rgba(74, 222, 128, 0.6f)
 val ScoreMediumHigh = Color(0xFFFACC15)  //rgba(250, 204, 21, 0.6f)
 val ScoreMediumLow = Color(0xFFFB923C)  //rgba(251, 146, 60, 0.6f)
 val ScoreLow = Color(0xFFF87171)  //rgba(248, 113, 113, 0.6f)
+
+//Black
+val Black = Color(0xFF161816)

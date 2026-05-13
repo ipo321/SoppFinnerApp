@@ -218,13 +218,15 @@ fun ImageDialog(
                 horizontalArrangement = Arrangement.Center
             ) {
                 TextButton(onClick = onDismiss) {
-                    Text("Lukk")
+                    Text(text = "Lukk", color = MaterialTheme.colorScheme.surfaceVariant)
+
                 }
             }
         },
         shape = MaterialTheme.shapes.medium,
+        containerColor = MaterialTheme.colorScheme.secondary,
         title = {
-            Text(title)
+            Text(text = title, color = MaterialTheme.colorScheme.surfaceVariant)
         },
         text = {
             Image(

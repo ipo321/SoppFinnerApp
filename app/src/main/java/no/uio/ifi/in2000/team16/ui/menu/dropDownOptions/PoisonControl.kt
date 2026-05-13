@@ -55,11 +55,11 @@ fun ColumnScope.PoisonControlContent() {
         onClick = { context.startActivity(intentPIN) },
         modifier = Modifier.wrapContentSize(),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MaterialTheme.colorScheme.onSurface
+            contentColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        Text("Ring Giftinformasjonen")
+        Text(text = "Ring Giftinformasjonen", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
     }
 }
 

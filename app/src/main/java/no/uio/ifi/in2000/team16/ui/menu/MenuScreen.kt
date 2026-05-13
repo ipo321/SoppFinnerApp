@@ -77,7 +77,7 @@ fun MenuScreen(
         Text(
             text = stringResource(R.string.meny),
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(padding.outerLarge))
         Column(

@@ -40,8 +40,8 @@ fun FromMenuDefaultScreen(
         BackButton(
             alignment = Alignment.CenterStart,
             textColor =MaterialTheme.colorScheme.onSurface,
-            onNavigateBack = onNavigateBack,
-            borderColor = MaterialTheme.colorScheme.surface
+            onNavigateBack = onNavigateBack
+
         )
         Spacer(modifier=Modifier.height(Team16Theme.padding.outerMedium))
         Text(
