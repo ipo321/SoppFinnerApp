@@ -95,16 +95,27 @@ ___
 ___
 ## Libraries
 
-**WE NEED TO ADD MORE AND GO THRU THEN TOGETHER**
+**MapLibre Native Android SDK:** provides high-performance vector map rendering, offline map support, and comprehensive mapping features without requiring additional frameworks. The SDK includes full Android lifecycle management and MapView Components (https://madewithmaplibre.com/sdks/maplibre-native-android-sdk).
 
-* MapLibre GL Android?
-* ONNX Runtime  - used to run the ML models
+**Google Mobile Ads SDK:** is a mobile advertising library which makes it possible to feauture ads in the app. Used in our app for asking the user for permission to use their location.
 
-* Dagger Hilt?
-* Room Database?
-* Jsoup?
-* MoCKK?
+**Ktor:** is an asynchronous framework for creating microservices, web applications and more (https://github.com/ktorio/ktor). 
 
+**Hilt / Dagger:** simplifies dependency injection (DI) by providing a standard, structured way to integrate the design pattern for DI into Android applications (https://dagger.dev/hilt/).
+
+**Sprite:** is a simple UI component that allows you to render and play Sprite Sheet animation in your composable screen (https://github.com/stevdza-san/SpriteView-KMP). Used for the loading animation that runs when the app is starting up.
+
+**MockK:** is a mocking library for Kotlin. In our app it is used for making mock objects for the unit tests.
+
+**ONNX Runtime:** provides an open source format for AI models. It defines an extensible computation graph model, as well as definitions of built-in operators and standard data types (https://github.com/onnx/onnx). Used to run the ML models in our app.
+
+Jsoup
+
+Room
+
+SplashScreen
+
+DataStore
 
 ___
 ## Members of the team
