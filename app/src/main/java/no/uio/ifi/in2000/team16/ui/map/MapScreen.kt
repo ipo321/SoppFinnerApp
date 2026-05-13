@@ -72,14 +72,18 @@ fun MapScreen(
         mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
         )
     }
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
     }
     val uiState by mapViewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
@@ -124,17 +128,35 @@ fun MapScreen(
             Context.LOCATION_SERVICE
         ) as LocationManager
 
-        //fires every time we want to update the user position from the GPS
+        //fires every time we want to update the user position from the GPS or Network
         //pushes the coordinates to the viewmodel
         val listener = LocationListener { location ->
             mapViewModel.onUserLocationUpdated(location.latitude, location.longitude)
         }
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            3000L, //for every 3 seconds
-            10f, //if moved 10 meters
-            listener
-        )
+
+        try {
+            // Request from GPS (Requires Fine Location)
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    3000L, //for every 3 seconds
+                    10f, //if moved 10 meters
+                    listener
+                )
+            }
+            // Request from Network (Works with Coarse Location)
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    3000L,
+                    10f,
+                    listener
+                )
+            }
+        } catch (e: SecurityException) {
+            Log.e("T16_Location", "Permission denied for provider: ${e.message}")
+        }
+
         //disposes of the GPS listener(to avoid leaks)
         onDispose { locationManager.removeUpdates(listener) }
     }
