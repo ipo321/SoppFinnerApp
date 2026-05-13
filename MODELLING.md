@@ -214,6 +214,13 @@ Theme.kt
 Type.kt
 ```
 
+# Modelling
+## Purpose
+Why we have chosen the ones we have and what we want with them...
+
+Actitivy diagrams are well suited for graphically representing the event flow in a use case ([reference](https://www.uio.no/studier/emner/matnat/ifi/IN2000/v26/forelesninger/in2000.2026.02.04_modellering-og-objektorinterte-prinsipper.pdf)). They  have somewhat overlapping uses with sequence diagrams, but sequence diagrams are typically closer to the code, while activity diagrams are more business‑oriented. We saw the advantage of using activity diagrams to visualize our use cases, as they gave us a better understanding of the flow in our app and the decision points within that flow.
+
+___
 ## Use case text
 
 ### Use case 1
@@ -278,6 +285,7 @@ Type.kt
 4.2 The user presses out of the search function  
 4.3 The user navigates to Lillehammer by dragging the map  
 
+___
 ## Use case diagrams  
 
 ### Use case diagram 1 
@@ -297,7 +305,8 @@ Type.kt
 <p align="center">
   <img src="docs/use_case_3.png" width="600">
 </p>
- 
+
+___
 ## Sequence diagrams  
 
 ### Sequence diagram 1  
@@ -334,13 +343,13 @@ sequenceDiagram
         P->>P: Calculate mushroom score
         P-->>UI: Provide score and relevant display information
         UI-->>F: Displays the information in a score card
-        Note over UI,F: Postcondition: Score above 0 shown
     else Mushroom not in season
         P-->>UI: Provide score and relevant display information
         UI-->>F: Show “Not in season” message
         F->>UI: Selects another mushroom
     end
     end
+    Note over UI,F: Postcondition: Score above 0 shown
 ```
 
 ### Sequence diagram 2  
@@ -392,13 +401,13 @@ sequenceDiagram
 
 
     end
+    end
     alt User does not want to favorite any mushrooms
              Forager->>MS: Taps "Soppsiden" on navBar
             NH->>ML: Navigates to MushroomListScreen
             ML-->>Forager: Displays MushroomListScreen
             Forager->>ML: Checks desired mushroom
             ML->>MS: Sends selected mushroom
-    end
     end
 
     Note over Forager,MS: Postcondition: User has changed mushrooms
@@ -452,7 +461,10 @@ sequenceDiagram
 
     Note over Forager,API: Postcondition: User navigated to desired location
 ```
+___
+## Class diagram
 
+___
 ## Activity diagrams  
 
 ### Activity diagram 1  
@@ -567,6 +579,7 @@ flowchart TD
     display --> ending
 ```
 
+___
 ## Statediagram
 
 ```mermaid
