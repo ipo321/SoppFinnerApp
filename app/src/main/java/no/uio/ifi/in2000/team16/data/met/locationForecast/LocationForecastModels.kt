@@ -1,5 +1,6 @@
 package no.uio.ifi.in2000.team16.data.met.locationForecast
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /*
@@ -25,8 +26,10 @@ data class MetTimeSeries(
 @Serializable
 data class MetData(
     val instant: MetInstant,
-    val next_1_hours: MetNext1Hours? = null,
-    val next_12_hours: MetNext12Hours? = null
+    @SerialName("next_1_hours")
+    val next1Hours: MetNext1Hours? = null,
+    @SerialName("next_12_hours")
+    val next12Hours: MetNext12Hours? = null
 )
 
 
@@ -38,12 +41,14 @@ data class MetNext12Hours(
 
 @Serializable
 data class MetSummary(
-    val symbol_code: String? = null
+    @SerialName("symbol_code")
+    val symbolCode: String? = null
 )
 
 @Serializable
 data class MetProbabilityDetails(
-    val probability_of_precipitation: Double? = null
+    @SerialName("probability_of_precipitation")
+    val probabilityOfPrecipitation: Double? = null
 )
 
 @Serializable
@@ -53,11 +58,16 @@ data class MetInstant(
 
 @Serializable
 data class MetDetails(
-    val air_temperature: Double? = null,
-    val relative_humidity: Double? = null,
-    val wind_speed: Double? = null,
-    val dew_point_temperature: Double? = null,
-    val fog_area_fraction: Double? = null
+    @SerialName("air_temperature")
+    val airTemperature: Double? = null,
+    @SerialName("relative_humidity")
+    val relativeHumidity: Double? = null,
+    @SerialName("wind_speed")
+    val windSpeed: Double? = null,
+    @SerialName("dew_point_temperature")
+    val dewPointTemperature: Double? = null,
+    @SerialName("fog_area_fraction")
+    val fogAreaFraction: Double? = null
 )
 
 @Serializable
@@ -67,7 +77,8 @@ data class MetNext1Hours(
 
 @Serializable
 data class MetPrecipDetails(
-    val precipitation_amount: Double? = null
+    @SerialName("precipitation_amount")
+    val precipitationAmount: Double? = null
 )
 
 

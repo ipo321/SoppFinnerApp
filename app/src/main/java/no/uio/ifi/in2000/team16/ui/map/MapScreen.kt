@@ -1,14 +1,26 @@
 package no.uio.ifi.in2000.team16.ui.map
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.LocationListener
+import android.location.LocationManager
 import android.util.Log
-import android.view.Gravity
+import android.view.ViewGroup
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -16,40 +28,37 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.toColorInt
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import androidx.core.content.ContextCompat
+import no.uio.ifi.in2000.team16.R
 import no.uio.ifi.in2000.team16.domain.model.BoundingBox
+import no.uio.ifi.in2000.team16.ui.common.ErrorScreen
 import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
-import org.maplibre.android.maps.Style
-import org.maplibre.android.style.layers.FillLayer
-import org.maplibre.android.style.layers.SymbolLayer
+import org.maplibre.android.style.layers.Property.NONE
+import org.maplibre.android.style.layers.Property.VISIBLE
+import org.maplibre.android.style.layers.PropertyFactory.visibility
 import org.maplibre.android.style.sources.GeoJsonSource
-import org.maplibre.android.style.layers.PropertyFactory.*
-import org.maplibre.android.style.expressions.Expression.*
-import androidx.compose.runtime.setValue
-import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
-import org.maplibre.android.style.layers.CircleLayer
 import org.maplibre.geojson.Feature
 import org.maplibre.geojson.FeatureCollection
 import org.maplibre.geojson.Point
+import org.maplibre.geojson.Polygon
 
 /*
+    The Map Screen is the main screen in the app.
+
     MapLibre on GitHub: https://github.com/maplibre/maplibre-native
-    Tutorials: https://maplibre.org/maplibre-native/android/examples/
-
-    The map is partly configured in res/layout/main.xml
-
-    The tiles that shows cities, streets etc. is from the map Base from MapTiler: https://cloud.maptiler.com/maps/
 
     In the emulator the map can be zoomed in on by double tapping on the screen,
     or zoomed in or out by holding Ctrl and drag the map.
@@ -57,55 +66,151 @@ import org.maplibre.geojson.Point
 
 @Composable
 fun MapScreen(
-    onNavigateToDev: () -> Unit,
-    viewModel: MapViewModel,
-    modifier: Modifier = Modifier
+    mapViewModel: MapViewModel,
+    isVisible: Boolean,
+    onMapLoaded: () -> Unit,
+    isNetConnected: Boolean,
+    isDarkMode: Boolean,
+    innerPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val uiState by viewModel.uiState.collectAsState()
-
-    // The map is made with MapView and remember to save state
-    val mapView = getMapView(viewModel, context)
-    // mapView is alerted when lifecycle changes
-    LifeCycleObserver(lifecycleOwner, mapView)
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        AndroidView(
-            modifier = Modifier.matchParentSize(),
-            factory = { mapView }
+    var locationPermissionGranted by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
         )
+    }
+    //Shows the "Allow Location" popup and remembers the response
+    val locationPermissionRequest = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+    val uiState by mapViewModel.uiState.collectAsState()
+    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
+    val searchTextFieldState = rememberTextFieldState()
+    // The map is made with MapView and remember to save state
+    val mapView = getMapView(mapViewModel, context) { mapRef = it }
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .wrapContentSize()
-        ) {
-            Dropdown(
-                onNavigateToDev = onNavigateToDev,
-                isHeatmapEnabled = uiState.isHeatmapEnabled,
-                isHistoricalFindsEnabled = uiState.isHistoricalFindsEnabled,
-                onToggleHistoricalFinds = { viewModel.toggleHistoricalFinds() },
-                favoriteMushrooms = uiState.favoriteMushrooms,
-                selectedMushroom = uiState.selectedMushroom,
-                onMushroomSelected = { mushroom -> viewModel.onMushroomSelected(mushroom) },
-                onToggleHeatMap = {
-                    mapView.getMapAsync { map ->
-                        val bounds = map.projection.visibleRegion.latLngBounds
-                        val currentBox = BoundingBox(
-                            north = bounds.northEast.latitude,
-                            south = bounds.southWest.latitude,
-                            east = bounds.northEast.longitude,
-                            west = bounds.southWest.longitude
-                        )
-                        viewModel.toggleHeatmap(currentBox)
-                    }
+    //Reload Map on internet reconect
+    var hadDisconnection by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isNetConnected) {
+        Log.d(
+            "T16_Net", "isNetConnected changed: $isNetConnected " +
+                    "hadDisconnection changed: $hadDisconnection"
+        )
+        if (!isNetConnected) {
+            hadDisconnection = true
+        } else if (hadDisconnection) {
+            hadDisconnection = false
+            mapViewModel.retryLastClick()
+        }
+    }
+
+
+    LaunchEffects(
+        viewModel = mapViewModel,
+        uiState = uiState,
+        mapRef = mapRef,
+        context = context,
+        locationPermissionRequest = locationPermissionRequest,
+        locationPermissionGranted = locationPermissionGranted,
+        onMapLoaded = onMapLoaded,
+        isDarkMode = isDarkMode
+    )
+    // mapView is alerted when lifecycle changes
+    MapLifecycle(mapView, isVisible)
+    // Sets up the GPS listener
+    DisposableEffect(locationPermissionGranted) {
+        if (!locationPermissionGranted) return@DisposableEffect onDispose {}
+
+        val locationManager = context.getSystemService(
+            Context.LOCATION_SERVICE
+        ) as LocationManager
+
+        //fires every time we want to update the user position from the GPS or Network
+        //pushes the coordinates to the viewmodel
+        val listener = LocationListener { location ->
+            mapViewModel.onUserLocationUpdated(location.latitude, location.longitude)
+        }
+
+        try {
+            // Request from GPS (Requires Fine Location)
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    3000L, //for every 3 seconds
+                    10f, //if moved 10 meters
+                    listener
+                )
+            }
+            // Request from Network (Works with Coarse Location)
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    3000L,
+                    10f,
+                    listener
+                )
+            }
+        } catch (e: SecurityException) {
+            Log.e("T16_Location", "Permission denied for provider: ${e.message}")
+        }
+
+        //disposes of the GPS listener(to avoid leaks)
+        onDispose { locationManager.removeUpdates(listener) }
+    }
+    MapScreenSurface(
+        searchTextFieldState = searchTextFieldState,
+        mapView = mapView,
+        mapViewModel = mapViewModel,
+        uiState = uiState,
+        innerPadding = innerPadding
+    )
+}
+
+@Composable
+fun MapScreenSurface(
+    searchTextFieldState: TextFieldState,
+    mapView: MapView,
+    mapViewModel: MapViewModel,
+    uiState: MapScreenState,
+    innerPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    val layoutDirection = LocalLayoutDirection.current
+    Box(modifier = modifier.fillMaxSize()) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = {
+                mapView.apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
                 }
+            }
+        )
+        if (uiState.isFetchingHeatmap) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary
             )
         }
+        MapComponents(
+            viewModel = mapViewModel,
+            uiState = uiState,
+            textFieldState = searchTextFieldState,
+            onSearch = { }
+        )
 
         when (uiState.screenStatus) {
             is ScreenStatus.Success -> {
@@ -113,133 +218,170 @@ fun MapScreen(
                     InfoPopUp(
                         msg = eval.description,
                         score = eval.score,
-                        contextData = uiState.currentContext
+                        contextData = uiState.currentContext,
+                        onDismiss = { mapViewModel.dismissEvaluation() },
+                        modifier = Modifier.padding(
+                            bottom = innerPadding.calculateBottomPadding(),
+                            start = innerPadding.calculateStartPadding(layoutDirection),
+                            end = innerPadding.calculateEndPadding(layoutDirection)
+                        )
                     )
                 }
             }
-            is ScreenStatus.Loading -> InfoPopUp("Laster inn data...", score = 0, contextData = null)
-            is ScreenStatus.Error -> InfoPopUp("Feil: ${(uiState.screenStatus as ScreenStatus.Error).message}", score = 0, contextData = null)
+
+            is ScreenStatus.Loading -> InfoPopUp(
+                msg = stringResource(R.string.laster_inn_data),
+                score = 0,
+                contextData = null,
+                onDismiss = null,
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
+            )
+
+            is ScreenStatus.Error -> ErrorScreen("Feil: ${uiState.screenStatus.message}")
             is ScreenStatus.Idle -> {}
         }
-
     }
 }
 
 @Composable
-fun getMapView(viewModel: MapViewModel, context: Context): MapView {
-
-    val uiState by viewModel.uiState.collectAsState()
-    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
-
-
+fun getMapView(
+    mapViewModel: MapViewModel,
+    context: Context,
+    onMapReady: (MapLibreMap) -> Unit,
+): MapView {
     val mapView = remember {
-        MapView(context).apply {
+        // This line fixes the crash in dark mode bug, because it makes Map Libre use a Texture View
+        val mode = MapLibreMapOptions.createFromAttributes(context, null)
+            .textureMode(true)
+
+        MapView(context, mode).apply { // mode are sent as argument here to fix the bug
             onCreate(null)
 
             getMapAsync { map ->
-                mapRef = map
-                // The map now uses BASE from MapTiler, this can be changed
-                map.setStyle("https://api.maptiler.com/maps/base-v4/style.json?key=pzawSSamH6NaI2881UMa") { style ->
-                    // Logging to see what happens when the map is used
-                    Log.d("MAP", "Style loaded: ${style.uri}")
+                onMapReady(map)
+                setMapLayout(map)
+                map.addOnMapClickListener { coordinate ->
+                    Log.d(context.getString(R.string.t16_map), "Map clicked at: $coordinate")
 
-                    setMapLayout(map)
-
-                    //HEATMAP løsning
-                    setupHeatmapLayer(style)    // Makes the heatmap layer
-                    setupHistoricalFindsLayer(style)
-                    // MAP
-                    // Makes the map clickable
-                    map.addOnMapClickListener { coordinate ->
-                        Log.d("MAP", "Map clicked at: $coordinate")
-
-                        viewModel.onMapClicked(
-                            lat = coordinate.latitude,
-                            lon = coordinate.longitude
+                    mapViewModel.onMapClicked(
+                        lat = coordinate.latitude,
+                        lon = coordinate.longitude
+                    )
+                    true
+                }
+                map.addOnCameraIdleListener {
+                    // Forward raw camera state to the VM; gating, throttling and
+                    // bounds-expansion live there so this callback stays UDF-clean.
+                    val pos = map.cameraPosition
+                    val region = map.projection.visibleRegion.latLngBounds
+                    mapViewModel.onCameraIdle(
+                        target = pos.target,
+                        zoom = pos.zoom,
+                        visibleBounds = BoundingBox(
+                            north = region.northEast.latitude,
+                            south = region.southWest.latitude,
+                            east = region.northEast.longitude,
+                            west = region.southWest.longitude,
                         )
-                        true
-                    }
-                    var lastTarget: LatLng? = null
-                    var lastZoom: Double = 0.0
-
-                    // Checks if map is still
-                    map.addOnCameraIdleListener() {
-                        val currentZoom = map.cameraPosition.zoom
-
-                        if (!viewModel.uiState.value.isHeatmapEnabled || currentZoom < 10.0) return@addOnCameraIdleListener
-
-                        val currentTarget = map.cameraPosition.target
-
-                        if (currentTarget != null && lastTarget != null) {
-                            val distanceInMeters = currentTarget.distanceTo(lastTarget!!)
-                            val zoomDiff = kotlin.math.abs(currentZoom - lastZoom)
-
-                            if (distanceInMeters < 200.0 && zoomDiff < 0.5) {
-                                return@addOnCameraIdleListener
-                            }
-                        }
-
-                        lastTarget = currentTarget
-                        lastZoom = currentZoom
-
-                        val visibleBounds = map.projection.visibleRegion.latLngBounds
-
-                        val north = visibleBounds.northEast.latitude
-                        val south = visibleBounds.southWest.latitude
-                        val east = visibleBounds.northEast.longitude
-                        val west = visibleBounds.southWest.longitude
-
-                        val latDiff = north - south
-                        val lonDiff = east - west
-
-                        val expandedBounds = BoundingBox(
-                            north = north + (latDiff * 0.5),
-                            south = south - (latDiff * 0.5),
-                            east = east + (lonDiff * 0.5),
-                            west = west - (lonDiff * 0.5)
-                        )
-
-                        viewModel.fetchHeatmapData(expandedBounds)
-                    }
+                    )
                 }
             }
         }
     }
-    //Mushroom finding pins
-    // Updating the pins each time they change
+    return mapView
+}
+
+@Composable
+fun LaunchEffects(
+    viewModel: MapViewModel,
+    uiState: MapScreenState,
+    mapRef: MapLibreMap?,
+    context: Context,
+    locationPermissionRequest: ManagedActivityResultLauncher<Array<String>, Map<String, @JvmSuppressWildcards Boolean>>,
+    locationPermissionGranted: Boolean,
+    onMapLoaded: () -> Unit,
+    isDarkMode: Boolean
+) {
+    val zoom = 12.0 // The zoom distance used for each zoom() call
+    // Satellite mode
+    LaunchedEffect(uiState.isSatelliteMode, mapRef, isDarkMode) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+
+        val styleUrl = if (uiState.isSatelliteMode)
+            "https://api.maptiler.com/maps/019dabad-5643-770e-9f49-33576ba87164/style.json?key=OXxwimrGO7F3CL0neXBq"
+        else
+            if (isDarkMode)
+                "https://api.maptiler.com/maps/019daf6d-d281-745e-939c-9621fc2be699/style.json?key=OXxwimrGO7F3CL0neXBq"
+            else
+                "https://api.maptiler.com/maps/019dab82-a3ed-7f0e-8e50-339cb9610079/style.json?key=OXxwimrGO7F3CL0neXBq"
+
+        currentMap.setStyle(styleUrl) { style ->
+            Log.d("T16_MAP", "Style loaded: ${style.uri}")
+            setupHeatmapLayer(style)
+            setupHistoricalFindsLayer(style, context)
+            setupForestLayer(style, uiState.showWmsForest)
+            addPinImage(style, context)
+            setupPinIcon(style)
+            setupUserLocationLayer(style)
+            onMapLoaded()
+        }
+    }
+    // WMS Forest Layer
+    LaunchedEffect(uiState.showWmsForest, mapRef, isDarkMode, uiState.isSatelliteMode) {
+        mapRef?.getStyle { style ->
+            style.getLayer("satskog-layer")?.setProperties(
+                visibility(if (uiState.showWmsForest) VISIBLE else NONE)
+            )
+        }
+    }
+    // Update pin where clicked with each new click
     LaunchedEffect(
-        uiState.currentContext?.historicalFinds,
-        uiState.isHistoricalFindsEnabled,
-        mapRef
+        uiState.lastClickedLat,
+        uiState.lastClickedLon,
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
     ) {
         val currentMap = mapRef ?: return@LaunchedEffect
-        val finds = uiState.currentContext?.historicalFinds ?: emptyList()
-
-        val features = finds
-            .filter { it.decimalLatitude != null && it.decimalLongitude != null }
-            .map { occ ->
-                Feature.fromGeometry(
-                    Point.fromLngLat(occ.decimalLongitude!!, occ.decimalLatitude!!)
-                )
-            }
+        val lat = uiState.lastClickedLat ?: return@LaunchedEffect
+        val lon = uiState.lastClickedLon ?: return@LaunchedEffect
 
         currentMap.getStyle { style ->
-            if (!style.isFullyLoaded) return@getStyle
-            val locationSource = style.getSourceAs<GeoJsonSource>("historical-finds-source") ?: return@getStyle
-
-            if (uiState.isHistoricalFindsEnabled) {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(features))
-            } else {
-                locationSource.setGeoJson(FeatureCollection.fromFeatures(emptyList()))
-            }
+            val source = style.getSourceAs<GeoJsonSource>("clicked-source") ?: return@getStyle
+            val point = Point.fromLngLat(lon, lat)
+            source.setGeoJson(Feature.fromGeometry(point))
         }
+    }
+    //Drawing the users position dot
+    LaunchedEffect(uiState.userLocation, mapRef, isDarkMode, uiState.isSatelliteMode) {
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val location = uiState.userLocation ?: return@LaunchedEffect
+        currentMap.getStyle { style ->
+            val source = style.getSourceAs<GeoJsonSource>("user-location-source")
+                ?: return@getStyle
+            val point = Point.fromLngLat(location.longitude, location.latitude)
+            source.setGeoJson(Feature.fromGeometry(point))
+        }
+    }
+
+    // Reacts to a search result by animating the camera, then clears the request.
+    LaunchedEffect(uiState.pendingCameraTarget, mapRef) {
+        val target = uiState.pendingCameraTarget ?: return@LaunchedEffect
+        val map = mapRef ?: return@LaunchedEffect
+        map.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(LatLng(target.lat, target.lon), target.zoom)
+        )
+        viewModel.onPendingCameraTargetConsumed()
     }
 
     // Updating the heatMapTiles each time they change
     LaunchedEffect(
         uiState.heatmapTiles,
         uiState.isHeatmapEnabled,
-        mapRef) {
+        mapRef,
+        isDarkMode,
+        uiState.isSatelliteMode
+    ) {
         val currentMap = mapRef ?: return@LaunchedEffect
 
 
@@ -251,23 +393,22 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             if (uiState.isHeatmapEnabled && uiState.heatmapTiles.isNotEmpty()) {
                 val features = mutableListOf<Feature>()
 
-                val lons = uiState.heatmapTiles.map { it.lon }.distinct().sorted()
-                val lats = uiState.heatmapTiles.map { it.lat }.distinct().sorted()
+                val tilesToDraw = uiState.heatmapTiles.filter { tile ->
+                    tile.size <= uiState.currentTileSize + 0.00001
+                }
 
-                val lonStep = lons.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-                val latStep = lats.zipWithNext { a, b -> b - a }.minOrNull() ?: 0.005
-
-                for (tile in uiState.heatmapTiles) {
+                tilesToDraw.forEach { tile ->
+                    val halfSize = tile.size / 2.0
 
                     val polygonPoints = listOf(
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat - (latStep / 2)),
-                        Point.fromLngLat(tile.lon + (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat + (latStep / 2)),
-                        Point.fromLngLat(tile.lon - (lonStep / 2), tile.lat - (latStep / 2))
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat - halfSize),
+                        Point.fromLngLat(tile.lon + halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat + halfSize),
+                        Point.fromLngLat(tile.lon - halfSize, tile.lat - halfSize)
                     )
 
-                    val polygon = org.maplibre.geojson.Polygon.fromLngLats(listOf(polygonPoints))
+                    val polygon = Polygon.fromLngLats(listOf(polygonPoints))
                     val feature = Feature.fromGeometry(polygon)
 
                     feature.addNumberProperty("score", tile.score)
@@ -276,7 +417,10 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
 
                 val featureCollection = FeatureCollection.fromFeatures(features)
                 source.setGeoJson(featureCollection)
-                Log.d("T16_Map_Heat", "Drew ${features.size} grid polygons natively.")
+                Log.d(
+                    context.getString(R.string.t16_map_heat),
+                    "Drew ${features.size} grid polygons natively."
+                )
 
             } else {
                 // Clear the map safely
@@ -284,124 +428,104 @@ fun getMapView(viewModel: MapViewModel, context: Context): MapView {
             }
         }
     }
+    //For making the screen start on the user position
+    LaunchedEffect(uiState.moveCameraToUser, mapRef) {
+        if (!uiState.moveCameraToUser) return@LaunchedEffect
+        val currentMap = mapRef ?: return@LaunchedEffect
+        val location = uiState.userLocation ?: return@LaunchedEffect
 
-    return mapView
-}
-
-@Composable
-fun LifeCycleObserver(lifecycleOwner: LifecycleOwner, mapView: MapView) {
-    DisposableEffect(lifecycleOwner, mapView) {
-        // observer listens to the lifecycle and when each of the functions below
-        // are called by the observer, the same ones are called by mapView
-        val observer = object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) { mapView.onStart() }
-            override fun onResume(owner: LifecycleOwner) { mapView.onResume() }
-            override fun onPause(owner: LifecycleOwner) { mapView.onPause() }
-            override fun onStop(owner: LifecycleOwner) { mapView.onStop() }
-            override fun onDestroy(owner: LifecycleOwner) { mapView.onDestroy() }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        // When mapScreen is removed, so is the observer and mapView no longer calls the above functions
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        currentMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(location, zoom)
+        )
+        //resets the flag
+        viewModel.onCameraMoved()
     }
-}
-
-// For now, the forest info is visible on screen
-// In the future, this info will be sent to the score algorithm instead
-@Composable
-fun BoxScope.InfoPopUp(
-    msg : String,
-    score : Int,
-    contextData: EnvironmentContext?,
-    modifier: Modifier = Modifier
-) {
-    ScoreCard(
-        score = score,
-        description = msg,
-        contextData = contextData,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .fillMaxWidth()
-            .padding(16.dp)
-    )
-}
-
-fun setMapLayout(map: MapLibreMap) {
-    map.cameraPosition = CameraPosition.Builder()
-        .target(LatLng(59.91, 10.75)) // Where the map opens, now Oslo
-        .zoom(11.0) // Degree of zoom when map is opened
-        .build()
-    map.setMinZoomPreference(2.0) // Minimum zoom
-    map.setMaxZoomPreference(25.0) // Maximum zoom
-
-    val ui = map.uiSettings
-    // If we want a compass
-    ui.isCompassEnabled = true
-    ui.compassGravity = Gravity.TOP or Gravity.END
-    // Adds zoom, scroll, rotation, tilt and double tap
-    ui.isZoomGesturesEnabled = true
-    ui.isScrollGesturesEnabled = true
-    ui.isRotateGesturesEnabled = true
-    ui.isTiltGesturesEnabled = true
-    ui.isDoubleTapGesturesEnabled = true
-    ui.isHorizontalScrollGesturesEnabled = true
-}
-
-private fun setupHeatmapLayer(style: Style) {
-    //  Source
-    val heatmapSource = GeoJsonSource("heatmap-source")
-    style.addSource(heatmapSource)
-
-    // Colour and Size
-    val fillLayer = FillLayer("heatmap-layer", "heatmap-source")
-
-
-    fillLayer.setProperties(
-        fillColor(
-            interpolate(
-                linear(), get("score"),
-                stop(0, rgba(200, 0, 0, 0.4f)),     // red
-                stop(1, rgba(255, 100, 0, 0.5f)),   // Orange
-                stop(50, rgba(255, 255, 0, 0.6f)),// Yellow
-                stop(100, rgba(0, 255, 0, 0.7f))  // Green
+    // this updates the scorecard when someone changes selected mushroom in Soppsiden
+    LaunchedEffect(uiState.selectedMushroom) {
+        viewModel.refreshCurrentLocation()
+    }
+    // Actually runs the popup and makes sure it doesn't rerun
+    LaunchedEffect(Unit) {
+        locationPermissionRequest.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
-        ),
-        //Changes the border
-        fillOutlineColor(rgba(0, 0, 0, 0f)),
-        fillOpacity(0.5f)
-    )
+        )
+    }
 
-    // Putting layer bellow roads and buildings
-    var insertBelowLayerId: String? = null
-    //style.addLayer(heatmapLayer)
+    //Showing mushrooms in the map
+    LaunchedEffect(
+        uiState.historicalFindMarkers,
+        uiState.isHistoricalFindsEnabled,
+        mapRef,
+        isDarkMode
+    ) {
+        val currentMap = mapRef ?: return@LaunchedEffect
 
-    for (layer in style.layers) {
-        val id = layer.id.lowercase()
-        if (id.contains("water") || id.contains("road") || id.contains("building") || layer is SymbolLayer) {
-            insertBelowLayerId = layer.id
-            break
+        currentMap.getStyle { style ->
+            if (style.isFullyLoaded) {
+                style.updateHistoricalFindsPins(
+                    markers = uiState.historicalFindMarkers,
+                    isEnabled = uiState.isHistoricalFindsEnabled
+                )
+            }
         }
     }
 
-    if (insertBelowLayerId != null) {
-        style.addLayerBelow(fillLayer, insertBelowLayerId)
-    } else {
-        style.addLayer(fillLayer)
+    // Centers the map on the user the first time we know where they are
+    // (or on Oslo if location permission is denied). Guarded by the VM-owned
+    // `hasCenteredInitially` flag so it survives recomposition and rotation.
+    LaunchedEffect(
+        uiState.userLocation,
+        locationPermissionGranted,
+        mapRef,
+        uiState.hasCenteredInitially
+    ) {
+        val map = mapRef ?: return@LaunchedEffect
+        if (uiState.hasCenteredInitially) return@LaunchedEffect
+
+        val userLat = uiState.userLocation?.latitude
+        val userLon = uiState.userLocation?.longitude
+
+        when {
+            userLat != null && userLon != null -> {
+                viewModel.onInitialCenterDone()
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(userLat, userLon))
+                    .zoom(zoom)
+                    .build()
+                onMapLoaded()
+            }
+            // No permission — fall back to a default location instead of
+            // waiting indefinitely for a fix that will never arrive.
+            !locationPermissionGranted -> {
+                viewModel.onInitialCenterDone()
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(59.91, 10.75))//Oslo
+                    .zoom(zoom)
+                    .build()
+                onMapLoaded()
+            }
+
+            else -> {
+                //Permission to location granted but no fix yet
+                //Shows Oslo temporarily
+                map.cameraPosition = CameraPosition.Builder()
+                    .target(LatLng(59.91, 10.75))
+                    .zoom(zoom)
+                    .build()
+            }
+        }
     }
 }
 
-private fun setupHistoricalFindsLayer(style: Style) {
-    val source = GeoJsonSource("historical-finds-source")
-    style.addSource(source)
 
-    val circleLayer = CircleLayer("historical-finds-layer", "historical-finds-source")
-    circleLayer.setProperties(
-        circleRadius(6f),
-        circleColor("#8B4513"),   // brown pin color
-        circleStrokeWidth(1.5f),
-        circleStrokeColor("#FFFFFF")
-    )
-    style.addLayer(circleLayer)
-}
+
+
+
+
+
+
+
+

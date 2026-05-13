@@ -1,31 +1,31 @@
 package no.uio.ifi.in2000.team16.domain.usecase
 
 import android.util.Log
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.async
-import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepository
-import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepository
-import no.uio.ifi.in2000.team16.data.met.frost.FrostRepository
-import no.uio.ifi.in2000.team16.data.nibio.ForestRepository
-import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepository
+import kotlinx.coroutines.coroutineScope
+import no.uio.ifi.in2000.team16.data.artsdatabasen.MushroomRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.frost.FrostRepositoryInterface
+import no.uio.ifi.in2000.team16.data.met.locationForecast.LocationForecastRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.ForestRepositoryInterface
+import no.uio.ifi.in2000.team16.data.nibio.SatSkogRepositoryInterface
 import no.uio.ifi.in2000.team16.domain.model.EnvironmentContext
 import no.uio.ifi.in2000.team16.domain.model.SpeciesProfile
-import javax.inject.Inject
 import java.util.Calendar
+import javax.inject.Inject
 import kotlin.system.measureTimeMillis
 
 
 /*
-Handles a single UseCase, takes in lon and lat and then calls all of the different
+Handles a single UseCase, takes in lon and lat and then calls all the different
 data repositories to fetch the data. Simplifies the Viewmodel. Returns the environment context object
 */
 
 class GetEnvironmentContextUseCase @Inject constructor(
-    private val locationForecastRepository: LocationForecastRepository,
-    private val mushroomRepository: MushroomRepository,
-    private val forestRepository: SatSkogRepository,
-    private val frostRepository: FrostRepository,
-    private val ar5Repository: ForestRepository
+    private val locationForecastRepository: LocationForecastRepositoryInterface,
+    private val mushroomRepository: MushroomRepositoryInterface,
+    private val forestRepository: SatSkogRepositoryInterface,
+    private val frostRepository: FrostRepositoryInterface,
+    private val ar5Repository: ForestRepositoryInterface
     //Add other repositories here
 ) {
     suspend operator fun invoke(lat: Double, lon: Double, profile: SpeciesProfile? = null): EnvironmentContext {
@@ -39,7 +39,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                     val weather = async { locationForecastRepository.weatherNext8Hours(lat, lon) }
                     val forest = async { forestRepository.getForestData(lat, lon) }
                     val history = async { frostRepository.weatherHistory(lat, lon) }
-                    val AR5 = async { ar5Repository.getArealType(lat, lon) }
+                    val arealresourcetype = async { ar5Repository.getArealType(lat, lon) }
                     //Add other repositories here
 
                     //Only send if we get species or else null, makes it possible to use the function for all species
@@ -48,7 +48,7 @@ class GetEnvironmentContextUseCase @Inject constructor(
                             mushroomRepository.getMushroomsNearLocation(
                                 lat,
                                 lon,
-                                mushRoomType = profile.taxKey
+                                mushroomType = profile.name
                             )
                         }
                     } else {
@@ -61,9 +61,8 @@ class GetEnvironmentContextUseCase @Inject constructor(
 
                     val occurrenceResult = speciesLocations?.await()
                     val historicalFindCount = occurrenceResult?.count ?: 0
-                    val historicalFinds = occurrenceResult?.results ?: emptyList()
 
-                    val forestAR5 = AR5.await()
+                    val forestAR5 = arealresourcetype.await()
                     val currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1
 
                     EnvironmentContext(
@@ -73,7 +72,6 @@ class GetEnvironmentContextUseCase @Inject constructor(
                         ar5 = forestAR5,
                         forestData = forestData,
                         historicalFindCount = historicalFindCount,
-                        historicalFinds = historicalFinds,
                         currentMonth = currentMonth
                     )
                 }

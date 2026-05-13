@@ -4,7 +4,8 @@ import no.uio.ifi.in2000.team16.data.artsdatabasen.Occurrence
 
 
 /*
-Dataclasses for handling the information that will be put into the evaluation module. Important to look at for all API and repositories as this is what your repository should return.
+Dataclasses for handling the information that will be put into the evaluation module.
+Important to look at for all API and repositories as this is what your repository should return.
 */
 
 data class EnvironmentContext(
@@ -17,20 +18,7 @@ data class EnvironmentContext(
     val historicalFinds: List<Occurrence> = emptyList(),
     val hist: Int = 0,
     val currentMonth: Int
-) {
-    companion object {
-        val Mock = EnvironmentContext(
-            currentWeather = null,
-            weatherHistory = null,
-            terrainData = null,
-            ar5 = null,
-            forestData = null,
-            historicalFindCount = 0,
-            currentMonth = 8 //August
-        )
-
-    }
-}
+)
 
 data class WeatherData(
     val temp: Double?,
@@ -82,6 +70,6 @@ data class ForestData(
 
 // Structure of the result from the algorithm
 data class EvaluationResult(
-    val score: Int,  // Score from 0 -100
+    val score: Int,  // Score from 0 to 100
     val description: String   // Description and reason of the score
 )

@@ -8,18 +8,26 @@ import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 
 /*
-    Repository for the AR5 API, than handles the data output and puts it into a ForestData module from the evaluation module.
+    Repository for the AR5 API, then handles the data output and puts it into a ForestData module from the evaluation module.
     Uses the same method as SAT-SKOG
  */
+
+interface ForestRepositoryInterface {
+    suspend fun getArealType(
+        lat: Double,
+        lon: Double
+    ): String?
+}
 @Singleton
 class ForestRepository @Inject constructor(
-    private val forestDataSource: ForestDataSource
-) {
+    private val forestDataSource: ForestDataSourceInterface
+) : ForestRepositoryInterface {
     // Cache
     private val cache = ConcurrentHashMap<String, Deferred<String?>>()
-    suspend fun getArealType(lat: Double, lon: Double): String? = coroutineScope {
+    override suspend fun getArealType(lat: Double, lon: Double): String? = coroutineScope {
         val cacheKey = String.format(Locale.US, "%.4f_%.4f", lat, lon)
 
         if (cache.containsKey(cacheKey)) {
@@ -33,6 +41,12 @@ class ForestRepository @Inject constructor(
                 forestDataSource.fetchArealType(lat, lon)
             }
         }
-        deferredResult.await()
+        return@coroutineScope try {
+            deferredResult.await()
+        } catch (e: Exception) {
+            cache.remove(cacheKey, deferredResult)
+            if (e is CancellationException) throw e
+            null
+        }
     }
 }

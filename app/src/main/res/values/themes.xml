@@ -10,18 +10,9 @@
 
     <style name="Theme.MySplashScreen" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/brown_mushroom</item>
-        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/brown_mushroom_inset</item>
+        <item name="windowSplashScreenAnimationDuration">600</item>
         <item name="postSplashScreenTheme">@style/Theme.Team16</item>
-    </style>
-
-    <style name="ThemeOverlay.AppCompat.navTheme">
-        <item name="colorPrimary">@color/white</item>
-    </style>
-
-    <style name="SlideActivityAnimation" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
-        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
     </style>
 
 </resources>

@@ -12,21 +12,33 @@ import javax.inject.Singleton
     API for getting weather data from MET and their locationforecast
 */
 
+interface LocationForecastDataSourceInterface {
+
+    suspend fun fetchWeather(
+        lat: Double,
+        lon: Double
+    ): MetResponse?
+}
+
 @Singleton
 class LocationForecastDataSource @Inject constructor(
     private val httpClient: HttpClient
-){
-    suspend fun fetchWeather(lat: Double, lon: Double): MetResponse? {
-        val url = "https://in2000.api.met.no/weatherapi/locationforecast/2.0/complete?lat=$lat&lon=$lon"  //Complete gives fog area fraction and condensation point
+) : LocationForecastDataSourceInterface {
+    override suspend fun fetchWeather(lat: Double, lon: Double): MetResponse? {
+        val url =
+            "https://in2000.api.met.no/weatherapi/locationforecast/2.0/complete?lat=$lat&lon=$lon"  //Complete gives fog area fraction and condensation point
 
         return try {
-            val response = httpClient.get(url){
+            httpClient.get(url) {
                 header("User-Agent", "IN2000 Team 16")
             }.body<MetResponse>()
-                response
-            } catch (e: Exception) {
-                Log.e("T16_Weather_DataSource", "Network error when fetching weather from LocationForecast API: ${e.message}", e)
-                null
+        } catch (e: Exception) {
+            Log.e(
+                "T16_Weather_DataSource",
+                "Network error when fetching weather from LocationForecast API: ${e.message}",
+                e
+            )
+            null
         }
 
     }
