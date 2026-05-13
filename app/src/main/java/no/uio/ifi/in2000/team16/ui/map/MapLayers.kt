@@ -312,7 +312,7 @@ private fun buildClusterCountLayer(): SymbolLayer =
         .withFilter(has(PROP_POINT_COUNT))
 
 /**
- * Adds a polygon fill layer that visualises mushroom-suitability scores.
+ * Adds a polygon fill layer that visualizes mushroom-suitability scores.
  *
  * Each feature is expected to carry a `score` property in the range 0–100.
  * The score is mapped to a color gradient: red (poor) → orange → yellow → green (good).
@@ -326,7 +326,7 @@ fun setupHeatmapLayer(style: Style) {
     val heatmapSource = GeoJsonSource("heatmap-source")
     style.addSource(heatmapSource)
 
-    // Colour and Size
+    // Color and Size
     val fillLayer = FillLayer("heatmap-layer", "heatmap-source")
 
 

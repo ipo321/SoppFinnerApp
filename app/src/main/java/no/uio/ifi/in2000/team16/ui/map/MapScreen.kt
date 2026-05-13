@@ -11,8 +11,12 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.LinearProgressIndicator
@@ -27,9 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import no.uio.ifi.in2000.team16.R
@@ -65,21 +70,26 @@ fun MapScreen(
     isVisible: Boolean,
     onMapLoaded: () -> Unit,
     isNetConnected: Boolean,
-    isDarkMode: Boolean
+    isDarkMode: Boolean,
+    innerPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val context = LocalContext.current
     var locationPermissionGranted by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
         )
     }
     //Shows the "Allow Location" popup and remembers the response
     val locationPermissionRequest = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        locationPermissionGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
     }
     val uiState by mapViewModel.uiState.collectAsState()
     var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
@@ -124,17 +134,35 @@ fun MapScreen(
             Context.LOCATION_SERVICE
         ) as LocationManager
 
-        //fires every time we want to update the user position from the GPS
+        //fires every time we want to update the user position from the GPS or Network
         //pushes the coordinates to the viewmodel
         val listener = LocationListener { location ->
             mapViewModel.onUserLocationUpdated(location.latitude, location.longitude)
         }
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            3000L, //for every 3 seconds
-            10f, //if moved 10 meters
-            listener
-        )
+
+        try {
+            // Request from GPS (Requires Fine Location)
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    3000L, //for every 3 seconds
+                    10f, //if moved 10 meters
+                    listener
+                )
+            }
+            // Request from Network (Works with Coarse Location)
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    3000L,
+                    10f,
+                    listener
+                )
+            }
+        } catch (e: SecurityException) {
+            Log.e("T16_Location", "Permission denied for provider: ${e.message}")
+        }
+
         //disposes of the GPS listener(to avoid leaks)
         onDispose { locationManager.removeUpdates(listener) }
     }
@@ -142,7 +170,8 @@ fun MapScreen(
         searchTextFieldState = searchTextFieldState,
         mapView = mapView,
         mapViewModel = mapViewModel,
-        uiState = uiState
+        uiState = uiState,
+        innerPadding = innerPadding
     )
 }
 
@@ -152,40 +181,16 @@ fun MapScreenSurface(
     mapView: MapView,
     mapViewModel: MapViewModel,
     uiState: MapScreenState,
+    innerPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .onGloballyPositioned { parentBounds ->
-                val parentHeightPx = parentBounds.size.height
-
-                mapView.post {
-                    // post runs after layout calculations are done
-                    // Makes sure the layout parameters are the same as the parent's.
-                    // This fixes the recurring bug we have with the gap between map and nav-bar
-                    val lp = mapView.layoutParams
-                    if (lp != null && lp.height != parentHeightPx) {
-                        lp.height = parentHeightPx
-                        mapView.layoutParams = lp
-                        mapView.requestLayout()
-                    }
-                }
-            }
-    ) {
+    val layoutDirection = LocalLayoutDirection.current
+    Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
-            factory = { mapView },
-            update = { view ->
-                // Trying to minimalize the bug that sometimes happen, which results in a gap between
-                // the mapview and the bottom navigation bar. Here we try to make sure that the mapview
-                // follows its parents width and height.
-                val lp = view.layoutParams
-                if (lp == null ||
-                    lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
-                    lp.height != ViewGroup.LayoutParams.MATCH_PARENT
-                ) {
-                    view.layoutParams = ViewGroup.LayoutParams(
+            factory = {
+                mapView.apply {
+                    layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
@@ -214,7 +219,12 @@ fun MapScreenSurface(
                         msg = eval.description,
                         score = eval.score,
                         contextData = uiState.currentContext,
-                        onDismiss = { mapViewModel.dismissEvaluation() }
+                        onDismiss = { mapViewModel.dismissEvaluation() },
+                        modifier = Modifier.padding(
+                            bottom = innerPadding.calculateBottomPadding(),
+                            start = innerPadding.calculateStartPadding(layoutDirection),
+                            end = innerPadding.calculateEndPadding(layoutDirection)
+                        )
                     )
                 }
             }
@@ -223,7 +233,8 @@ fun MapScreenSurface(
                 msg = stringResource(R.string.laster_inn_data),
                 score = 0,
                 contextData = null,
-                onDismiss = null
+                onDismiss = null,
+                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
             )
 
             is ScreenStatus.Error -> ErrorScreen("Feil: ${uiState.screenStatus.message}")

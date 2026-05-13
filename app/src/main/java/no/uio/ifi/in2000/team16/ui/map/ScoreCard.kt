@@ -250,7 +250,7 @@ fun getInterpolatedScoreColor(score: Int): Color {
 }
 
 
-//Makes the scoreCirlce and the ring around it:
+//Makes the scoreCirlce and the surrounding ring:
 @Composable
 fun ScoreCircle(score: Int, modifier: Modifier = Modifier){
     val scoreColor = getInterpolatedScoreColor(score)

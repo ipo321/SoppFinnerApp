@@ -35,7 +35,7 @@ Python has been used on scripts on directly part of the app. The reason for usin
 ## Architecture pattern
 Followed Model-View-ViewModel architecture with clean architecture principles. three distinct layers as described bellow
 
-Low coupling and high cohesion thru the codebase
+Low coupling and high cohesion through the codebase
 Related functionalities in specific packages. NEtworking for weather in the met, and so onD Dependencie injection using dagger hilt 
 
 ### UI Layer
@@ -45,7 +45,7 @@ UI state as a read-only stateflow
 
 
 ### Domain Layer
-Core logic and completly independent of the UI and data frameworks. Houses the scoring logic which is accesses thru interfaces. the machine learning algorithms 
+Core logic and completly independent of the UI and data frameworks. Houses the scoring logic which is accesses through interfaces. the machine learning algorithms 
 A domain layer was not strongly recommended in the https://developer.android.com/topic/architecture/recommendations for android app, but was just a recommendation. Even if our app is not Huge 
 We would deem it appropriate to use a domain layer. Mainly because of the amount og logic and the usefulness of usecases minimalizing the amount of codes in the UI-layer and reusability
 * Use cases 

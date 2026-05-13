@@ -47,6 +47,7 @@ class FakeLocationRepository : LocationRepositoryInterface {
 /**
  * A fake MushroomRepository used for unit tests.
  */
+@Suppress("unused", "RedundantSuppression")
 class FakeMushroomRepository : MushroomRepositoryInterface {
     val occurrence = mockk<OccurrenceResult>(relaxed = true)
 
