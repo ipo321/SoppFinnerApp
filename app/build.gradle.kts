@@ -118,9 +118,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.sprite)
 
-    // Jsoup
-    implementation(libs.jsoup)
-
     implementation(libs.androidx.appcompat.v171)
     implementation(libs.androidx.drawerlayout)
     implementation(libs.androidx.navigation.compose)

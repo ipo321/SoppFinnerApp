@@ -109,8 +109,6 @@ ___
 
 **ONNX Runtime:** provides an open source format for AI models. It defines an extensible computation graph model, as well as definitions of built-in operators and standard data types (https://github.com/onnx/onnx). Used to run the ML models in our app.
 
-Jsoup
-
 Room
 
 SplashScreen
