@@ -1,17 +1,5 @@
 <resources>
     <string name="app_name">SoppSporer</string>
-    <string name="navigation_drawer_open">Open Navigation Drawer</string>
-    <string name="navigation_drawer_close">Close Navigation Drawer</string>
-    <string name="home">Home</string>
-    <string name="sopp">Sopp</string>
-    <string name="subscription">Subscription</string>
-    <string name="library">Library</string>
-    <string name="min_side">Min side</string>
-    <string name="kart">kart</string>
-    <string name="filtrer">filtrer</string>
-    <string name="brunsopp">Sopp</string>
-    <string name="vet_ikke_helt">vet ikke helt</string>
-    <string name="informasjon">Informasjon</string>
 
     <string name="traktantarell_bio">Traktkantarell er en sopp som hører til gruppen trompetsopper. Det er en utmerket matsopp. Den er vanlig i Norge og kommer sent på høsten. Traktkantarell vokser i klynger. Traktkantarell vokser på samme sted som den dødelig giftige spiss giftslørsopp, så man må være oppmerksom når man plukker. De to soppene skilles tydelig på at traktantarell har ribber mens spiss giftslørsopp har skiver under hatten. Traktkantarell er gråbrun på hatten. Under hatten har den ribber. Den har en hul stilk og meget tynt kjøtt.</string>
     <string name="kantarell_bio">Den ekte kantarellen er en av Norges beste og mest gjenkjennelige matsopper. Den vokser i hele landet og har lang sesong. Ekte kantarell er en eggegul sopp med butte, gaffelgrenede ribber på undersiden av hatten. Hatten er traktformet og med en bølget rand på godt voksne eksemplarer. Den eneste soppen som kan forveksles med ekte kantarell er falsk kantarell. Ingen giftige sopper ligner.</string>
@@ -36,12 +24,11 @@
     <string name="mushroom_list_title">Soppsiden</string>
     <string name="mushroom_list_favorites">Favoritter</string>
     <string name="mushroom_list_others">Øvrige</string>
-    <string name="cd_soppkontroll_logo">Soppkontroll logo</string>
     <string name="soppkontroll_brand">Soppkontroll.no</string>
     <string name="soppkontroll_description">tilbyr digital soppkontroll som lar brukerne sjekke om soppen er spiselig eller ikke.</string>
     <string name="soppkontroll_visit_button">Besøk Soppkontroll.no</string>
     <string name="warning_not_for_identification">OBS: Dette er ikke en app for identifikasjon av sopp</string>
-    <string name="laster_inn_data">Laster inn data...</string>
+    <string name="laster_inn_data">Laster inn data…</string>
     <string name="back_button">Tilbake</string>
     <string name="checkBox_description">Velg til kart</string>
     <string name="kart_big_k">Kart</string>
