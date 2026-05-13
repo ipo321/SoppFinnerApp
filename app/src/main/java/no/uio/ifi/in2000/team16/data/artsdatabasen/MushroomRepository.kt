@@ -73,7 +73,7 @@ class MushroomRepository @Inject constructor(
         val lonMax = lon + lonOffset
 
         // Convert the mushroom name to the internal species ID used by the data source.
-        // Return an empty result immediately if the name is not recognised.
+        // Return an empty result immediately if the name is not recognized.
         val localSpeciesId = LocalSpeciesIdMapper.fromName(mushroomType)
             ?: return OccurrenceResult()
 
@@ -94,7 +94,7 @@ class MushroomRepository @Inject constructor(
         mushroomType: String,
     ): OccurrenceResult {
         // Convert the mushroom name to the internal species ID used by the data source.
-        // Return an empty result immediately if the name is not recognised.
+        // Return an empty result immediately if the name is not recognized.
         val localSpeciesId = LocalSpeciesIdMapper.fromName(mushroomType)
             ?: return OccurrenceResult()
 
