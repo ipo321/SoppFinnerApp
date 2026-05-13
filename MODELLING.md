@@ -229,11 +229,11 @@ Type.kt
 2. The system retrieves the necessary information from the APIs MET (Frost and Location Forecast) and Nibio (SAT-skog and AR5)  
 3. The system checks whether the mushroom is in season  
 4. The mushroom is in season and the system calculates a score  
-5. The user is presented with a score card that contains the score and relevant information  
+5. The user is presented with a scorecard that contains the score and relevant information  
 
 **Alternative flow:**  
 3.1 The mushroom is not in season  
-3.2 The score card tells the user that the mushroom is not in season  
+3.2 The scorecard tells the user that the mushroom is not in season  
 3.3 The user selects a mushroom that is in season   
 
 ### Use case 2  
