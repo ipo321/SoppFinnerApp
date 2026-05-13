@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
@@ -176,38 +175,12 @@ fun MapScreenSurface(
     uiState: MapScreenState,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .onGloballyPositioned { parentBounds ->
-                val parentHeightPx = parentBounds.size.height
-
-                mapView.post {
-                    // post runs after layout calculations are done
-                    // Makes sure the layout parameters are the same as the parent's.
-                    // This fixes the recurring bug we have with the gap between map and nav-bar
-                    val lp = mapView.layoutParams
-                    if (lp != null && lp.height != parentHeightPx) {
-                        lp.height = parentHeightPx
-                        mapView.layoutParams = lp
-                        mapView.requestLayout()
-                    }
-                }
-            }
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
-            factory = { mapView },
-            update = { view ->
-                // Trying to minimalize the bug that sometimes happen, which results in a gap between
-                // the mapview and the bottom navigation bar. Here we try to make sure that the mapview
-                // follows its parents width and height.
-                val lp = view.layoutParams
-                if (lp == null ||
-                    lp.width != ViewGroup.LayoutParams.MATCH_PARENT ||
-                    lp.height != ViewGroup.LayoutParams.MATCH_PARENT
-                ) {
-                    view.layoutParams = ViewGroup.LayoutParams(
+            factory = {
+                mapView.apply {
+                    layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
