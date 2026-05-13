@@ -355,8 +355,12 @@ sequenceDiagram
         alt User has favorite mushroom
             MS-->>Forager: Displays favorite in quick selection
             Forager->>MS: Taps on favorite mushroom
-            MS-->>Forager: Shows selected mushroom
-            MS-->>Forager: No quick selection available
+           
+           
+           
+    end
+    alt User does not have favorite mushroom
+         MS-->>Forager: No quick selection available
             Forager->>MS: Taps "Soppsiden" on navBar
             NH->>ML: Navigates to MushroomListScreen
             ML-->>Forager: Displays MushroomListScreen
@@ -366,28 +370,27 @@ sequenceDiagram
 
 
             Forager->>MI: Taps a mushroom to mark as favorite
-            MI->>Forager: Indicates favorite being selected
+            MI-->>Forager: Indicates favorite being selected
             Forager->>MI: Taps "Kart" on navBar
             NH->>MS: Navigate to MapScreen
             MS-->>Forager: Displays MapScreen
-
-
             Forager->>MS: Reopens drop-down menu
-            Forager->>ML: Opens Mushroom page
-            Forager->>ML: Finds desired mushroom
-            ML->>MS: Sends selected mushroom
-        end
+            MS-->>Forager: Displays favorite in quick selection
+            Forager->>MS: Taps on favorite mushroom
+
+
     end
-    alt User does not have favo
-
-
-        Forager->>MS: Reopens drop-down menu
-            Forager->>ML: Opens Mushroom page
-            Forager->>ML: Finds desired mushroom
+    alt User does not want to favorite any mushrooms
+             Forager->>MS: Taps "Soppsiden" on navBar
+            NH->>ML: Navigates to MushroomListScreen
+            ML-->>Forager: Displays MushroomListScreen
+            Forager->>ML: Checks desired mushroom
             ML->>MS: Sends selected mushroom
+    end
     end
 
     Note over Forager,MS: Postcondition: User has changed mushrooms
+
 ```
 
 ### Sequence diagram 3  
@@ -448,17 +451,17 @@ config:
   layout: elk
 ---
 flowchart TD
-    title["Calculation of Mushroom Score"]
+    title["Calculation of <br>Mushroom Score"]
 
 
     start((Start))
 
 
-    taps([User taps the map])
-    calculate([Score is calculated])
+    taps([User taps <br>the map])
+    calculate([Score is <br>calculated])
     present([Score is presented])
-    message([Score card shows that the mushroom is not in season])
-    change([User chooses a mushroom that is in season])
+    message([Score card shows <br>that the mushroom is <br>not in season])
+    change([User chooses a <br>mushroom that is <br>in season])
 
 
     inSeason{Mushroom in season?}
@@ -485,18 +488,18 @@ config:
   layout: elk
 ---
 flowchart TD
-    title["Selecting mushrooms for the app"]
+    title["Selecting mushrooms <br>for the app"]
 
 
     start((Start))
 
 
-    dropdown([User opens dropdown menu])
-    taps([User taps and selects mushroom])
-    addFavorite([User adds a mushroom to favorites])
-    select([User selects mushroom directly from the list])
-    list([User navigates to mushroom screen])
-    map([User navigates to map screen])
+    dropdown([User opens <br>dropdown menu])
+    taps([User taps and selects <br>mushroom])
+    addFavorite([User adds a <br>mushroom to favorites])
+    select([User selects mushroom <br>directly from the list])
+    list([User navigates to <br>mushroom screen])
+    map([User navigates <br>to map screen])
 
 
     hasFavorite{Favorites added?}
@@ -529,11 +532,11 @@ flowchart TD
     start((Start))
 
 
-    bar([User presses and opens the search bar])
-    enter([User enters 'Lillehammer'])
-    display([Lillehammer area displays on screen])
-    out([User closes the search bar])
-    nav([User navigates to Lillehammer by dragging the map])
+    bar([User presses and <br>opens the search bar])
+    enter([User enters <br>'Lillehammer'])
+    display([Lillehammer area <br>displays on screen])
+    out([User closes the <br>search bar])
+    nav([User navigates to <br>Lillehammer by dragging <br>the map])
 
 
     success{API retrieving successful?}
