@@ -136,7 +136,7 @@ fun Navigation(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(top = innerPadding.calculateTopPadding())
         ) {
             val isMapVisible = (currentRoute == MAP_SCREEN)
 
@@ -146,7 +146,8 @@ fun Navigation(
                     isVisible = isMapVisible,
                     onMapLoaded = { isMapLoaded.value = true },
                     isNetConnected = isNetConnected,
-                    isDarkMode = darkTheme
+                    isDarkMode = darkTheme,
+                    innerPadding = innerPadding
                 )
             }
             NavHost(
@@ -154,6 +155,7 @@ fun Navigation(
                 startDestination = if (onboardingCompleted == true) MAP_SCREEN else ONBOARDING_SCREEN,
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(bottom = innerPadding.calculateBottomPadding())
             ) {
                 composable(ONBOARDING_SCREEN) {
                     OnBoardingScreen(
