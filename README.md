@@ -86,7 +86,7 @@ ___
 ___
 ## Libraries
 
-**[AndroidX ConstraintLayout (Views/XML)](https://developer.android.com/topic/libraries/architecture/datastore):** is used to position the MapLibre map view on the screen, and to lay it out relative to other views and UI elements.
+**AndroidX ConstraintLayout (Views/XML):** is used to position the MapLibre map view on the screen, and to lay it out relative to other views and UI elements.
 
 **AndroidX Navigation:** is used to define and manage navigation between the app screens in a structured way.  
 
