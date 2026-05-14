@@ -218,6 +218,10 @@ Type.kt
 ## Purpose
 Why we have chosen the ones we have and what we want with them...
 
+Use-case diagrams are dynamic UML diagrams that focus on the interaction between actors and the system. Furthermore, actors can be divided into both primary and secondary actors. In our use-case diagrams, the primary actor is the user. We aim to illustrate the main and alternative flows for the functions we expect users to utilize most frequently in the application. 
+([reference](https://www.uio.no/studier/emner/matnat/ifi/IN1030/v25/materiale-fra-gruppetimer/gruppe-5/notat-om-uml-diagrammene-i-in1030.pdf))([reference](https://www.geeksforgeeks.org/system-design/use-case-diagram/))
+
+
 Actitivy diagrams are well suited for graphically representing the event flow in a use case ([reference](https://www.uio.no/studier/emner/matnat/ifi/IN2000/v26/forelesninger/in2000.2026.02.04_modellering-og-objektorinterte-prinsipper.pdf)). They  have somewhat overlapping uses with sequence diagrams, but sequence diagrams are typically closer to the code, while activity diagrams are more business‑oriented. We saw the advantage of using activity diagrams to visualize our use cases, as they gave us a better understanding of the flow in our app and the decision points within that flow.
 
 ___
