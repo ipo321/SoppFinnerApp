@@ -224,6 +224,15 @@ Use-case diagrams are dynamic UML diagrams that focus on the interaction between
 
 Actitivy diagrams are well suited for graphically representing the event flow in a use case ([reference](https://www.uio.no/studier/emner/matnat/ifi/IN2000/v26/forelesninger/in2000.2026.02.04_modellering-og-objektorinterte-prinsipper.pdf)). They  have somewhat overlapping uses with sequence diagrams, but sequence diagrams are typically closer to the code, while activity diagrams are more business‑oriented. We saw the advantage of using activity diagrams to visualize our use cases, as they gave us a better understanding of the flow in our app and the decision points within that flow.
 
+Sequence diagrams are dynamic UML diagrams designed to visualize the interactions between objects in a system, in chronological order.([reference](https://www.uio.no/studier/emner/matnat/ifi/IN1030/v25/materiale-fra-gruppetimer/gruppe-5/notat-om-uml-diagrammene-i-in1030.pdf) We use sequence diagrams to visualize how the code flows in order of functions and dataflow between different components in our most frequently used app-features.
+
+
+---CLASSDIAGRAMS TEXT---
+meow meow meow
+
+State diagrams are dynamic UML diagrams which visualize a system’s or parts of a system’s state in response to external stimuli and/or the passage of time.([reference](https://www.geeksforgeeks.org/system-design/unified-modeling-language-uml-state-diagrams/))
+In our case we decided to include the entire apps range of functionalities in the diagram, because it gave a good overview of what our app includes. It also gives us a great way of visualizing what the interactions our users have with the app, lead into what results we expect the interaction to have. A distinction between the normal state diagram and ours is how ours is missing an end-node. This is because our application is not designed with a endpoint for users to reach, but more as a tool that can be continuously used with no clear cut end.
+
 ___
 ## Use case text
 
