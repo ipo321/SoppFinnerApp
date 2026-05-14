@@ -86,26 +86,26 @@ ___
 ___
 ## Libraries
 
-**AndroidX ConstraintLayout (Views/XML):** is used to position the MapLibre map view on the screen, and to lay it out relative to other views and UI elements.
+**[AndroidX ConstraintLayout (Views/XML)](https://developer.android.com/topic/libraries/architecture/datastore):** is used to position the MapLibre map view on the screen, and to lay it out relative to other views and UI elements.
 
 **AndroidX Navigation:** is used to define and manage navigation between the app screens in a structured way.  
 
-**DataStore:** is a data storage solution that lets you store key-value pairs or typed objects with protocol buffers ([reference](https://developer.android.com/topic/libraries/architecture/datastore)). In our app it is used for saving user settings and favorite mushrooms.
+**[DataStore](https://developer.android.com/topic/libraries/architecture/datastore):** is a data storage solution that lets you store key-value pairs or typed objects with protocol buffers. In our app it is used for saving user settings and favorite mushrooms.
 
 **Google Mobile Ads SDK:** is a mobile advertising library which makes it possible to feauture ads in the app. Used in our app for asking the user for permission to use their location.
 
-**Hilt / Dagger:** simplifies dependency injection (DI) by providing a standard, structured way to integrate the design pattern for DI into Android applications ([reference](https://dagger.dev/hilt/)).
+**[Hilt / Dagger](https://dagger.dev/hilt/):** simplifies dependency injection (DI) by providing a standard, structured way to integrate the design pattern for DI into Android applications.
 
 **Jetpack Compose:** is a UI toolkit for building user interfaces with composable functions.
 
-**Ktor:** is an asynchronous framework for creating microservices, web applications and more ([reference](https://github.com/ktorio/ktor)).
+**[Ktor](https://github.com/ktorio/ktor):** is an asynchronous framework for creating microservices, web applications and more.
 
-**MapLibre Native Android SDK:** provides high-performance vector map rendering, offline map support, and comprehensive mapping features without requiring additional frameworks ([reference](https://madewithmaplibre.com/sdks/maplibre-native-android-sdk)). The SDK includes full Android lifecycle management and MapView Components. It is used in our app to display an interactive map on the screen.
+**[MapLibre Native Android SDK](https://madewithmaplibre.com/sdks/maplibre-native-android-sdk):** provides high-performance vector map rendering, offline map support, and comprehensive mapping features without requiring additional frameworks. The SDK includes full Android lifecycle management and MapView Components. It is used in our app to display an interactive map on the screen.
 
 **MockK:** is a mocking library for Kotlin. In our app it is used for making mock objects for the unit tests.
 
-**ONNX Runtime:** provides an open source format for AI models. It defines an extensible computation graph model, as well as definitions of built-in operators and standard data types ([reference](https://github.com/onnx/onnx)). Used to run the ML models in our app.
+**[ONNX Runtime](https://github.com/onnx/onnx):** provides an open source format for AI models. It defines an extensible computation graph model, as well as definitions of built-in operators and standard data types. Used to run the ML models in our app.
 
-**SplashScreen:** lets the app launch with an animation, including an into-app motion at launch, a splash screen showing your app icon, and a transition to your app itself [reference](https://developer.android.com/develop/ui/views/launch/splash-screen)).
+**[SplashScreen](https://developer.android.com/develop/ui/views/launch/splash-screen):** lets the app launch with an animation, including an into-app motion at launch, a splash screen showing your app icon, and a transition to your app itself.
 
-**Sprite:** is a simple UI component that allows you to render and play Sprite Sheet animation in your composable screen ([reference](https://github.com/stevdza-san/SpriteView-KMP)). Used for the loading animation that runs when the app is starting up.
+**[Sprite](https://github.com/stevdza-san/SpriteView-KMP):** is a simple UI component that allows you to render and play Sprite Sheet animation in your composable screen. Used for the loading animation that runs when the app is starting up.
