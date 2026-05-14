@@ -556,4 +556,378 @@ flowchart TD
 ```
 
 
+## Class diagrams
+
+### Class diagram 1
+
+This is a class diagram that visualizes the process of changing screens. 
+```mermaid
+
+classDiagram
+direction TB
+    class NavHost {
+	    +navigate(route: String)
+    }
+
+    class MenuScreen {
+	    +navController: NavController
+	    +darkTheme: Boolean
+	    +onToggleTheme:() -> Unit
+    }
+
+    class MenuItemData {
+	    +text: String
+	    +icon: ImageVector
+	    +iconDescription: String
+	    +route: String
+    }
+
+    class MushroomListScreen {
+	    +viewModel: MushroomInfoViewModel
+	    +navigateToMushroom:() -> Unit
+	    +onMushroomControl:() -> Unit
+    }
+
+    class MushroomInfoScreen {
+	    +viewModel: MushroomInfoViewModel
+	    +onNavigateBack:() -> Unit
+	    +onMushroomControl:() -> Unit
+	    +onNavigateToMap:() -> Unit
+    }
+
+    class MushroomInfoViewModel {
+	    +toggleFavorite(mushroom: Mushroom)
+	    +onMushroomSelected(mushroom: Mushroom)
+    }
+
+    class HelpSection {
+	    +title: String
+	    +text: String
+	    +imageRes: Int
+    }
+
+    class InfoScreen {
+	    +onNavigateBack:() -> Unit
+    }
+
+    class AlgorithmScreen {
+	    +onNavigateBack:() -> Unit
+    }
+
+    class PoisonControl {
+	    +onNavigateBack:() -> Unit
+    }
+
+    class Security {
+	    +onNavigateBack:() -> Unit
+    }
+
+    class SummaryScreen {
+	    title: String
+	    imageRes. Int
+	    +ImageDialog
+	    +onNavigateBack:() -> Unit
+	    +HelpScreen()
+	    +HelpSectionItem(section: HelpSection)
+	    onDismiss:() -> Unit)
+    }
+
+    class SpeciesDataSource {
+	    +amount: Int
+	    +mushroomList: List~Mushroom~
+	    +allSpeciesProfiles: List~SpeciesProfile~
+	    +getAllMushrooms() : List~Mushroom~
+	    +getAmountOfMushrooms() : Int
+    }
+
+    class Mushroom {
+	    +commonName: String
+	    +latinName: String
+	    +imageRes: Int
+	    +bioRes: String
+	    +properties: List~MushroomProperty~
+	    +profile: SpeciesProfile
+    }
+
+    class MushroomProperty {
+	    +label: String
+	    +iconRes: Int
+	    +isNegative: Boolean
+    }
+
+    class SpeciesRepository {
+	    +speciesDataSource: SpeciesDataSourceInterface
+	    +dataStore: DataStore
+	    +initializeDefaults()
+	    +toggleFavorite(mushroom: Mushroom)
+	    +getMushroomByName(name: String) : Mushroom?
+	    +updateSelectedMushroom(mushroom: Mushroom)
+	    +getAllMushrooms() : List~Mushroom~
+	    +getMushroomCount() : Int
+    }
+
+    class SpeciesProfile {
+	    +name: String
+	    +taxKey: String
+	    +optimalBonitet: Double
+	    +optimalForestAge: Double
+	    +minForestAge: Double
+	    +spruceAffinity: Float
+	    +pineAffinity: Float
+	    +broadleafAffinity: Float
+	    +optimalAvgTemp: Double
+	    +hardinessMinTemp: Double
+	    +maxToleranceTemp: Double
+	    +optimalTotalRain14d: Double
+	    +activeMonths: List~Int~
+	    +optimalCurrentHumidity: Double
+	    +maxCurrentRainMm: Double
+	    +minRaw: Float
+	    +maxRaw: Float
+    }
+
+	note "Composable screen, not a regular Kotlin class"
+	note for SummaryScreen "Uses HelpSection data to display the guide"
+	note for HelpSection "data class"
+	note for SpeciesProfile "Had to cut off som attributes,
+	to keep it short"
+
+    NavHost --> MenuScreen
+    NavHost --> MushroomListScreen
+    NavHost --> MushroomInfoScreen
+    NavHost --> InfoScreen
+    NavHost --> AlgorithmScreen
+    NavHost --> SummaryScreen
+    NavHost --> Security
+    NavHost --> PoisonControl
+    MenuScreen --> MenuItemData
+    MushroomListScreen --> MushroomInfoViewModel
+    MushroomInfoScreen --> MushroomInfoViewModel
+    MushroomListScreen --> MushroomInfoScreen
+    SummaryScreen --> HelpSection
+    MushroomInfoViewModel --> SpeciesRepository
+    SpeciesRepository --> SpeciesDataSource
+    SpeciesDataSource --> Mushroom
+    SpeciesDataSource --> SpeciesProfile
+    Mushroom --> MushroomProperty
+    Mushroom --> SpeciesProfile
+```
+
+### Class diagram 2
+This is a class diagram that visualizes how the app evaluates the chosen area on the map
+```mermaid
+
+classDiagram
+direction TB
+    class MapViewModel {
+	    +speciesRepository: SpeciesRepositoryInterface
+	    +locationRepository: LocationRepositoryInterface
+	    +getEnvironmentContextUseCase: GetEnvironmentContextUseCase
+	    +calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase
+	    +scorerProvider: ScorerProvider
+	    +onMapClicked(lat: Double, lon: Double)
+	    +fetchHeatmapData(bounds: BoundingBox)
+	    +toggleHeatmap()
+	    +onMushroomSelected(mushroom: Mushroom)
+	    +onSearchQueryChanged(query: String)
+	    +searchAddressByText(query: String)
+	    +searchLocation(location: SearchableLocation)
+	    +centerOnUser()
+	    +onCameraMoved()
+	    +onCameraIdle(target: LatLng?, zoom: Double, visibleBounds: BoundingBox)
+	    +onUserLocationUpdated(lat: Double, lon: Double)
+	    +onPendingCameraTargetConsumed()
+	    +toggleSatellite()
+	    +toggleWmsForest()
+	    +toggleHistoricalFinds()
+	    +dismissEvaluation()
+	    +refreshCurrentLocation()
+	    setSearchBarExpanded(expanded: Boolean)
+    }
+
+    class GetEnvironmentContextUseCase {
+	    +locationForecastRepository: LocationForecastRepositoryInterface
+	    +mushroomRepository: MushroomRepositoryInterface
+	    +forestRepository: SatSkogRepositoryInterface
+	    +frostRepository: FrostRepositoryInterface
+	    +ar5Repository: ForestRepositoryInterface
+	    +invoke(lat: Double, lon: Doubleprofile: SpeciesProfile? = null) : EnvironmentContext
+    }
+
+    class CalculateHeatmapAreaUseCase {
+	    +locationForecastRepository: LocationForecastRepositoryInterface
+	    +mushroomRepository: MushroomRepositoryInterface
+	    +forestRepository: SatSkogRepositoryInterface
+	    +frostRepository: FrostRepositoryInterface
+	    +scorerProvider: ScorerProvider
+	    +invoke(bounds: BoundingBox, profile: SpeciesProfile,
+	    ): List
+	    existingTiles: List = emptyList()
+	    +getStepSize(mapHeight: Double) : Double
+	    +generateGridPoints(bounds: BoundingBox, step: Double) : List
+	    +calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) : Double
+    }
+
+    class FrostRepository {
+	    +weatherHistory(lat: Double, lon: Double) : WeatherHistory?
+    }
+
+    class LocationForecastRepository {
+	    +weatherNext8Hours(lat: Double, lon: Double) : WeatherData?
+	    +roundToTwoDecimals(value: Double) : Double
+    }
+
+    class SatSkogRepository {
+	    +fetchAndMapForestData(lat: Double, lon: Double) : ForestData?
+	    +getForestData(lat: Double, lon: Double) : ForestData?
+	    +getForestDataForHeatmap(lat: Double, lon: Double) : ForestData?
+    }
+
+    class ScoreProvider {
+	    +getScorer() : MushroomScorer
+    }
+
+    class MushroomScorer {
+	    +calculateScore(context: EnvironmentContext, species: SpeciesProfile) : EvaluationResult
+    }
+
+    class EnvironmentContext {
+	    +weatherHistory: WeatherHistory?
+	    +weatherData: WeatherData?
+	    +forestData: ForestData?
+    }
+
+    class EvaluationResult {
+	    +score: Int
+	    +description: String
+	    +isInSeason: Boolean
+    }
+
+    class SpeciesProfile {
+	    +name: String
+	    +taxKey: String
+	    +optimalBonitet: Double
+	    +optimalForestAge: Double
+	    +minForestAge: Double
+	    +spruceAffinity: Float
+	    +pineAffinity: Float
+	    +broadleafAffinity: Float
+	    +optimalAvgTemp: Double
+	    +hardinessMinTemp: Double
+	    +maxToleranceTemp: Double
+	    +optimalTotalRain14d: Double
+	    +activeMonths: List~Int~
+	    +optimalCurrentHumidity: Double
+	    +maxCurrentRainMm: Double
+	    +minRaw: Float
+	    +maxRaw: Float
+    }
+
+    class WeatherHistory {
+	    +avgTempPast14Days: Double?
+	    +totalRainPast14Days: Double?
+	    +minTempPast14Days: Double?
+	    +maxTempPast14Days: Double?
+    }
+
+    class WeatherData {
+	    +temperature: Double
+	    +precipitation: Double
+	    +windSpeed: Double
+    }
+
+    class ForestData {
+	    +forestType: String
+	    +bonitet: String
+    }
+
+    class BoundingBox {
+	    +north: Double
+	    +south: Double
+	    +east: Double
+	    +west: Double
+    }
+
+    class HeatmapTile {
+	    +score: Int
+	    +bounds: BoundingBox
+    }
+
+    class SearchableLocation {
+	    +name: String
+	    +lat: Double
+	    +lon: Double
+    }
+
+    class LocationRepository {
+	    +placeDataSource: PlaceDataSourceInterface
+	    +addressDataSource: AddressDataSourceInterface
+	    +search(query: String) : List~SearchableLocation~
+	    +getLocationCoordinates(query: String) : SearchableLocation?
+    }
+
+    class AiAlgorithm {
+	    -aiRepository: AiService
+	    +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+    }
+
+    class BasicAlgorithm {
+	    +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+	    -buildDescription(forest: Double, history: Double, current: Double) String
+    }
+
+    class AiService {
+	    +getAiScore(prompt: String) EvaluationResult
+    }
+
+    class MlAlgorithm {
+	    -contextApp: Context
+	    +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+	    -buildDescription(ml: Double, current: Double) String
+    }
+
+	<<interface>> MushroomScorer
+	<<Interface>> AiService
+
+    MapViewModel --> GetEnvironmentContextUseCase
+    MapViewModel --> CalculateHeatmapAreaUseCase
+    MapViewModel --> LocationRepository
+    MapViewModel --> ScoreProvider
+    MapViewModel --> EvaluationResult
+    MapViewModel --> SpeciesProfile
+    MapViewModel --> BoundingBox
+    MapViewModel --> SearchableLocation
+    GetEnvironmentContextUseCase --> FrostRepository
+    GetEnvironmentContextUseCase --> LocationForecastRepository
+    GetEnvironmentContextUseCase --> SatSkogRepository
+    GetEnvironmentContextUseCase --> EnvironmentContext
+    FrostRepository --> WeatherHistory
+    LocationForecastRepository --> WeatherData
+    SatSkogRepository --> ForestData
+    EnvironmentContext --> WeatherHistory
+    EnvironmentContext --> WeatherData
+    EnvironmentContext --> ForestData
+    ScoreProvider --> MushroomScorer
+    MushroomScorer --> EnvironmentContext
+    MushroomScorer --> SpeciesProfile
+    MushroomScorer --> EvaluationResult
+    AiAlgorithm ..|> MushroomScorer
+    AiAlgorithm ..|> AiService
+    AiAlgorithm --> EnvironmentContext
+    AiAlgorithm --> SpeciesProfile
+    AiAlgorithm --> EvaluationResult
+    BasicAlgorithm ..|> MushroomScorer
+    BasicAlgorithm --> EnvironmentContext
+    BasicAlgorithm --> SpeciesProfile
+    BasicAlgorithm --> EvaluationResult
+    MlAlgorithm ..|> MushroomScorer
+    MlAlgorithm --> EnvironmentContext
+    MlAlgorithm --> SpeciesProfile
+    MlAlgorithm --> EvaluationResult
+    CalculateHeatmapAreaUseCase --> BoundingBox
+    CalculateHeatmapAreaUseCase --> HeatmapTile
+    HeatmapTile --> BoundingBox
+    LocationRepository --> SearchableLocation
+    SatSkogRepository --> ForestData
+```
 
