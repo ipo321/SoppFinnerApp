@@ -1,237 +1,14 @@
-
-<!--
-Beskrivelse og diagrammer, vi anbefaler å generere dem med
-Mermaid som vist på forelesning. Se kravene til modellering
-lenger ned i dette dokumentet. Ha med hvorfor diagrammet er
-valgt og hva dere ønsker å med det.`
--->
-
-# Modelling
-
-
-
-This is a structures view just from using the /tree /f
-```Text
-C:.
-└───team16
-    ├───data
-    │   ├───ai
-    │   ├───artsdatabasen
-    │   ├───di
-    │   ├───kartverket
-    │   ├───met
-    │   │   ├───frost
-    │   │   └───locationForecast
-    │   ├───nibio
-    │   ├───onBoard
-    │   ├───profileScreen
-    │   ├───roomDatabase
-    │   │   └───userDatabase
-    │   └───species
-    ├───domain
-    │   ├───ai
-    │   ├───logic
-    │   │   └───mushroom
-    │   ├───model
-    │   └───usecase
-    └───ui
-        ├───common
-        ├───dev
-        ├───loading
-        ├───map
-        ├───minSide
-        │   └───dropDownOptions
-        ├───mushroomInfo
-        ├───navigation
-        ├───onboard
-        ├───popUp
-        └───theme
-```
-And here is an overview of the test files
-```Text
-    ExampleUnitTest.kt
-    MapViewModelTest.kt
-    MushroomInfoViewModelTest.kt
-    MushroomRepoTest.kt
-    MushroomScorerTest.kt
-    SpeciesRepoTest.kt
-    SpeciesTest.kt
-```
-And here it is with all files
-``` Text
-C:.
-└───team16
-│   Application.kt
-│   MainActivity.kt
-│   Profile.kt
-│   
-├───data
-│   ├───ai
-│   │       AiDataSource.kt
-│   │       AiDataSourceModels.kt
-│   │       AiRepository.kt
-│   │       
-│   ├───artsdatabasen
-│   │       LocalMushroomDataSoruce.kt
-│   │       LocalSpeciesMapper.kt
-│   │       MushroomDataSource.kt
-│   │       MushroomInfo.kt
-│   │       MushroomRepository.kt
-│   │       
-│   ├───di
-│   │       AiModule.kt
-│   │       DataModule.kt
-│   │       JsonModule.kt
-│   │       
-│   ├───kartverket
-│   │       Address.kt
-│   │       AddressDataSource.kt
-│   │       AddressRepository.kt
-│   │       
-│   ├───met
-│   │   ├───frost
-│   │   │       FrostDataSource.kt
-│   │   │       FrostDataSourceModel.kt
-│   │   │       FrostRepository.kt
-│   │   │       StationLocator.kt
-│   │   │       
-│   │   └───locationForecast
-│   │           LocationForecastDataSource.kt
-│   │           LocationForecastModels.kt
-│   │           LocationForecastRepository.kt
-│   │           
-│   ├───nibio
-│   │       ForestDataSource.kt
-│   │       ForestRepository.kt
-│   │       SatSkogDataSource.kt
-│   │       SatSkogModels.kt
-│   │       SatSkogRepository.kt
-│   │       
-│   ├───onBoard
-│   │       DataStoreRepository.kt
-│   │       
-│   ├───profileScreen
-│   │       profileScreenDropdownItem.kt
-│   │       profileScreenRepository.kt
-│   │       
-│   ├───roomDatabase
-│   │   │   AppDatabase.kt
-│   │   │   DatabaseModule.kt
-│   │   │   
-│   │   └───userDatabase
-│   │           User.kt
-│   │           UserDao.kt
-│   │           UserRepository.kt
-│   │           
-│   └───species
-│           SpeciesDataSource.kt
-│           SpeciesRepository.kt
-│           
-├───domain
-│   ├───ai
-│   │       AiService.kt
-│   │       
-│   ├───logic
-│   │   └───mushroom
-│   │           AiAlgorithm.kt
-│   │           BasicAlgorithm.kt
-│   │           KillSwitches.kt
-│   │           MlAlgorithm.kt
-│   │           MushroomScorer.kt
-│   │           ScorerProvider.kt
-│   │           Scorers.kt
-│   │           
-│   ├───model
-│   │       EvalutationModels.kt
-│   │       HeatmapModels.kt
-│   │       Mushroom.kt
-│   │       SpeciesProfile.kt
-│   │       
-│   └───usecase
-│           CalculateHeatmapAreaUseCase.kt
-│           GetEnvironmentContextUseCase.kt
-│           
-└───ui
-├───common
-│       Text.kt
-│       UiState.kt
-│       
-├───dev
-│       DevScreen.kt
-│       DevViewModel.kt
-│       
-├───loading
-│       Animation.kt
-│       SplashViewModel.kt
-│       
-├───map
-│       DropDownMenu.kt
-│       MapScreen.kt
-│       MapViewModel.kt
-│       MenuOptions.kt
-│       OnboardingModel.kt
-│       ScoreCard.kt
-│       UiState.kt
-│       
-├───minSide
-│   │   ProfileScreen.kt
-│   │   ProfileScreenViewModel.kt
-│   │   
-│   └───dropDownOptions
-│           HistoryScreen.kt
-│           InfoScreen.kt
-│           SettingsScreen.kt
-│           ShroomBankScreen.kt
-│           ShroomControlScreen.kt
-│           ShroomSpotScreen.kt
-│           
-├───mushroomInfo
-│       MushroomInfoScreen.kt
-│       MushroomInfoViewModel.kt
-│       MushroomListScreen.kt
-│       
-├───navigation
-│       BottombarNavItem.kt
-│       BottomNavigationBar.kt
-│       Navigation.kt
-│       Screens.kt
-│       
-├───onboard
-│       MainModule.kt
-│       onboardingPage.kt
-│       onboardingScreen.kt
-│       OnBoardItem.kt
-│       OnBoardModel.kt
-│       WelcomeViewModel.kt
-│       
-├───popUp
-│       PopUpScreen.kt
-│       
-└───theme
-Color.kt
-Shape.kt
-Theme.kt
-Type.kt
-```
-
 # Modelling
 ## Purpose
-Why we have chosen the ones we have and what we want with them...
+Use-case diagrams are dynamic UML diagrams that focus on the interaction between actors and the system. Furthermore, actors can be divided into both primary and secondary actors. In our use-case diagrams, the primary actor is the user. We aim to illustrate the main and alternative flows for the functions we expect users to utilize most frequently in the application.  
 
-Use-case diagrams are dynamic UML diagrams that focus on the interaction between actors and the system. Furthermore, actors can be divided into both primary and secondary actors. In our use-case diagrams, the primary actor is the user. We aim to illustrate the main and alternative flows for the functions we expect users to utilize most frequently in the application. 
-([reference](https://www.uio.no/studier/emner/matnat/ifi/IN1030/v25/materiale-fra-gruppetimer/gruppe-5/notat-om-uml-diagrammene-i-in1030.pdf))([reference](https://www.geeksforgeeks.org/system-design/use-case-diagram/))
+Sequence diagrams are dynamic UML diagrams designed to visualize the interactions between objects in a system, in chronological order. We use sequence diagrams to visualize how the code flows in order of functions and dataflow between different components in our most frequently used app-features.  
 
+A class diagram is a static structural diagram that describes how the system is built by displaying the classes, their attributes, functions and relationships between each object. For the use case, we decided to divide the class diagram into two functions: navigation between screens and evaluation of area on the map. This was done with the purpose to make the diagrams readable and clear.   
 
-Actitivy diagrams are well suited for graphically representing the event flow in a use case ([reference](https://www.uio.no/studier/emner/matnat/ifi/IN2000/v26/forelesninger/in2000.2026.02.04_modellering-og-objektorinterte-prinsipper.pdf)). They  have somewhat overlapping uses with sequence diagrams, but sequence diagrams are typically closer to the code, while activity diagrams are more business‑oriented. We saw the advantage of using activity diagrams to visualize our use cases, as they gave us a better understanding of the flow in our app and the decision points within that flow.
+Actitivy diagrams are well suited for graphically representing the event flow in a use case. They  have somewhat overlapping uses with sequence diagrams, but sequence diagrams are typically closer to the code, while activity diagrams are more business‑oriented. We saw the advantage of using activity diagrams to visualize our use cases, as they gave us a better understanding of the flow in our app and the decision points within that flow.  
 
-Sequence diagrams are dynamic UML diagrams designed to visualize the interactions between objects in a system, in chronological order.([reference](https://www.uio.no/studier/emner/matnat/ifi/IN1030/v25/materiale-fra-gruppetimer/gruppe-5/notat-om-uml-diagrammene-i-in1030.pdf) We use sequence diagrams to visualize how the code flows in order of functions and dataflow between different components in our most frequently used app-features.
-
-
----CLASSDIAGRAMS TEXT---
-meow meow meow
-
-State diagrams are dynamic UML diagrams which visualize a system’s or parts of a system’s state in response to external stimuli and/or the passage of time.([reference](https://www.geeksforgeeks.org/system-design/unified-modeling-language-uml-state-diagrams/))
-In our case we decided to include the entire apps range of functionalities in the diagram, because it gave a good overview of what our app includes. It also gives us a great way of visualizing what the interactions our users have with the app, lead into what results we expect the interaction to have. A distinction between the normal state diagram and ours is how ours is missing an end-node. This is because our application is not designed with a endpoint for users to reach, but more as a tool that can be continuously used with no clear cut end.
+State diagrams are dynamic UML diagrams which visualize a system’s or parts of a system’s state in response to external stimuli and/or the passage of time. In our case we decided to include the entire apps range of functionalities in the diagram, because it gave a good overview of what our app includes. It also gives us a great way of visualizing what the interactions our users have with the app, lead into what results we expect the interaction to have. A distinction between the normal state diagram and ours is how ours is missing an end-node. This is because our application is not designed with a endpoint for users to reach, but more as a tool that can be continuously used with no clear cut end.
 
 ___
 ## Use case text
@@ -240,7 +17,7 @@ ___
 
 **Name:** Calculation of mushroom score  
 **Primary actor:** Mushroom forager  
-**Secondary actor:** Proxy server  
+**Secondary actor:** APIs  
 **Precondition:** The user has opened the map page and the map screen is loaded  
 **Postcondition:** The user has been presented with a score above 0  
 
@@ -476,6 +253,416 @@ sequenceDiagram
 ```
 ___
 ## Class diagram
+
+### Class diagram 1
+```mermaid
+classDiagram
+direction TB
+    class NavHost {
+        +navigate(route: String)
+    }
+
+
+    class MenuScreen {
+        +navController: NavController
+        +darkTheme: Boolean
+        +onToggleTheme:() -> Unit
+    }
+
+
+    class MenuItemData {
+        +text: String
+        +icon: ImageVector
+        +iconDescription: String
+        +route: String
+    }
+
+
+    class MushroomListScreen {
+        +viewModel: MushroomInfoViewModel
+        +navigateToMushroom:() -> Unit
+        +onMushroomControl:() -> Unit
+    }
+
+
+    class MushroomInfoScreen {
+        +viewModel: MushroomInfoViewModel
+        +onNavigateBack:() -> Unit
+        +onMushroomControl:() -> Unit
+        +onNavigateToMap:() -> Unit
+    }
+
+
+    class MushroomInfoViewModel {
+        +toggleFavorite(mushroom: Mushroom)
+        +onMushroomSelected(mushroom: Mushroom)
+    }
+
+
+    class HelpSection {
+        +title: String
+        +text: String
+        +imageRes: Int
+    }
+
+
+    class InfoScreen {
+        +onNavigateBack:() -> Unit
+    }
+
+
+    class AlgorithmScreen {
+        +onNavigateBack:() -> Unit
+    }
+
+
+    class PoisonControl {
+        +onNavigateBack:() -> Unit
+    }
+
+
+    class Security {
+        +onNavigateBack:() -> Unit
+    }
+
+
+    class SummaryScreen {
+        title: String
+        imageRes. Int
+        +ImageDialog
+        +onNavigateBack:() -> Unit
+        +HelpScreen()
+        +HelpSectionItem(section: HelpSection)
+        onDismiss:() -> Unit)
+    }
+
+
+    class SpeciesDataSource {
+        +amount: Int
+        +mushroomList: List~Mushroom~
+        +allSpeciesProfiles: List~SpeciesProfile~
+        +getAllMushrooms() : List~Mushroom~
+        +getAmountOfMushrooms() : Int
+    }
+
+
+    class Mushroom {
+        +commonName: String
+        +latinName: String
+        +imageRes: Int
+        +bioRes: String
+        +properties: List~MushroomProperty~
+        +profile: SpeciesProfile
+    }
+
+
+    class MushroomProperty {
+        +label: String
+        +iconRes: Int
+        +isNegative: Boolean
+    }
+
+
+    class SpeciesRepository {
+        +speciesDataSource: SpeciesDataSourceInterface
+        +dataStore: DataStore
+        +initializeDefaults()
+        +toggleFavorite(mushroom: Mushroom)
+        +getMushroomByName(name: String) : Mushroom?
+        +updateSelectedMushroom(mushroom: Mushroom)
+        +getAllMushrooms() : List~Mushroom~
+        +getMushroomCount() : Int
+    }
+
+
+    class SpeciesProfile {
+        +name: String
+        +taxKey: String
+        +optimalBonitet: Double
+        +optimalForestAge: Double
+        +minForestAge: Double
+        +spruceAffinity: Float
+        +pineAffinity: Float
+        +broadleafAffinity: Float
+        +optimalAvgTemp: Double
+        +hardinessMinTemp: Double
+        +maxToleranceTemp: Double
+        +optimalTotalRain14d: Double
+        +activeMonths: List~Int~
+        +optimalCurrentHumidity: Double
+        +maxCurrentRainMm: Double
+        +minRaw: Float
+        +maxRaw: Float
+    }
+
+
+    note "Composable screen, <br>not a regular Kotlin class"
+    note for SummaryScreen "Uses HelpSection data <br>to display the guide"
+    note for HelpSection "data class"
+    note for SpeciesProfile "Had to cut off <br>some attributes,<br>to keep it short"
+
+
+    NavHost --> MenuScreen
+    NavHost --> MushroomListScreen
+    NavHost --> MushroomInfoScreen
+    NavHost --> InfoScreen
+    NavHost --> AlgorithmScreen
+    NavHost --> SummaryScreen
+    NavHost --> Security
+    NavHost --> PoisonControl
+    MenuScreen --> MenuItemData
+    MushroomListScreen --> MushroomInfoViewModel
+    MushroomInfoScreen --> MushroomInfoViewModel
+    MushroomListScreen --> MushroomInfoScreen
+    SummaryScreen --> HelpSection
+    MushroomInfoViewModel --> SpeciesRepository
+    SpeciesRepository --> SpeciesDataSource
+    SpeciesDataSource --> Mushroom
+    SpeciesDataSource --> SpeciesProfile
+    Mushroom --> MushroomProperty
+    Mushroom --> SpeciesProfile
+```
+
+### Class diagram 2
+
+```mermaid
+classDiagram
+direction TB
+    class MapViewModel {
+        +speciesRepository: SpeciesRepositoryInterface
+        +locationRepository: LocationRepositoryInterface
+        +getEnvironmentContextUseCase: GetEnvironmentContextUseCase
+        +calculateHeatmapAreaUseCase: CalculateHeatmapAreaUseCase
+        +scorerProvider: ScorerProvider
+        +onMapClicked(lat: Double, lon: Double)
+        +fetchHeatmapData(bounds: BoundingBox)
+        +toggleHeatmap()
+        +onMushroomSelected(mushroom: Mushroom)
+        +onSearchQueryChanged(query: String)
+        +searchAddressByText(query: String)
+        +searchLocation(location: SearchableLocation)
+        +centerOnUser()
+        +onCameraMoved()
+        +onCameraIdle(target: LatLng?, zoom: Double, visibleBounds: BoundingBox)
+        +onUserLocationUpdated(lat: Double, lon: Double)
+        +onPendingCameraTargetConsumed()
+        +toggleSatellite()
+        +toggleWmsForest()
+        +toggleHistoricalFinds()
+        +dismissEvaluation()
+        +refreshCurrentLocation()
+        setSearchBarExpanded(expanded: Boolean)
+    }
+
+
+    class GetEnvironmentContextUseCase {
+        +locationForecastRepository: LocationForecastRepositoryInterface
+        +mushroomRepository: MushroomRepositoryInterface
+        +forestRepository: SatSkogRepositoryInterface
+        +frostRepository: FrostRepositoryInterface
+        +ar5Repository: ForestRepositoryInterface
+        +invoke(lat: Double, lon: Doubleprofile: SpeciesProfile? = null) : EnvironmentContext
+    }
+
+
+    class CalculateHeatmapAreaUseCase {
+        +locationForecastRepository: LocationForecastRepositoryInterface
+        +mushroomRepository: MushroomRepositoryInterface
+        +forestRepository: SatSkogRepositoryInterface
+        +frostRepository: FrostRepositoryInterface
+        +scorerProvider: ScorerProvider
+        +invoke(bounds: BoundingBox, profile: SpeciesProfile,
+        ): List
+        existingTiles: List = emptyList()
+        +getStepSize(mapHeight: Double) : Double
+        +generateGridPoints(bounds: BoundingBox, step: Double) : List
+        +calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double) : Double
+    }
+
+
+    class FrostRepository {
+        +weatherHistory(lat: Double, lon: Double) : WeatherHistory?
+    }
+
+
+    class LocationForecastRepository {
+        +weatherNext8Hours(lat: Double, lon: Double) : WeatherData?
+        +roundToTwoDecimals(value: Double) : Double
+    }
+
+
+    class SatSkogRepository {
+        +fetchAndMapForestData(lat: Double, lon: Double) : ForestData?
+        +getForestData(lat: Double, lon: Double) : ForestData?
+        +getForestDataForHeatmap(lat: Double, lon: Double) : ForestData?
+    }
+
+
+    class ScoreProvider {
+        +getScorer() : MushroomScorer
+    }
+
+
+    class MushroomScorer {
+        +calculateScore(context: EnvironmentContext, species: SpeciesProfile) : EvaluationResult
+    }
+
+
+    class EnvironmentContext {
+        +weatherHistory: WeatherHistory?
+        +weatherData: WeatherData?
+        +forestData: ForestData?
+    }
+
+
+    class EvaluationResult {
+        +score: Int
+        +description: String
+        +isInSeason: Boolean
+    }
+
+
+    class SpeciesProfile {
+        +name: String
+        +taxKey: String
+        +optimalBonitet: Double
+        +optimalForestAge: Double
+        +minForestAge: Double
+        +spruceAffinity: Float
+        +pineAffinity: Float
+        +broadleafAffinity: Float
+        +optimalAvgTemp: Double
+        +hardinessMinTemp: Double
+        +maxToleranceTemp: Double
+        +optimalTotalRain14d: Double
+        +activeMonths: List~Int~
+        +optimalCurrentHumidity: Double
+        +maxCurrentRainMm: Double
+        +minRaw: Float
+        +maxRaw: Float
+    }
+
+
+    class WeatherHistory {
+        +avgTempPast14Days: Double?
+        +totalRainPast14Days: Double?
+        +minTempPast14Days: Double?
+        +maxTempPast14Days: Double?
+    }
+
+
+    class WeatherData {
+        +temperature: Double
+        +precipitation: Double
+        +windSpeed: Double
+    }
+
+
+    class ForestData {
+        +forestType: String
+        +bonitet: String
+    }
+
+
+    class BoundingBox {
+        +north: Double
+        +south: Double
+        +east: Double
+        +west: Double
+    }
+
+
+    class HeatmapTile {
+        +score: Int
+        +bounds: BoundingBox
+    }
+
+
+    class SearchableLocation {
+        +name: String
+        +lat: Double
+        +lon: Double
+    }
+
+
+    class LocationRepository {
+        +placeDataSource: PlaceDataSourceInterface
+        +addressDataSource: AddressDataSourceInterface
+        +search(query: String) : List~SearchableLocation~
+        +getLocationCoordinates(query: String) : SearchableLocation?
+    }
+
+
+    class AiAlgorithm {
+        -aiRepository: AiService
+        +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+    }
+
+
+    class BasicAlgorithm {
+        +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+        -buildDescription(forest: Double, history: Double, current: Double) String
+    }
+
+
+    class AiService {
+        +getAiScore(prompt: String) EvaluationResult
+    }
+
+
+    class MlAlgorithm {
+        -contextApp: Context
+        +calculateScore(context: EnvironmentContext, species: SpeciesProfile) EvaluationResult
+        -buildDescription(ml: Double, current: Double) String
+    }
+
+
+    <<interface>> MushroomScorer
+    <<Interface>> AiService
+
+
+    MapViewModel --> GetEnvironmentContextUseCase
+    MapViewModel --> CalculateHeatmapAreaUseCase
+    MapViewModel --> LocationRepository
+    MapViewModel --> ScoreProvider
+    MapViewModel --> EvaluationResult
+    MapViewModel --> SpeciesProfile
+    MapViewModel --> BoundingBox
+    MapViewModel --> SearchableLocation
+    GetEnvironmentContextUseCase --> FrostRepository
+    GetEnvironmentContextUseCase --> LocationForecastRepository
+    GetEnvironmentContextUseCase --> SatSkogRepository
+    GetEnvironmentContextUseCase --> EnvironmentContext
+    FrostRepository --> WeatherHistory
+    LocationForecastRepository --> WeatherData
+    SatSkogRepository --> ForestData
+    EnvironmentContext --> WeatherHistory
+    EnvironmentContext --> WeatherData
+    EnvironmentContext --> ForestData
+    ScoreProvider --> MushroomScorer
+    MushroomScorer --> EnvironmentContext
+    MushroomScorer --> SpeciesProfile
+    MushroomScorer --> EvaluationResult
+    AiAlgorithm ..|> MushroomScorer
+    AiAlgorithm ..|> AiService
+    AiAlgorithm --> EnvironmentContext
+    AiAlgorithm --> SpeciesProfile
+    AiAlgorithm --> EvaluationResult
+    BasicAlgorithm ..|> MushroomScorer
+    BasicAlgorithm --> EnvironmentContext
+    BasicAlgorithm --> SpeciesProfile
+    BasicAlgorithm --> EvaluationResult
+    MlAlgorithm ..|> MushroomScorer
+    MlAlgorithm --> EnvironmentContext
+    MlAlgorithm --> SpeciesProfile
+    MlAlgorithm --> EvaluationResult
+    CalculateHeatmapAreaUseCase --> BoundingBox
+    CalculateHeatmapAreaUseCase --> HeatmapTile
+    HeatmapTile --> BoundingBox
+    LocationRepository --> SearchableLocation
+    SatSkogRepository --> ForestData
+
+```
 
 ___
 ## Activity diagrams  
