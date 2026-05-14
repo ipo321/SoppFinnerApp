@@ -238,15 +238,13 @@ We have followed the MVVM , here is what each role corresponds to in our project
 
 ## 6. API Level
 
-From `app/build.gradle.kts`:
-
 - `minSdk = 24` (Android 7.0 Nougat). Covers approximately 98% of active Android devices. Below 24 we lose Java 8 stream APIs and reliable `java.time` support that the app relies on through Kotlin stdlib.
 - `targetSdk = 36`, the reason we chose this targetSdk was simply because android studio recommended it when we first made the project 
 
 
 ## 7. Robustness and Lifecycle
 
-- **No-network / API-failure paths** surface through `ErrorScreen` and snackbars driven by `NetworkConnectivityObserver` and `LocationConnectivityObserver`. The UI never silently shows stale or empty data without an indicator.
+- **No-network / API-failure paths** surface through snackbars driven by `NetworkConnectivityObserver` and `LocationConnectivityObserver`. The UI never silently shows stale or empty data without an indicator.
 - A global `CrashHandler` (under `ui/popUp/`) catches uncaught exceptions and routes the user to a `CrashActivity` rather than letting the process die without feedback.
 - **Configuration changes** are non destructive: state is owned by ViewModels (Hilt-scoped to the nav back-stack entry) and exposed as `StateFlow`, so rotation and recomposition do not re-trigger network work.
 - All network calls are **asynchronous** (Ktor + coroutines) and cancellation-aware via structured concurrency.
