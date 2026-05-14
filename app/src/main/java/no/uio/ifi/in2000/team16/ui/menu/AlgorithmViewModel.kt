@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import no.uio.ifi.in2000.team16.data.species.SpeciesRepository
+import no.uio.ifi.in2000.team16.data.species.SpeciesRepositoryInterface
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.AlgorithmType
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.ScorerProvider
 import no.uio.ifi.in2000.team16.domain.logic.mushroom.toUiName
@@ -26,7 +26,7 @@ data class AlgorithmUiState(
 
 @HiltViewModel
 class AlgorithmViewModel @Inject constructor(
-    private val speciesRepository: SpeciesRepository,
+    private val speciesRepository: SpeciesRepositoryInterface,
     private val scorerProvider: ScorerProvider
 ) : ViewModel() {
 
