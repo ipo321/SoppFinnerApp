@@ -13,6 +13,7 @@ but the functionality will be severally limited.
 
 **API-keys**
 To run the application locally, you must provide your own API credentials. The app should not crash without these credentials but the AI functions will not work. For later deployment the storing of the API keys should be changed to secure them better.
+At the moment the local.properties file with our API credentials have been added to the git include and manually to the zip file, but this is REAL BAD code practises. This has been done just so that the evaluator could get the app working straight out of the zip file. 
 
 ``` Text 
 AZURE_API_KEY= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
