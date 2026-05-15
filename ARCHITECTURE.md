@@ -1,7 +1,5 @@
 # ARCHITECTURE
 
-> This document is written for developers who will operate, maintain, or extend the app. It describes the technologies used, how the code is organized, the architectural patterns followed, and the rationale behind the key decisions.
-
 ## 1. Introduction
 
 This is an Android app that helps users check the chances of mushrooms in an area. It combines weather data, forest data, and historical observations into a heat map and pin for a scorecard for selectable mushroom species. It currently supports 11 mushroom species, each with some basic information.
