@@ -92,8 +92,6 @@ ___
 
 **[DataStore](https://developer.android.com/topic/libraries/architecture/datastore):** is a data storage solution that lets you store key-value pairs or typed objects with protocol buffers. In our app it is used for saving user settings and favorite mushrooms.
 
-**Google Mobile Ads SDK:** is a mobile advertising library which makes it possible to feauture ads in the app. Used in our app for asking the user for permission to use their location.
-
 **[Hilt / Dagger](https://dagger.dev/hilt/):** simplifies dependency injection (DI) by providing a standard, structured way to integrate the design pattern for DI into Android applications.
 
 **Jetpack Compose:** is a UI toolkit for building user interfaces with composable functions.
