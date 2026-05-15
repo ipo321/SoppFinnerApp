@@ -264,7 +264,11 @@ Unit tests live under `app/src/test/java/no/uio/ifi/in2000/team16/`:
 
 Test stack: **JUnit 4**, **MockK**, and `kotlinx-coroutines-test`.
 
-## 9. Future Development
+## 9. Warnings
+- 2 warnings about **Duplicated icons under different names** (`cute_mushroom.png`, `sprite01.png`): These warnings are fixable, we just did not have the time and the functional gain was low.
+- 1 Warning **Image defined in density-independent drawable folder**(`sprite01.png`): This file should have been in a different folder. since there is little functional gain we did not prioritize to reorder the files. 
+
+## 10. Future Development
 
 Notes for others picking up the project:
 
