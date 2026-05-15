@@ -66,7 +66,7 @@ class FrostDataSource @Inject constructor(
                 parameter("time", timeRange)
                 parameter("incobs", "true")
             }
-            println("Frost API URL: ${response.call.request.url}")
+            Log.d("T16_Frost_DataSource","Frost API URL: ${response.call.request.url}")
             response.body<FrostResponse>()
         } catch (e: Exception) {
             Log.e("T16_Frost_DataSource","Network error when calling Frost Fallback API: ${e.message}",e)
