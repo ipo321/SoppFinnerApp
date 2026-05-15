@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-This is an Android app that helps users check the chances of mushrooms in an area. It combines weather data, forest data, and historical observations into a heat map and pin for a scorecard for selectable mushroom species. It currently has 11 mushrooms and with some basic information on each of them. 
+This is an Android app that helps users check the chances of mushrooms in an area. It combines weather data, forest data, and historical observations into a heat map and pin for a scorecard for selectable mushroom species. It currently supports 11 mushroom species, each with some basic information.
 
 The codebase follows **MVVM** with a lightweight **clean architecture** split into three layers  `ui`, `domain`, and `data` wired together with **Dagger Hilt**. State is exposed through `StateFlow` and consumed by Jetpack Compose under a **Unidirectional Data Flow (UDF)** model.
 
@@ -195,7 +195,7 @@ We have followed the MVVM , here is what each role corresponds to in our project
 ### 4.1 UI Layer
 
 - Composable screens hold **no business logic**. They read state via `viewModel.uiState.collectAsState()` and forward user events to ViewModel methods.
-- Each screen level ViewModel exposes a single `StateFlow<XxxUiState>` backed by an immutable `data class`.
+- Each feature screens ViewModel exposes a single `StateFlow<XxxUiState>` backed by an immutable `data class`. (The splash screen is a short-lived exception that uses Compose MutableState.) 
 - Side effects (network calls, DataStore writes, scoring) run inside `viewModelScope.launch { ... }`.
 
 ### 4.2 Domain Layer
@@ -226,7 +226,7 @@ We have followed the MVVM , here is what each role corresponds to in our project
 ### 5.2 High Cohesion
 
 - Each package owns exactly one concern (for example, `data/met/frost/` is only MET Frost). Files inside a feature package change together.
-- Each screen has a single state object rather than many overlapping flows, keeping rendering logic predictable.
+- Most screens have a single state object rather than many overlapping flows, keeping rendering logic predictable.
 - Larger functions are broken down into small, named helper functions instead of one long body.
 
 ### 5.3 Unidirectional Data Flow (UDF)
@@ -238,8 +238,8 @@ We have followed the MVVM , here is what each role corresponds to in our project
 
 ## 6. API Level
 
-- `minSdk = 24` (Android 7.0 Nougat). Covers approximately 98% of active Android devices. Below 24 we lose Java 8 stream APIs and reliable `java.time` support that the app relies on through Kotlin stdlib.
-- `targetSdk = 36`, the reason we chose this targetSdk was simply because android studio recommended it when we first made the project 
+- `minSdk = 24` (Android 7.0 Nougat). Below 24 we lose Java 8 stream APIs and reliable `java.time` support that the app relies on through Kotlin stdlib.
+- `targetSdk = 36`, the reason we chose this targetSdk was simply because android studio recommended it when we first made the project.
 
 
 ## 7. Robustness and Lifecycle
