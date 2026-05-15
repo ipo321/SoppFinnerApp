@@ -24,7 +24,7 @@ kotlin = "2.3.21"
 composeBom = "2026.05.00"
 foundationLayout = "1.11.1"
 activity = "1.13.0"
-materialVersion = "1.13.0"
+materialVersion = "1.14.0"
 mockk = "1.14.9"
 navigationCompose = "2.9.8"
 onnxruntimeAndroid = "1.26.0"
@@ -33,7 +33,6 @@ datastoreCore = "1.2.1"
 datastorePreferencesCore = "1.2.1"
 material3 = "1.4.0"
 foundation = "1.11.1"
-adsMobileSdk = "1.0.1"
 sprite = "1.1.0"
 gamesActivity = "4.4.2"
 navigationRuntimeKtx = "2.9.8"
@@ -81,7 +80,6 @@ androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-ads-mobile-sdk = { group = "com.google.android.libraries.ads.mobile.sdk", name = "ads-mobile-sdk", version.ref = "adsMobileSdk" }
 material-v1130 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 onnxruntime-android = { module = "com.microsoft.onnxruntime:onnxruntime-android", version.ref = "onnxruntimeAndroid" }
