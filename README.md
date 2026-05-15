@@ -12,7 +12,7 @@ The app needs an internet connection to be able to offer a full user-experience.
 but the functionality will be severally limited.  
 
 **API-keys**
-To run the application locally, you must provide your own API credentials. The app should not crash without these credentials but the AI functions will not work. For later deployment the storing of the API keys should be changed to secure them better.
+To run the application locally, you must provide your own API credentials. The app should not crash without these credentials but the AI functions will not work. For later deployment the storing of the API keys should be changed to secure them better. As requested the API key and address has been hard coded in on the ZIP-file delivered, but they have however not been uploaded to the github for security reasons.
 
 ``` Text 
 AZURE_API_KEY= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
